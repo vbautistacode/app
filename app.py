@@ -1,5 +1,6 @@
 import streamlit as st
 import numpy as np
+import requests
 import json
 import joblib
 import os
@@ -18,7 +19,7 @@ import pandas as pd
 # Configurar Pandas para aceitar futuras mudanças no tratamento de objetos
 pd.set_option('future.no_silent_downcasting', True)
 # --- Funções para persistência ---
-diretorio_base = r"https://github.com/vbautistacode/app/main/"
+diretorio_base = r"https://raw.github.com/vbautistacode/app/main/"
 def save_data():
 # Garantir que o diretório exista
     if not os.path.exists(diretorio_base):
@@ -33,10 +34,16 @@ def save_data():
     with open(caminho_team_data, "w", encoding="utf-8") as f:
         json.dump(st.session_state["team_data"], f, indent=4, ensure_ascii=False)
 def load_data():
-    # Caminhos completos dos arquivos
-    caminho_horse_data = os.path.join(diretorio_base, "horse_data.json")
-    caminho_team_data = os.path.join(diretorio_base, "team_data.json")
-    caminho_bet_data = os.path.join(diretorio_base, "bet_data.json")
+    arquivos = ["horse_data.json", "team_data.json", "bet_data.json"]
+    for arquivo in arquivos:
+        url_arquivo = diretorio_base + arquivo
+        try:
+            response = requests.get(url_arquivo)
+            response.raise_for_status()  # Garante que a requisição foi bem-sucedida
+            # Carregar JSON corretamente
+            st.session_state[arquivo.replace(".json", "")] = response.json()
+        except requests.exceptions.RequestException:
+            st.session_state[arquivo.replace(".json", "")] = []
     # Carregar os dados, se existirem
     if os.path.exists(caminho_horse_data):
         with open(caminho_horse_data, "r", encoding="utf-8") as f:
@@ -85,22 +92,15 @@ tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs(["Locais", "Dados dos Cavalos
 # --- Aba 1: Escolha ou Registro do Local de Prova ---
 with tab1:
     st.subheader("Escolha ou Registre o Local de Prova")
-# Diretório onde o arquivo será buscado
-    diretorio_base = r"https://github.com/vbautistacode/app/main/"
-# Função para carregar os locais
     def carregar_locais():
-# Caminho completo do arquivo
-        caminho_arquivo = os.path.join(diretorio_base, "locais_prova.json")
-        if os.path.exists(caminho_arquivo):
-            with open(caminho_arquivo, "r", encoding="utf-8") as f:
-                data = json.load(f)
-                return data.get("Locais de Prova", [])
-        return []
-# Função para salvar os locais
-    def salvar_locais(locais):
-        with open("locais_prova.json", "w", encoding="utf-8") as f:
-            json.dump({"Locais de Prova": locais}, f, ensure_ascii=False, indent=4)
-# Carregar os locais existentes
+        url_arquivo = diretorio_base + "locais_prova.json"
+        try:
+            response = requests.get(url_arquivo)
+            response.raise_for_status()
+            data = response.json()
+            return data.get("Locais de Prova", [])
+        except requests.exceptions.RequestException:
+            return []
     locais_prova = carregar_locais()
 # Dropdown para selecionar um local existente
     local_selecionado = st.selectbox("Selecione um local de prova:", locais_prova, key="select_local")
@@ -111,32 +111,22 @@ with tab1:
     if st.button("Salvar Novo Local"):
         if novo_local and novo_local not in locais_prova:
             locais_prova.append(novo_local)
-            salvar_locais(locais_prova)
-            st.session_state["local_atual"] = novo_local  # Atualizar o local selecionado
+            st.session_state["local_atual"] = novo_local
             st.success(f"Novo local '{novo_local}' adicionado com sucesso!")
-# st.experimental_rerun()
         elif novo_local in locais_prova:
             st.warning("Este local já está registrado.")
 # Lista de opções de "Going"
     going_conditions = [
-        "Firm", #Solo seco e duro"
-        "Good to Firm", #Solo rápido com amortecimento"
-        "Good", #Equilíbrio entre firmeza e umidade"
-        "Good to Soft", #Solo levemente úmido"
-        "Soft", #Solo úmido e profundo"
-        "Heavy", #Solo lamacento e muito exigente"
-        "Yielding", #Solo cedendo (Good to Soft na Irlanda)"
-        "Standard",#
-        "Slow", #
-        "All-Weather" #Pista sintética, consistente"
-    ]
+        "Firm", "Good to Firm", "Good", "Good to Soft", "Soft", "Heavy", 
+        "Yielding", "Standard", "Slow", "All-Weather"
+    ] 
 # Dropdown para selecionar um tipo de pista
     tipo_pista = st.selectbox("Escolha o tipo de pista (Going):", going_conditions, key="select_going_1")
 # Salvar o tipo de pista selecionado no `session_state`
     st.session_state["tipo_pista_atual"] = tipo_pista
     st.session_state["going_conditions"] = going_conditions
-# Inserir a distancia e salvar
-    distance = st.number_input("Distância da Pista", min_value=0.00, step=0.00)
+# Inserir a distância e salvar
+    distance = st.number_input("Distância da Pista", min_value=0.00, step=0.01)
     st.session_state["distance"] = distance
 
 # --- Aba 2: Dados dos Cavalos ---
@@ -666,7 +656,7 @@ with tab4:
 with tab5:
 # Configuração de logging
     logging.basicConfig(level=logging.INFO)
-    caminho_corridas = "https://github.com/vbautistacode/app/blob/main/dados_corridas.csv"
+    caminho_corridas = "https://github.com/vbautistacode/app/main/dados_corridas.csv"
     try:
 # Carregar os dados de corridas
         if not os.path.exists(caminho_corridas):
