@@ -549,7 +549,7 @@ with tab4:
     nome_arquivo = "https://raw.githubusercontent.com/vbautistacode/app/main/apostas_registradas.csv"
     try:
 # Carregar os dados automaticamente da planilha
-        df_cavalos = pd.read_excel(nome_arquivo)
+        df_cavalos = pd.read_csv(nome_arquivo)
 # 4.3.1 Histórico de Performance Pessoal
         if {"Nome", "Lucro", "Valor Apostado", "Odds"}.issubset(df_cavalos.columns):
 # Criar a coluna "Lucro Total" com a subtração de "Lucro" e "Valor Apostado"
@@ -588,7 +588,7 @@ nome_arquivo = "https://raw.githubusercontent.com/vbautistacode/app/main/apostas
 try:
     with tab4:
 # Carregar os dados do arquivo
-        df_cavalos = pd.read_excel(nome_arquivo)
+        df_cavalos = pd.read_csv(nome_arquivo)
 # Verificar se as colunas necessárias estão disponíveis
         if {"Nome", "Lucro", "Valor Apostado"}.issubset(df_cavalos.columns):
 # Calcular "Lucro Total"
@@ -1080,7 +1080,7 @@ with tab6:
             file_path = "https://raw.githubusercontent.com/vbautistacode/app/main/apostas_registradas.csv"
             if os.path.exists(file_path):
 # Ler os dados existentes
-                df_existente = pd.read_excel(file_path)
+                df_existente = pd.read_csv(file_path)
                 df_nova_aposta = pd.DataFrame([nova_aposta])
                 df_final = pd.concat(
                     [df_existente, df_nova_aposta], ignore_index=True
