@@ -18,7 +18,7 @@ import pandas as pd
 # Configurar Pandas para aceitar futuras mudanças no tratamento de objetos
 pd.set_option('future.no_silent_downcasting', True)
 # --- Funções para persistência ---
-diretorio_base = r"https://github.com/vbautistacode/app/blob/main/"
+diretorio_base = r"https://github.com/vbautistacode/app/main/"
 def save_data():
 # Garantir que o diretório exista
     if not os.path.exists(diretorio_base):
@@ -86,7 +86,7 @@ tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs(["Locais", "Dados dos Cavalos
 with tab1:
     st.subheader("Escolha ou Registre o Local de Prova")
 # Diretório onde o arquivo será buscado
-    diretorio_base = r"https://github.com/vbautistacode/app/blob/main/"
+    diretorio_base = r"https://github.com/vbautistacode/app/main/"
 # Função para carregar os locais
     def carregar_locais():
 # Caminho completo do arquivo
