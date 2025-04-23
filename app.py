@@ -1080,7 +1080,7 @@ with tab6:
             st.success("Aposta registrada com sucesso!")
 # Salvar aposta em um arquivo Excel
             file_path = "https://raw.github.com/vbautistacode/app/blob/main/apostas_registradas.xlsx"
-            df = pd.read_excel(nome_arquivo, engine='openpyxl')
+            df = pd.read_excel(file_path, engine='openpyxl')
             if os.path.exists(file_path):
 # Ler os dados existentes
                 df_existente = pd.read_excel(file_path)
