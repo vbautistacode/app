@@ -20,46 +20,17 @@ import pandas as pd
 pd.set_option('future.no_silent_downcasting', True)
 # --- Funções para persistência ---
 diretorio_base = r"https://raw.github.com/vbautistacode/app/main/"
-def save_data():
-# Garantir que o diretório exista
-    if not os.path.exists(diretorio_base):
-        os.makedirs(diretorio_base)  # Criar o diretório se não existir
-    # Caminhos completos dos arquivos
-    caminho_horse_data = os.path.join(diretorio_base, "horse_data.json")
-    caminho_team_data = os.path.join(diretorio_base, "team_data.json")
-    caminho_bet_data = os.path.join(diretorio_base, "bet_data.json")
-    # Salvar os dados nos caminhos especificados
-    with open(caminho_horse_data, "w", encoding="utf-8") as f:
-        json.dump(st.session_state["horse_data"], f, indent=4, ensure_ascii=False)
-    with open(caminho_team_data, "w", encoding="utf-8") as f:
-        json.dump(st.session_state["team_data"], f, indent=4, ensure_ascii=False)
 def load_data():
     arquivos = ["horse_data.json", "team_data.json", "bet_data.json"]
     for arquivo in arquivos:
         url_arquivo = diretorio_base + arquivo
         try:
             response = requests.get(url_arquivo)
-            response.raise_for_status()  # Garante que a requisição foi bem-sucedida
-            # Carregar JSON corretamente
+            response.raise_for_status()  # Verifica erros na requisição
+# Carregar JSON corretamente
             st.session_state[arquivo.replace(".json", "")] = response.json()
         except requests.exceptions.RequestException:
-            st.session_state[arquivo.replace(".json", "")] = []
-    # Carregar os dados, se existirem
-    if os.path.exists(caminho_horse_data):
-        with open(caminho_horse_data, "r", encoding="utf-8") as f:
-            st.session_state["horse_data"] = json.load(f)
-    else:
-        st.session_state["horse_data"] = []
-    if os.path.exists(caminho_team_data):
-        with open(caminho_team_data, "r", encoding="utf-8") as f:
-            st.session_state["team_data"] = json.load(f)
-    else:
-        st.session_state["team_data"] = []
-    if os.path.exists(caminho_bet_data):
-        with open(caminho_bet_data, "r", encoding="utf-8") as f:
-            st.session_state["bet_data"] = json.load(f)
-    else:
-        st.session_state["bet_data"] = []
+            st.session_state[arquivo.replace(".json", "")] = []  # Retorna lista vazia se houver erro
 # Inicializa os dados no session_state
 if "horse_data" not in st.session_state:
     st.session_state["horse_data"] = []
