@@ -1,0 +1,36 @@
+{
+    "Going_Conditions": [
+      {
+        "Type": "Firm",
+        "Description": "Solo muito seco e duro, geralmente encontrado no verão. Favorece corridas rápidas, mas pode aumentar o risco de lesões."
+      },
+      {
+        "Type": "Good to Firm",
+        "Description": "Solo rápido, mas com um pouco de amortecimento. Adequado para a maioria dos cavalos."
+      },
+      {
+        "Type": "Good",
+        "Description": "Condição ideal, com equilíbrio entre firmeza e umidade. Seguro e ideal para grandes competições."
+      },
+      {
+        "Type": "Good to Soft",
+        "Description": "Solo com mais umidade, mas ainda firme o suficiente para corridas. Favorece cavalos que preferem terrenos mais macios."
+      },
+      {
+        "Type": "Soft",
+        "Description": "Solo mais profundo e úmido, comum no inverno. Exige mais resistência dos cavalos, tornando as corridas mais lentas."
+      },
+      {
+        "Type": "Heavy",
+        "Description": "Solo extremamente úmido e lamacento, muito exigente fisicamente. Apenas cavalos com alta resistência se destacam."
+      },
+      {
+        "Type": "Yielding",
+        "Description": "Termo usado na Irlanda, equivalente ao 'Good to Soft'. Indica que o solo cede sob a pressão dos cascos."
+      },
+      {
+        "Type": "All-Weather",
+        "Description": "Superfície artificial com classificações como 'Fast', 'Standard' ou 'Slow'. Proporciona consistência, independentemente do clima."
+      }
+    ]
+  }
