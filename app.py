@@ -546,7 +546,7 @@ with tab4:
 with tab4:
     st.subheader("Métrica de Apostas")
 # Caminho do arquivo
-    nome_arquivo = https://github.com/vbautistacode/app/blob/main/apostas_registradas.xlsx"
+    nome_arquivo = "https://github.com/vbautistacode/app/blob/main/apostas_registradas.xlsx"
     df = pd.read_excel(nome_arquivo, engine='openpyxl')
     try:
 # Carregar os dados automaticamente da planilha
