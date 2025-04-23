@@ -546,8 +546,7 @@ with tab4:
 with tab4:
     st.subheader("Métrica de Apostas")
 # Caminho do arquivo
-    nome_arquivo = "https://raw.github.com/vbautistacode/app/blob/main/apostas_registradas.xlsx"
-    df = pd.read_excel(nome_arquivo, engine='openpyxl')
+    nome_arquivo = "https://raw.githubusercontent.com/vbautistacode/app/refs/heads/main/apostas_registradas.csv"
     try:
 # Carregar os dados automaticamente da planilha
         df_cavalos = pd.read_excel(nome_arquivo)
@@ -585,8 +584,7 @@ with tab4:
         
 #4.4.Gráficos e Visuais
 #4.4.1.Gráfico de barras - Lucro por cavalo
-nome_arquivo = "https://raw.github.com/vbautistacode/app/blob/main/apostas_registradas.xlsx"
-df = pd.read_excel(nome_arquivo, engine='openpyxl')
+nome_arquivo = "https://raw.githubusercontent.com/vbautistacode/app/refs/heads/main/apostas_registradas.csv"
 try:
     with tab4:
 # Carregar os dados do arquivo
@@ -1079,8 +1077,7 @@ with tab6:
             st.session_state["bet_data"].append(nova_aposta)
             st.success("Aposta registrada com sucesso!")
 # Salvar aposta em um arquivo Excel
-            file_path = "https://raw.github.com/vbautistacode/app/blob/main/apostas_registradas.xlsx"
-            df = pd.read_excel(file_path, engine='openpyxl')
+            file_path = "https://raw.githubusercontent.com/vbautistacode/app/refs/heads/main/apostas_registradas.csv"
             if os.path.exists(file_path):
 # Ler os dados existentes
                 df_existente = pd.read_excel(file_path)
