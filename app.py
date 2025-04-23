@@ -627,7 +627,7 @@ with tab4:
 with tab5:
 # Configuração de logging
     logging.basicConfig(level=logging.INFO)
-    caminho_corridas = "https://raw.github.com/vbautistacode/app/main/dados_corridas.csv"
+    caminho_corridas = "https://raw.githubusercontent.com/vbautistacode/app/main/dados_corridas.csv"
     df = pd.read_csv(caminho_corridas)
     print((df.head))
     try:
