@@ -256,7 +256,7 @@ with tab2:
                 st.error(f"Erro ao salvar o arquivo: {e}")
 # Botão para salvar em CSV
     if st.button("Salvar em CSV", key="unique_key_1"):
-                salvar_csv(df_horses, 'https://raw.githubusercontent.com/vbautistacode/app/refs/heads/main/dados_corridas.csv')
+                salvar_csv(df_horses, 'https://raw.githubusercontent.com/vbautistacode/app/main/dados_corridas.csv')
     else:
         st.warning("Ainda não há cavalos registrados.")
 
@@ -362,7 +362,7 @@ with tab3:
                 st.error(f"Erro ao salvar o arquivo: {e}")
 # Botão para salvar em CSV
     if st.button("Salvar em CSV", key="unique_key_2"):
-            salvar_csv(df_teams, 'https://raw.githubusercontent.com/vbautistacode/app/refs/heads/main/dados_equipe.csv')
+            salvar_csv(df_teams, 'https://raw.githubusercontent.com/vbautistacode/app/main/dados_equipe.csv')
     else:
         st.warning("Ainda não há equipes cadastradas.")
 
@@ -546,7 +546,7 @@ with tab4:
 with tab4:
     st.subheader("Métrica de Apostas")
 # Caminho do arquivo
-    nome_arquivo = "https://raw.githubusercontent.com/vbautistacode/app/refs/heads/main/apostas_registradas.csv"
+    nome_arquivo = "https://raw.githubusercontent.com/vbautistacode/app/main/apostas_registradas.csv"
     try:
 # Carregar os dados automaticamente da planilha
         df_cavalos = pd.read_excel(nome_arquivo)
@@ -584,7 +584,7 @@ with tab4:
         
 #4.4.Gráficos e Visuais
 #4.4.1.Gráfico de barras - Lucro por cavalo
-nome_arquivo = "https://raw.githubusercontent.com/vbautistacode/app/refs/heads/main/apostas_registradas.csv"
+nome_arquivo = "https://raw.githubusercontent.com/vbautistacode/app/main/apostas_registradas.csv"
 try:
     with tab4:
 # Carregar os dados do arquivo
@@ -666,7 +666,7 @@ with tab4:
 with tab5:
 # Configuração de logging
     logging.basicConfig(level=logging.INFO)
-    caminho_corridas = "https://raw.githubusercontent.com/vbautistacode/app/refs/heads/main/dados_corridas.csv"
+    caminho_corridas = "https://raw.githubusercontent.com/vbautistacode/app/main/dados_corridas.csv"
     try:
 # Carregar os dados de corridas
         if not os.path.exists(caminho_corridas):
@@ -777,7 +777,7 @@ def preprocessar_dados(dados_1, dados_2):
                 elif coluna == 'Acerto':
                     dados_corridas[coluna] = 0
 # Salvar em resultados_corridas.csv
-        caminho_resultados = "https://raw.githubusercontent.com/vbautistacode/app/refs/heads/main/resultados_corridas.csv"
+        caminho_resultados = "https://raw.githubusercontent.com/vbautistacode/app/main/resultados_corridas.csv"
 # if st.button("Salvar Resultados"):
         try:
             dados_corridas.to_csv(caminho_resultados, index=False)
@@ -882,7 +882,7 @@ def treinar_e_avaliar_modelo(X, y):
 # Calculando o Índice de Valor Real
 with tab5:
     try:
-        dados = pd.read_csv("https://raw.githubusercontent.com/vbautistacode/app/refs/heads/main/dados_corridas.csv")
+        dados = pd.read_csv("https://raw.githubusercontent.com/vbautistacode/app/main/dados_corridas.csv")
         if dados.empty:
             st.error("O arquivo 'dados_corridas.csv' está vazio. Verifique os dados de entrada.")
             st.stop()
@@ -979,9 +979,9 @@ def calcular_boa_aposta(dados):
         return None
 def main():
 # Configuração inicial dos caminhos dos arquivos
-    caminho_corridas = "https://raw.githubusercontent.com/vbautistacode/app/refs/heads/main/dados_corridas.csv"
-    caminho_equipes = "https://raw.githubusercontent.com/vbautistacode/app/refs/heads/main/dados_equipe.csv"
-    caminho_resultados = "https://raw.githubusercontent.com/vbautistacode/app/refs/heads/main/resultados_corridas.csv"
+    caminho_corridas = "https://raw.githubusercontent.com/vbautistacode/app/main/dados_corridas.csv"
+    caminho_equipes = "https://raw.githubusercontent.com/vbautistacode/app/main/dados_equipe.csv"
+    caminho_resultados = "https://raw.githubusercontent.com/vbautistacode/app/main/resultados_corridas.csv"
     with tab5:  # Exibe os resultados na aba específica
         try:
 # Carregar os dados necessários
@@ -1077,7 +1077,7 @@ with tab6:
             st.session_state["bet_data"].append(nova_aposta)
             st.success("Aposta registrada com sucesso!")
 # Salvar aposta em um arquivo Excel
-            file_path = "https://raw.githubusercontent.com/vbautistacode/app/refs/heads/main/apostas_registradas.csv"
+            file_path = "https://raw.githubusercontent.com/vbautistacode/app/main/apostas_registradas.csv"
             if os.path.exists(file_path):
 # Ler os dados existentes
                 df_existente = pd.read_excel(file_path)
@@ -1131,7 +1131,7 @@ with tab7:
     def integrar_retroalimentacao(dados_corridas, historico):
         try:
     # Carregar resultados_corridas na tab7
-            caminho_resultados = "https://raw.githubusercontent.com/vbautistacode/app/refs/heads/main/resultados_corridas.csv"
+            caminho_resultados = "https://raw.githubusercontent.com/vbautistacode/app/main/resultados_corridas.csv"
             dados_resultados = pd.read_csv(caminho_resultados)
             colunas_esperadas = ['Nome', 'Resultado_Oficial']
             colunas_faltantes = [col for col in colunas_esperadas if col not in dados_resultados.columns]
@@ -1225,8 +1225,8 @@ with tab7:
     def retroalimentacao_e_historico(X, y, tab7):
             try:
     # Caminhos para os arquivos de dados
-                caminho_resultados = "https://raw.githubusercontent.com/vbautistacode/app/refs/heads/main/resultados_corridas.csv"
-                caminho_historico = "https://raw.githubusercontent.com/vbautistacode/app/refs/heads/main/historico_modelo.csv"
+                caminho_resultados = "https://raw.githubusercontent.com/vbautistacode/app/main/resultados_corridas.csv"
+                caminho_historico = "https://raw.githubusercontent.com/vbautistacode/app/main/historico_modelo.csv"
     # Verificar se o arquivo existe e carregar os dados
                 if os.path.exists(caminho_historico):
                     historico_existente = pd.read_csv(caminho_historico)
@@ -1357,8 +1357,8 @@ with tab7:
     # Função principal para execução do fluxo
     def main():
     # Caminhos para os arquivos de entrada
-            caminho_corridas = "https://raw.githubusercontent.com/vbautistacode/app/refs/heads/main/resultados_corridas.csv"
-            caminho_equipes = "https://raw.githubusercontent.com/vbautistacode/app/refs/heads/main/dados_equipe.csv"
+            caminho_corridas = "https://raw.githubusercontent.com/vbautistacode/app/main/resultados_corridas.csv"
+            caminho_equipes = "https://raw.githubusercontent.com/vbautistacode/app/main/dados_equipe.csv"
             try:
     # Verificar se os arquivos existem
                 if not os.path.exists(caminho_corridas):
