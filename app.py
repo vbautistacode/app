@@ -112,7 +112,8 @@ st.title("Apostas | Dados & Estratégias")
 # Abas para organização
 tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs(["Locais", "Dados dos Cavalos", "Dados das Equipes", "Análises","Predições","Controle de Apostas", "Machine Learning"])
 
-# --- Aba 1: Escolha ou Registro do Local de Prova ---
+# --- Aba 1: Escolha ou Registro do Local de Prova ---   
+with tab1:
 import requests
 
 GITHUB_TOKEN = "GITHUB_TOKEN"
@@ -124,8 +125,6 @@ if response.status_code == 200:
     print("✅ Autenticação no GitHub funcionando!")
 else:
     print(f"❌ Erro na autenticação: {response.json()}")
-    
-with tab1:
     st.subheader("Escolha ou Registre o Local de Prova")
 
     def carregar_locais():
