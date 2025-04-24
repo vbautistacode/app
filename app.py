@@ -601,27 +601,6 @@ with tab4:
         st.plotly_chart(fig_line, use_container_width=True)
     else:
         st.warning("Dados insuficientes para gerar o gráfico de evolução do bankroll.")
-with tab4:
-# Botão para salvar os dados no DataFrame
-    if st.button("Salvar Dados"):
-        try:
-# Inicialize ou carregue o DataFrame
-            if "horse_data" not in st.session_state:
-                st.session_state["horse_data"] = []  # Inicializa se ainda não existe
-            if "team_data" not in st.session_state:
-                st.session_state["team_data"] = []  # Inicializa se ainda não existe
-# Adicione os dados aos estados existentes
-            st.session_state["horse_data"].append(horse_data)
-            st.session_state["team_data"].append(team_data)
-# Cria DataFrames a partir dos dados no session_state
-            df_horse = pd.DataFrame(st.session_state["horse_data"])
-            df_team = pd.DataFrame(st.session_state["team_data"])
-# Salva os DataFrames em arquivos CSV
-            df_horse.to_csv("dados_cavalos.csv", index=False)
-            df_team.to_csv("dados_equipes.csv", index=False)
-            st.success("Os dados foram salvos com sucesso!")
-        except Exception as e:
-            st.error(f"Erro ao salvar os dados: {e}")
 
 # --- Aba 5: Análise de Probabilidades ---
 with tab5:
