@@ -288,7 +288,6 @@ if st.button("Salvar em CSV", key="unique_key_1"):
     salvar_csv_no_github(df_horses)
 else:
     st.warning("Ainda não há cavalos registrados.")
-)
 
 # --- Aba 3: Dados das Equipes ---
 with tab3:
