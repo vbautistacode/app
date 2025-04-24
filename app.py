@@ -17,10 +17,10 @@ from sklearn.pipeline import Pipeline
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report, precision_score, recall_score, f1_score
 import pandas as pd
+
 # Configurar Pandas para aceitar futuras mudanças no tratamento de objetos
 pd.set_option('future.no_silent_downcasting', True)
-# 🔹 Configuração do repositório e caminho do arquivo
-GITHUB_TOKEN = "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"
+
 # --- Funções para persistência ---
 diretorio_base = r"https://raw.github.com/vbautistacode/app/main/"
 def load_data():
@@ -34,6 +34,7 @@ def load_data():
             st.session_state[arquivo.replace(".json", "")] = response.json()
         except requests.exceptions.RequestException:
             st.session_state[arquivo.replace(".json", "")] = []  # Retorna lista vazia se houver erro
+
 # Inicializa os dados no session_state
 if "horse_data" not in st.session_state:
     st.session_state["horse_data"] = []
@@ -44,6 +45,41 @@ if not st.session_state.get("initialized", False):
     st.session_state["initialized"] = True
 if 'Nome ' not in st.session_state:
     st.session_state['Nom'] = "Cavalo_Default"  # Nome padrão ou escolha inicial
+
+# 🔹 Configuração do repositório e caminho do arquivo
+GITHUB_TOKEN = "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"
+REPO_OWNER = "vbautistacode"
+REPO_NAME = "app"
+BRANCH = "main"
+
+# ✅ Função para salvar JSON no GitHub
+def salvar_json_no_github(data, nome_arquivo):
+    try:
+# 🔹 Converter JSON para string e Base64
+        json_content = json.dumps(data, indent=4, ensure_ascii=False)
+        encoded_content = base64.b64encode(json_content.encode()).decode()
+# 🔹 URL do arquivo no GitHub
+        GITHUB_API_URL = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/contents/{nome_arquivo}"
+# 🔹 Obter SHA do arquivo atual (necessário para update)
+        response = requests.get(GITHUB_API_URL, headers={"Authorization": f"token {GITHUB_TOKEN}"})
+        sha = response.json().get("sha", None)
+# 🔹 Montar payload para envio
+        payload = {
+            "message": f"Atualizando {nome_arquivo} via API",
+            "content": encoded_content,
+            "branch": BRANCH
+        }
+        if sha:
+            payload["sha"] = sha  # Necessário para sobrescrever um arquivo existente
+# 🔹 Enviar solicitação PUT para salvar no GitHub
+        response = requests.put(GITHUB_API_URL, json=payload, headers={"Authorization": f"token {GITHUB_TOKEN}"})
+        if response.status_code in [200, 201]:
+            print(f"✅ {nome_arquivo} salvo no GitHub com sucesso!")
+        else:
+            print(f"❌ Erro ao salvar {nome_arquivo}: {response.json()}")
+    except Exception as e:
+        print(f"❌ Erro inesperado: {e}")
+
 # --- Funções de cálculo ---
 def kelly_criterion(b, implied_probability):
     kelly_fraction = (b * implied_probability - ((1 - implied_probability)) / b)
@@ -58,6 +94,7 @@ def calculate_dutching(odds, bankroll):
         implied_probabilities = [p / total_probability for p in implied_probabilities]
 # Usa o valor do bankroll como o total a ser investido
     return [bankroll * p for p in implied_probabilities]
+
 # --- Interface Streamlit ---
 st.title("Apostas | Dados & Estratégias")
 # Abas para organização
@@ -97,7 +134,7 @@ with tab1:
 # Dropdown para selecionar um tipo de pista
     tipo_pista = st.selectbox("Escolha o tipo de pista (Going):", going_conditions, key="select_going_1")
 # Salvar o tipo de pista selecionado no `session_state`
-    st.session_state["tipo_pista_atual"] = tipo_pista
+    salvar_json_no_github(st.session_state["tipo_pista_atual"], "tipo_pista.json")
     st.session_state["going_conditions"] = going_conditions
 # Inserir a distância e salvar
     distance = st.number_input("Distância da Pista", min_value=0.00, step=0.01)
@@ -214,22 +251,20 @@ with tab2:
 
 # ✅ Nova função para salvar CSV no GitHub
 def salvar_csv_no_github(dataframe):
-    GITHUB_TOKEN = "GITHUB_TOKEN"
+    GITHUB_TOKEN = "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"
     DEPO_OWNER = "vbautistacode"
     REPO_NAME = "app"
     BRANCH = "main"
     FILE_PATH = "dados_corridas.csv"
     GITHUB_API_URL = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/contents/{FILE_PATH}"
     try:
-        # 🔹 Converte CSV para Base64
+# 🔹 Converte CSV para Base64
         csv_content = dataframe.to_csv(index=False, encoding="utf-8")
         encoded_content = base64.b64encode(csv_content.encode()).decode()
-
-        # 🔹 Obtém o SHA do arquivo atual (necessário para update)
+# 🔹 Obtém o SHA do arquivo atual (necessário para update)
         response = requests.get(GITHUB_API_URL, headers={"Authorization": f"token {GITHUB_TOKEN}"})
         sha = response.json().get("sha", None)
-
-        # 🔹 Monta payload para enviar à API do GitHub
+# 🔹 Monta payload para enviar à API do GitHub
         payload = {
             "message": "Atualizando dados_corridas.csv via API",
             "content": encoded_content,
@@ -237,18 +272,14 @@ def salvar_csv_no_github(dataframe):
         }
         if sha:
             payload["sha"] = sha  # Necessário para sobrescrever um arquivo existente
-
-        # 🔹 Envia solicitação PUT para salvar o arquivo no GitHub
+# 🔹 Envia solicitação PUT para salvar o arquivo no GitHub
         response = requests.put(GITHUB_API_URL, json=payload, headers={"Authorization": f"token {GITHUB_TOKEN}"})
-
         if response.status_code in [200, 201]:
             st.success("✅ CSV salvo no GitHub com sucesso!")
         else:
             st.error(f"❌ Erro ao salvar no GitHub: {response.json()}")
-
     except Exception as e:
         st.error(f"❌ Erro inesperado: {e}")
-
 # 🔹 Botão para salvar no GitHub
 if st.button("Salvar em CSV", key="unique_key_1"):
     salvar_csv_no_github(df_horses)
