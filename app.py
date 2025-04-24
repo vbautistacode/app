@@ -603,30 +603,28 @@ with tab4:
         st.warning("Dados insuficientes para gerar o gráfico de evolução do bankroll.")
 
 # --- Aba 5: Análise de Probabilidades ---
-with tab5:
 # Configuração de logging
-    logging.basicConfig(level=logging.INFO)
-    caminho_corridas = "https://raw.githubusercontent.com/vbautistacode/app/main/dados_corridas.csv"
-    df = pd.read_csv(caminho_corridas)
-    print((df.head))
-    try:
-# Carregar os dados de corridas
-        if not os.path.exists(caminho_corridas):
-            st.error(f"O arquivo '{caminho_corridas}' não foi encontrado.")
+logging.basicConfig(level=logging.INFO)
+# 🔹 URL correta do arquivo CSV no GitHub
+caminho_corridas = "https://raw.githubusercontent.com/vbautistacode/app/main/dados_corridas.csv"
+# ✅ Correção: Carregar os dados de corridas corretamente
+try:
+# 🔹 Verifica a existência do arquivo remoto via `requests`
+    response = requests.get(caminho_corridas)
+    if response.status_code == 404:
+        st.error(f"O arquivo '{caminho_corridas}' não foi encontrado no GitHub.")
+    else:
         dados_corridas = pd.read_csv(caminho_corridas)
         if dados_corridas.empty:
             st.warning("O arquivo de corridas está vazio. Por favor, adicione os dados necessários.")
-    except Exception as e:
-        st.error(f"Erro ao carregar o arquivo: {e}")
-# Funções utilitárias
-def validar_caminho_arquivo(caminho_arquivo):
+except Exception as e:
+    st.error(f"Erro ao carregar o arquivo: {e}")
+# ✅ Correção: Função utilitária para validar caminho do arquivo remoto
+def validar_caminho_arquivo(url_arquivo):
     try:
-        diretorio = os.path.dirname(caminho_arquivo)
-        if not os.path.exists(diretorio):
-            os.makedirs(diretorio)
-            logging.info(f"Diretório criado: {diretorio}")
-        if not os.path.isfile(caminho_arquivo):
-            logging.warning(f"Arquivo não encontrado: {caminho_arquivo}")
+        response = requests.get(url_arquivo)
+        if response.status_code == 404:
+            logging.warning(f"Arquivo não encontrado: {url_arquivo}")
             return False
         return True
     except Exception as e:
