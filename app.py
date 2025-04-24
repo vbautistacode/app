@@ -65,12 +65,7 @@ import os
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")  # Pegue o token da variável de ambiente
 GITHUB_API_URL = "https://api.github.com/user"
 
-response = requests.get(GITHUB_API_URL, headers={"Authorization": f"token {GITHUB_TOKEN}"})
-
-if response.status_code == 200:
-    print("✅ Autenticação no GitHub funcionando!")
-else:
-    print(f"❌ Erro na autenticação: {response.json()}")
+curl -H "Authorization: token SEU_NOVO_TOKEN_GITHUB" https://api.github.com/user
 
 # ✅ Função para salvar CSV no GitHub
 def salvar_csv_no_github(dataframe, nome_arquivo):
