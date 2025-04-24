@@ -22,15 +22,16 @@ import pandas as pd
 pd.set_option('future.no_silent_downcasting', True)
 
 # --- Funções para persistência ---
-diretorio_base = r"https://raw.github.com/vbautistacode/app/main/"
+diretorio_base = "https://raw.githubusercontent.com/vbautistacode/app/main/"
+
 def load_data():
     arquivos = ["horse_data.json", "team_data.json", "bet_data.json"]
+    
     for arquivo in arquivos:
         url_arquivo = diretorio_base + arquivo
         try:
             response = requests.get(url_arquivo)
             response.raise_for_status()  # Verifica erros na requisição
-# Carregar JSON corretamente
             st.session_state[arquivo.replace(".json", "")] = response.json()
         except requests.exceptions.RequestException:
             st.session_state[arquivo.replace(".json", "")] = []  # Retorna lista vazia se houver erro
@@ -40,30 +41,38 @@ if "horse_data" not in st.session_state:
     st.session_state["horse_data"] = []
 if "team_data" not in st.session_state:
     st.session_state["team_data"] = []
+if "going_conditions" not in st.session_state:  # 🔹 Evita erro de chave não definida
+    st.session_state["going_conditions"] = ["Firm", "Good to Firm", "Good", "Good to Soft", "Soft", "Heavy", 
+                                            "Yielding", "Standard", "Slow", "All-Weather"]
+
 if not st.session_state.get("initialized", False):
     load_data()
     st.session_state["initialized"] = True
-if 'Nome ' not in st.session_state:
-    st.session_state['Nom'] = "Cavalo_Default"  # Nome padrão ou escolha inicial
 
-# 🔹 Configuração do repositório e caminho do arquivo
+if "Nome" not in st.session_state:
+    st.session_state["Nome"] = "Cavalo_Default"  # Nome padrão ou escolha inicial
+
+# 🔹 Configuração do repositório GitHub
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 REPO_OWNER = "vbautistacode"
 REPO_NAME = "app"
 BRANCH = "main"
 
-# ✅ Função para salvar JSON no GitHub
+# ✅ Função para salvar CSV no GitHub
 def salvar_csv_no_github(dataframe, nome_arquivo):
     try:
         if dataframe.empty:
             print(f"⚠️ O arquivo '{nome_arquivo}' está vazio! Não será salvo.")
             return
+        
         csv_content = dataframe.to_csv(index=False, encoding="utf-8")
         encoded_content = base64.b64encode(csv_content.encode()).decode()
         GITHUB_API_URL = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/contents/{nome_arquivo}"
         headers = {"Authorization": f"token {GITHUB_TOKEN}"}
+        
         response = requests.get(GITHUB_API_URL, headers=headers)
         sha = response.json().get("sha", None)
+
         payload = {
             "message": f"Atualizando {nome_arquivo} via API",
             "content": encoded_content,
@@ -71,13 +80,16 @@ def salvar_csv_no_github(dataframe, nome_arquivo):
         }
         if sha:
             payload["sha"] = sha
+
         response = requests.put(GITHUB_API_URL, json=payload, headers=headers)
         if response.status_code in [200, 201]:
             print(f"✅ {nome_arquivo} salvo no GitHub com sucesso!")
         else:
             print(f"❌ Erro ao salvar {nome_arquivo}: {response.json()}")
+
     except Exception as e:
         print(f"❌ Erro inesperado: {e}")
+
 
 # --- Funções de cálculo ---
 def kelly_criterion(b, implied_probability):
@@ -96,12 +108,14 @@ def calculate_dutching(odds, bankroll):
 
 # --- Interface Streamlit ---
 st.title("Apostas | Dados & Estratégias")
+
 # Abas para organização
 tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs(["Locais", "Dados dos Cavalos", "Dados das Equipes", "Análises","Predições","Controle de Apostas", "Machine Learning"])
 
 # --- Aba 1: Escolha ou Registro do Local de Prova ---
 with tab1:
     st.subheader("Escolha ou Registre o Local de Prova")
+
     def carregar_locais():
         url_arquivo = diretorio_base + "locais_prova.json"
         try:
@@ -111,12 +125,14 @@ with tab1:
             return data.get("Locais de Prova", [])
         except requests.exceptions.RequestException:
             return []
+
     locais_prova = carregar_locais()
-# Dropdown para selecionar um local existente
+
+    # Dropdown para selecionar um local existente
     local_selecionado = st.selectbox("Selecione um local de prova:", locais_prova, key="select_local")
-# Salvar o local selecionado no `session_state`
     st.session_state["local_atual"] = local_selecionado
-# Registrar um novo local
+
+    # Registrar um novo local
     novo_local = st.text_input("Ou registre um novo local de prova:")
     if st.button("Salvar Novo Local"):
         if novo_local and novo_local not in locais_prova:
@@ -125,19 +141,13 @@ with tab1:
             st.success(f"Novo local '{novo_local}' adicionado com sucesso!")
         elif novo_local in locais_prova:
             st.warning("Este local já está registrado.")
-# Lista de opções de "Going"
-    going_conditions = [
-        "Firm", "Good to Firm", "Good", "Good to Soft", "Soft", "Heavy", 
-        "Yielding", "Standard", "Slow", "All-Weather"
-    ] 
-# Dropdown para selecionar um tipo de pista
-    tipo_pista = st.selectbox("Escolha o tipo de pista (Going):", going_conditions, key="select_going_1")
-# Salvar o tipo de pista selecionado no `session_state`
-    salvar_json_no_github(st.session_state["tipo_pista_atual"], "tipo_pista.json")
-    st.session_state["going_conditions"] = going_conditions
-# Inserir a distância e salvar
-    distance = st.number_input("Distância da Pista", min_value=0.00, step=0.01)
-    st.session_state["distance"] = distance
+
+    # Lista de opções de "Going"
+    tipo_pista = st.selectbox("Escolha o tipo de pista (Going):", st.session_state["going_conditions"], key="select_going_1")
+
+    # Salvar o tipo de pista selecionado no `session_state`
+    st.session_state["tipo_pista_atual"] = tipo_pista
+    st.session_state["distance"] = st.number_input("Distância da Pista", min_value=0.00, step=0.01)
 
 # --- Aba 2: Dados dos Cavalos ---
 with tab2:
