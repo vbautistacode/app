@@ -282,7 +282,7 @@ def salvar_csv_no_github(dataframe):
 
     except Exception as e:
         st.error(f"❌ Erro inesperado: {e}")
-with tab2:
+
 # ✅ Botão para salvar no GitHub
 if st.button("Salvar em CSV", key="unique_key_1"):
     salvar_csv_no_github(df_horses)
