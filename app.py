@@ -59,14 +59,6 @@ REPO_OWNER = "vbautistacode"
 REPO_NAME = "app"
 BRANCH = "main"
 
-import requests
-import os
-
-GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")  # Pegue o token da variável de ambiente
-GITHUB_API_URL = "https://api.github.com/user"
-
-curl -H "Authorization: token SEU_NOVO_TOKEN_GITHUB" https://api.github.com/user
-
 # ✅ Função para salvar CSV no GitHub
 def salvar_csv_no_github(dataframe, nome_arquivo):
     try:
