@@ -227,8 +227,7 @@ with tab2:
     if st.session_state["horse_data"]:
         st.write("### Cavalos Registrados")
         df_horses = pd.DataFrame(st.session_state["horse_data"])
-        st.dataframe(df_horses)
-with tab2:        
+        st.dataframe(df_horses)       
 # ✅ Correção da função de salvamento no GitHub
 def salvar_csv_no_github(dataframe):
     GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
@@ -260,11 +259,12 @@ def salvar_csv_no_github(dataframe):
             st.error(f"❌ Erro ao salvar no GitHub: {response.json()}")
     except Exception as e:
         st.error(f"❌ Erro inesperado: {e}")
+with tab2:
 # ✅ Botão para salvar no GitHub
-if st.button("Salvar em CSV", key="unique_key_1"):
-    salvar_csv_no_github(df_horses)
-else:
-    st.warning("Ainda não há cavalos registrados.")
+    if st.button("Salvar em CSV", key="unique_key_1"):
+        salvar_csv_no_github(df_horses)
+    else:
+        st.warning("Ainda não há cavalos registrados.")
 
 # --- Aba 3: Dados das Equipes ---
 with tab3:
