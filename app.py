@@ -53,7 +53,7 @@ if "Nome" not in st.session_state:
     st.session_state["Nome"] = "Cavalo_Default"  # Nome padrão ou escolha inicial
 
 # 🔹 Configuração do repositório GitHub
-GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+GITHUB_TOKEN = "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"
 GITHUB_API_URL = "https://api.github.com/user"
 REPO_OWNER = "vbautistacode"
 REPO_NAME = "app"
