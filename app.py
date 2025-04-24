@@ -354,23 +354,51 @@ with tab3:
                                 "Jockey 3rds": jockey_thirds,
                             })
                             st.success(f"Alterações na equipe '{nome_equipe}' salvas com sucesso!")
-# Exibir equipes já cadastradas
-    if st.session_state["team_data"]:
-        st.write("### Equipes Cadastradas")
-        df_teams = pd.DataFrame(st.session_state["team_data"])
-        st.dataframe(df_teams)
-# Função para salvar os dados em um arquivo .csv
-        def salvar_csv(dataframe, nome_arquivo):
-            try:
-                dataframe.to_csv(nome_arquivo, index=False, encoding='utf-8')
-                st.success(f"Arquivo '{nome_arquivo}' salvo com sucesso!")
-            except Exception as e:
-                st.error(f"Erro ao salvar o arquivo: {e}")
-# Botão para salvar em CSV
+# ✅ Função para salvar CSV no GitHub
+def salvar_csv_no_github(dataframe):
+    try:
+        if dataframe.empty:
+            st.warning("⚠️ O arquivo CSV está vazio! Não será salvo.")
+            return
+
+        csv_content = dataframe.to_csv(index=False, encoding="utf-8")
+        encoded_content = base64.b64encode(csv_content.encode()).decode()
+        headers = {"Authorization": f"token {GITHUB_TOKEN}"}
+
+        response = requests.get(GITHUB_API_URL, headers=headers)
+        sha = response.json().get("sha", None)
+
+        payload = {
+            "message": "Atualizando dados_equipe.csv via API",
+            "content": encoded_content,
+            "branch": BRANCH
+        }
+        if sha:
+            payload["sha"] = sha
+
+        response = requests.put(GITHUB_API_URL, json=payload, headers=headers)
+        if response.status_code in [200, 201]:
+            st.success("✅ CSV de Equipes salvo no GitHub com sucesso!")
+        else:
+            st.error(f"❌ Erro ao salvar no GitHub: {response.json()}")
+
+    except Exception as e:
+        st.error(f"❌ Erro inesperado: {e}")
+
+# 🔹 Exibir equipes já cadastradas
+if "team_data" not in st.session_state:
+    st.session_state["team_data"] = []
+
+if st.session_state["team_data"]:
+    st.write("### Equipes Cadastradas")
+    df_teams = pd.DataFrame(st.session_state["team_data"])
+    st.dataframe(df_teams)
+
+    # ✅ Botão para salvar no GitHub
     if st.button("Salvar em CSV", key="unique_key_2"):
-            salvar_csv(df_teams, 'https://raw.githubusercontent.com/vbautistacode/app/main/dados_equipe.csv')
-    else:
-        st.warning("Ainda não há equipes cadastradas.")
+        salvar_csv_no_github(df_teams)
+else:
+    st.warning("Ainda não há equipes cadastradas.")
 
 # --- Aba 4: Resultados ---
 with tab4:
