@@ -53,15 +53,24 @@ if "Nome" not in st.session_state:
     st.session_state["Nome"] = "Cavalo_Default"  # Nome padrão ou escolha inicial
 
 # 🔹 Configuração do repositório GitHub
-GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+GITHUB_TOKEN = "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"
 GITHUB_API_URL = "https://api.github.com/user"
 REPO_OWNER = "vbautistacode"
 REPO_NAME = "app"
 BRANCH = "main"
-if GITHUB_TOKEN:
-    print("✅ Token carregado com sucesso!")
+
+import requests
+import os
+
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")  # Pegue o token da variável de ambiente
+GITHUB_API_URL = "https://api.github.com/user"
+
+response = requests.get(GITHUB_API_URL, headers={"Authorization": f"token {GITHUB_TOKEN}"})
+
+if response.status_code == 200:
+    print("✅ Autenticação no GitHub funcionando!")
 else:
-    print("❌ Erro: Token não definido.")
+    print(f"❌ Erro na autenticação: {response.json()}")
 
 # ✅ Função para salvar CSV no GitHub
 def salvar_csv_no_github(dataframe, nome_arquivo):
