@@ -47,32 +47,31 @@ if 'Nome ' not in st.session_state:
     st.session_state['Nom'] = "Cavalo_Default"  # Nome padrão ou escolha inicial
 
 # 🔹 Configuração do repositório e caminho do arquivo
-GITHUB_TOKEN = "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"
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 REPO_OWNER = "vbautistacode"
 REPO_NAME = "app"
 BRANCH = "main"
 
 # ✅ Função para salvar JSON no GitHub
-def salvar_json_no_github(data, nome_arquivo):
+def salvar_csv_no_github(dataframe, nome_arquivo):
     try:
-# 🔹 Converter JSON para string e Base64
-        json_content = json.dumps(data, indent=4, ensure_ascii=False)
-        encoded_content = base64.b64encode(json_content.encode()).decode()
-# 🔹 URL do arquivo no GitHub
+        if dataframe.empty:
+            print(f"⚠️ O arquivo '{nome_arquivo}' está vazio! Não será salvo.")
+            return
+        csv_content = dataframe.to_csv(index=False, encoding="utf-8")
+        encoded_content = base64.b64encode(csv_content.encode()).decode()
         GITHUB_API_URL = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/contents/{nome_arquivo}"
-# 🔹 Obter SHA do arquivo atual (necessário para update)
-        response = requests.get(GITHUB_API_URL, headers={"Authorization": f"token {GITHUB_TOKEN}"})
+        headers = {"Authorization": f"token {GITHUB_TOKEN}"}
+        response = requests.get(GITHUB_API_URL, headers=headers)
         sha = response.json().get("sha", None)
-# 🔹 Montar payload para envio
         payload = {
             "message": f"Atualizando {nome_arquivo} via API",
             "content": encoded_content,
             "branch": BRANCH
         }
         if sha:
-            payload["sha"] = sha  # Necessário para sobrescrever um arquivo existente
-# 🔹 Enviar solicitação PUT para salvar no GitHub
-        response = requests.put(GITHUB_API_URL, json=payload, headers={"Authorization": f"token {GITHUB_TOKEN}"})
+            payload["sha"] = sha
+        response = requests.put(GITHUB_API_URL, json=payload, headers=headers)
         if response.status_code in [200, 201]:
             print(f"✅ {nome_arquivo} salvo no GitHub com sucesso!")
         else:
