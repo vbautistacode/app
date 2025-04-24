@@ -790,7 +790,7 @@ def calcular_probabilidades_vencedor_e_exibir(dados):
             dados['desempenho_historico'] = (
                 ((dados['Wins'] + dados['2nds'] + dados['3rds']) / (dados['Runs'] + 1e-6))
             )
-            dados['probabilidade_vitoria'] = ((1 / dados['desempenho_historico'] + dados['experiencia_jet']) + (1 / dados['Odds']) * 0.10 - (dados['Intervalo_Peso'] * 0.05) - (dados['Going_encoded'] * 0.03))
+            dados['probabilidade_vitoria'] = (((1 / dados['desempenho_historico'] + dados['experiencia_jet']) + (1 / dados['Odds']) * 0.15) * ((dados['Intervalo_Peso'] * 0.15) - (dados['Going_encoded'] * 0.15)))
 # Normalizar as probabilidades
             prob_min = dados['probabilidade_vitoria'].min()
             prob_max = dados['probabilidade_vitoria'].max()
