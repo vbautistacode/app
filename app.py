@@ -152,148 +152,143 @@ with tab1:
 # --- Aba 2: Dados dos Cavalos ---
 with tab2:
     st.subheader("Informações Técnicas de Cavalos")
-# Check if a location was selected in the previous tab
-    if "local_atual" in st.session_state and st.session_state["local_atual"]:
-        st.write(f"Registrando para o local: **{st.session_state['local_atual']}**")
+
+    # ✅ Verifica se 'horse_data' já foi inicializado
     if "horse_data" not in st.session_state:
         st.session_state["horse_data"] = []
-# Button to start horse registration
+
+    if "local_atual" in st.session_state and st.session_state["local_atual"]:
+        st.write(f"Registrando para o local: **{st.session_state['local_atual']}**")
+
+    # ✅ Inicializa a variável de controle de registro
+    if "horse_data_started" not in st.session_state:
+        st.session_state["horse_data_started"] = False
+
     if st.button("Cadastro de Dados dos Cavalos"):
         st.session_state["horse_data_started"] = True
-    if st.session_state.get("horse_data_started", False):
-# Dropdown to select or add a new horse
-        if st.session_state["horse_data"]:
-            cavalo_selecionado = st.selectbox(
+
+    if st.session_state["horse_data_started"]:
+        # ✅ Ajusta a seleção de cavalos existentes
+        cavalo_selecionado = st.selectbox(
             "Selecione o Cavalo para Editar ou Adicionar Novo",
             ["Adicionar Novo"] + [horse["Nome"] for horse in st.session_state["horse_data"]],
             key="select_horse_edit"
         )
-        if cavalo_selecionado == "Adicionar Novo":
-            cavalo_dados = None
-        else:
-            cavalo_dados = next(
-                (horse for horse in st.session_state["horse_data"] if horse["Nome"] == cavalo_selecionado),
-                None
-            )
-    else:
-# st.warning("Ainda não há cavalos registrados. Preencha os dados para adicionar um novo cavalo.")
-        cavalo_selecionado = "Adicionar Novo"
-        cavalo_dados = None
-# Divisão em duas colunas
-        col1, col2 = st.columns(2)
-# Campos na primeira coluna
-        with col1:
-# Form for horse details
-            if "local_atual" in st.session_state:
-                local_atual = st.session_state["local_atual"]
-                Nome  = st.text_input("Nome do Cavalo", cavalo_dados["Nome"] if cavalo_dados else "")
-                idade = st.number_input("Idade", min_value=0, max_value=30, step=1, value=cavalo_dados["Idade"] if cavalo_dados else 0)
-                runs = st.number_input("Runs (Corridas)", min_value=0, step=1, value=cavalo_dados["Runs"] if cavalo_dados else 0)
-                wins = st.number_input("Wins (Vitórias)", min_value=0, step=1, value=cavalo_dados["Wins"] if cavalo_dados else 0)
-                seconds = st.number_input("2nds (Segundos Lugares)", min_value=0, step=1, value=cavalo_dados["2nds"] if cavalo_dados else 0)
-                thirds = st.number_input("3rds (Terceiros Lugares)", min_value=0, step=1, value=cavalo_dados["3rds"] if cavalo_dados else 0)
-        with col2:
-                odds = st.number_input("Odds (Probabilidades)", min_value=0.01, step=0.01, value=cavalo_dados["Odds"] if cavalo_dados else 0.01)
-# Processar: Calcular diferença em dias
-# Entrada: data anterior
-                data_anterior = st.date_input("Data Ultima Corrida", value=datetime.today().date())
-# Processar: Converter 'data_anterior' para o mesmo tipo de 'data_atual'
-                data_anterior = datetime.combine(data_anterior, datetime.min.time())  # Converte para datetime
-                data_atual = datetime.now()  # Apenas data
-# Calcular a diferença em dias (com precisão decimal)
-                diferenca_dias = (data_atual - data_anterior).days
-                if 'diferenca_dias' not in st.session_state:
-                    st.session_state['diferenca_dias'] = diferenca_dias
-                else:
-                    st.session_state['diferenca_dias'] = diferenca_dias  # Atualiza o valor armazenado
-                intervalo_corridas = st.number_input("Intervalo", min_value=0, step=1, value=diferenca_dias)
-                Ranking = st.number_input("Ranking (Colocação)", min_value=0, step=0, value=cavalo_dados["Ranking"] if cavalo_dados else 0)
-# Verificar se o tipo de pista foi armazenado no session_state
-                if "going_conditions" in st.session_state:
-# Usar o valor armazenado no session_state
-                    going = st.selectbox("Going", st.session_state["going_conditions"], key="select_going_2")
-                else:
-                    going = st.selectbox("Going", ["Firm", "Good to Firm", "Good", "Good to Soft", "Soft", "Heavy", "Yielding", "Standard", "Slow", "All-Weather"])
-                distancia = st.number_input("Distancia", min_value=0.00, step=0.00, value=cavalo_dados["Distancia"] if cavalo_dados else 0.00) 
-# Button to save or add a new horse
-                if st.button("Salvar Dados do Cavalo"):
-                    if cavalo_selecionado == "Adicionar Novo":
-                        novo_cavalo = {
-                            "Local": local_atual,
-                            "Nome": Nome ,
-                            "Idade": idade,
-                            "Runs": runs,
-                            "Wins": wins,
-                            "2nds": seconds,
-                            "3rds": thirds,
-                            "Odds": odds,
-                            "Intervalo": diferenca_dias,
-                            "Going": going,
-                            "Ranking": Ranking,
-                            "Distancia": distancia,
-                            }
-                        st.session_state["horse_data"].append(novo_cavalo)
-                        st.success(f"Novo cavalo '{Nome}' adicionado com sucesso no local '{st.session_state['local_atual']}'!")
-                    else:
-                        for horse in st.session_state["horse_data"]:
-                            if horse["Nome"] == cavalo_selecionado:
-                                horse.update({
-                                    "Local": local_atual,
-                                    "Nome": Nome ,
-                                    "Idade": idade,
-                                    "Runs": runs,
-                                    "Wins": wins,
-                                    "2nds": seconds,
-                                    "3rds": thirds,
-                                    "Odds": odds,
-                                    "Intervalo": diferenca_dias,
-                                    "Going": going,
-                                    "Ranking": Ranking,
-                                    "Distancia": distancia,
-                                })
-                                st.success(f"Alterações no cavalo '{Nome }' salvas com sucesso!")
-# Display registered horses
-    if st.session_state["horse_data"]:
-            st.write("### Cavalos Registrados")
-            df_horses = pd.DataFrame(st.session_state["horse_data"])
-            st.dataframe(df_horses)
 
-# ✅ Nova função para salvar CSV no GitHub
+        cavalo_dados = next(
+            (horse for horse in st.session_state["horse_data"] if horse["Nome"] == cavalo_selecionado),
+            None
+        ) if cavalo_selecionado != "Adicionar Novo" else None
+
+        # ✅ Divisão em colunas para melhor organização
+        col1, col2 = st.columns(2)
+
+        with col1:
+            local_atual = st.session_state.get("local_atual", "Não definido")
+            Nome = st.text_input("Nome do Cavalo", cavalo_dados["Nome"] if cavalo_dados else "")
+            idade = st.number_input("Idade", min_value=0, max_value=30, step=1, value=cavalo_dados["Idade"] if cavalo_dados else 0)
+            runs = st.number_input("Runs (Corridas)", min_value=0, step=1, value=cavalo_dados["Runs"] if cavalo_dados else 0)
+            wins = st.number_input("Wins (Vitórias)", min_value=0, step=1, value=cavalo_dados["Wins"] if cavalo_dados else 0)
+            seconds = st.number_input("2nds (Segundos Lugares)", min_value=0, step=1, value=cavalo_dados["2nds"] if cavalo_dados else 0)
+            thirds = st.number_input("3rds (Terceiros Lugares)", min_value=0, step=1, value=cavalo_dados["3rds"] if cavalo_dados else 0)
+
+        with col2:
+            odds = st.number_input("Odds (Probabilidades)", min_value=0.01, step=0.01, value=cavalo_dados["Odds"] if cavalo_dados else 0.01)
+            
+            # ✅ Ajuste de cálculo de intervalo de dias
+            data_anterior = st.date_input("Data Última Corrida", value=datetime.today().date())
+            data_anterior = datetime.combine(data_anterior, datetime.min.time())
+            data_atual = datetime.now()
+            diferenca_dias = (data_atual - data_anterior).days
+            
+            st.session_state["diferenca_dias"] = diferenca_dias
+            intervalo_corridas = st.number_input("Intervalo", min_value=0, step=1, value=diferenca_dias)
+            Ranking = st.number_input("Ranking (Colocação)", min_value=0, step=1, value=cavalo_dados["Ranking"] if cavalo_dados else 0)
+
+            # ✅ Corrige o acesso ao tipo de pista
+            going = st.selectbox("Going", st.session_state.get("going_conditions", 
+                ["Firm", "Good to Firm", "Good", "Good to Soft", "Soft", "Heavy", "Yielding", "Standard", "Slow", "All-Weather"]), 
+                key="select_going_2"
+            )
+
+            distancia = st.number_input("Distancia", min_value=0.00, step=0.01, value=cavalo_dados["Distancia"] if cavalo_dados else 0.00)
+
+        # ✅ Botão para salvar dados do cavalo
+        if st.button("Salvar Dados do Cavalo"):
+            novo_cavalo = {
+                "Local": local_atual,
+                "Nome": Nome,
+                "Idade": idade,
+                "Runs": runs,
+                "Wins": wins,
+                "2nds": seconds,
+                "3rds": thirds,
+                "Odds": odds,
+                "Intervalo": diferenca_dias,
+                "Going": going,
+                "Ranking": Ranking,
+                "Distancia": distancia,
+            }
+
+            if cavalo_selecionado == "Adicionar Novo":
+                st.session_state["horse_data"].append(novo_cavalo)
+                st.success(f"Novo cavalo '{Nome}' adicionado com sucesso no local '{local_atual}'!")
+            else:
+                for horse in st.session_state["horse_data"]:
+                    if horse["Nome"] == cavalo_selecionado:
+                        horse.update(novo_cavalo)
+                        st.success(f"Alterações no cavalo '{Nome}' salvas com sucesso!")
+
+    # ✅ Exibição de cavalos cadastrados
+    if st.session_state["horse_data"]:
+        st.write("### Cavalos Registrados")
+        df_horses = pd.DataFrame(st.session_state["horse_data"])
+        st.dataframe(df_horses)
+
+# ✅ Correção da função de salvamento no GitHub
 def salvar_csv_no_github(dataframe):
-    GITHUB_TOKEN = "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"
-    DEPO_OWNER = "vbautistacode"
+    GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+    REPO_OWNER = "vbautistacode"
     REPO_NAME = "app"
     BRANCH = "main"
     FILE_PATH = "dados_corridas.csv"
     GITHUB_API_URL = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/contents/{FILE_PATH}"
+
     try:
-# 🔹 Converte CSV para Base64
+        if dataframe.empty:
+            st.warning("⚠️ O arquivo CSV está vazio! Não será salvo.")
+            return
+
         csv_content = dataframe.to_csv(index=False, encoding="utf-8")
         encoded_content = base64.b64encode(csv_content.encode()).decode()
-# 🔹 Obtém o SHA do arquivo atual (necessário para update)
-        response = requests.get(GITHUB_API_URL, headers={"Authorization": f"token {GITHUB_TOKEN}"})
+        headers = {"Authorization": f"token {GITHUB_TOKEN}"}
+
+        response = requests.get(GITHUB_API_URL, headers=headers)
         sha = response.json().get("sha", None)
-# 🔹 Monta payload para enviar à API do GitHub
+
         payload = {
             "message": "Atualizando dados_corridas.csv via API",
             "content": encoded_content,
             "branch": BRANCH
         }
         if sha:
-            payload["sha"] = sha  # Necessário para sobrescrever um arquivo existente
-# 🔹 Envia solicitação PUT para salvar o arquivo no GitHub
-        response = requests.put(GITHUB_API_URL, json=payload, headers={"Authorization": f"token {GITHUB_TOKEN}"})
+            payload["sha"] = sha
+
+        response = requests.put(GITHUB_API_URL, json=payload, headers=headers)
         if response.status_code in [200, 201]:
             st.success("✅ CSV salvo no GitHub com sucesso!")
         else:
             st.error(f"❌ Erro ao salvar no GitHub: {response.json()}")
+
     except Exception as e:
         st.error(f"❌ Erro inesperado: {e}")
-# 🔹 Botão para salvar no GitHub
+
+# ✅ Botão para salvar no GitHub
 if st.button("Salvar em CSV", key="unique_key_1"):
     salvar_csv_no_github(df_horses)
 else:
     st.warning("Ainda não há cavalos registrados.")
+)
 
 # --- Aba 3: Dados das Equipes ---
 with tab3:
