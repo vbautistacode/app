@@ -1,6 +1,7 @@
 import streamlit as st
 import numpy as np
 import requests
+import base64
 import json
 import joblib
 import os
@@ -18,6 +19,8 @@ from sklearn.metrics import accuracy_score, classification_report, precision_sco
 import pandas as pd
 # Configurar Pandas para aceitar futuras mudanças no tratamento de objetos
 pd.set_option('future.no_silent_downcasting', True)
+# 🔹 Configuração do repositório e caminho do arquivo
+GITHUB_TOKEN = "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"
 # --- Funções para persistência ---
 diretorio_base = r"https://raw.github.com/vbautistacode/app/main/"
 def load_data():
@@ -208,18 +211,49 @@ with tab2:
             st.write("### Cavalos Registrados")
             df_horses = pd.DataFrame(st.session_state["horse_data"])
             st.dataframe(df_horses)
-# Função para salvar os dados em um arquivo .csv
-    def salvar_csv(dataframe, nome_arquivo):
-            try:
-                dataframe.to_csv(nome_arquivo, index=False, encoding='utf-8')
-                st.success(f"Arquivo '{nome_arquivo}' salvo com sucesso!")
-            except Exception as e:
-                st.error(f"Erro ao salvar o arquivo: {e}")
-# Botão para salvar em CSV
-    if st.button("Salvar em CSV", key="unique_key_1"):
-                salvar_csv(df_horses, 'https://raw.githubusercontent.com/vbautistacode/app/main/dados_corridas.csv')
-    else:
-        st.warning("Ainda não há cavalos registrados.")
+
+# ✅ Nova função para salvar CSV no GitHub
+def salvar_csv_no_github(dataframe):
+    GITHUB_TOKEN = "GITHUB_TOKEN"
+    DEPO_OWNER = "vbautistacode"
+    REPO_NAME = "app"
+    BRANCH = "main"
+    FILE_PATH = "dados_corridas.csv"
+    GITHUB_API_URL = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/contents/{FILE_PATH}"
+    try:
+        # 🔹 Converte CSV para Base64
+        csv_content = dataframe.to_csv(index=False, encoding="utf-8")
+        encoded_content = base64.b64encode(csv_content.encode()).decode()
+
+        # 🔹 Obtém o SHA do arquivo atual (necessário para update)
+        response = requests.get(GITHUB_API_URL, headers={"Authorization": f"token {GITHUB_TOKEN}"})
+        sha = response.json().get("sha", None)
+
+        # 🔹 Monta payload para enviar à API do GitHub
+        payload = {
+            "message": "Atualizando dados_corridas.csv via API",
+            "content": encoded_content,
+            "branch": BRANCH
+        }
+        if sha:
+            payload["sha"] = sha  # Necessário para sobrescrever um arquivo existente
+
+        # 🔹 Envia solicitação PUT para salvar o arquivo no GitHub
+        response = requests.put(GITHUB_API_URL, json=payload, headers={"Authorization": f"token {GITHUB_TOKEN}"})
+
+        if response.status_code in [200, 201]:
+            st.success("✅ CSV salvo no GitHub com sucesso!")
+        else:
+            st.error(f"❌ Erro ao salvar no GitHub: {response.json()}")
+
+    except Exception as e:
+        st.error(f"❌ Erro inesperado: {e}")
+
+# 🔹 Botão para salvar no GitHub
+if st.button("Salvar em CSV", key="unique_key_1"):
+    salvar_csv_no_github(df_horses)
+else:
+    st.warning("Ainda não há cavalos registrados.")
 
 # --- Aba 3: Dados das Equipes ---
 with tab3:
