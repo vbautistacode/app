@@ -354,6 +354,14 @@ with tab3:
                                 "Jockey 3rds": jockey_thirds,
                             })
                             st.success(f"Alterações na equipe '{nome_equipe}' salvas com sucesso!")
+# 🔹 Configuração do GitHub
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")  # Pegando o token do ambiente
+REPO_OWNER = "vbautistacode"
+REPO_NAME = "app"
+BRANCH = "main"
+FILE_PATH = "dados_equipe.csv"
+GITHUB_API_URL = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/contents/{FILE_PATH}"
+
 # ✅ Função para salvar CSV no GitHub
 def salvar_csv_no_github(dataframe):
     try:
