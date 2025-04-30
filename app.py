@@ -734,13 +734,13 @@ def carregar_dados_csv(caminho_arquivo_1, caminho_arquivo_2):
 def categorizar_intervalo(intervalo):
 #Função para categorizar o intervalo de descanso entre corridas
     if intervalo <= 7:
-        return "Muito Curto", 9
+        return "Muito Curto", 2.5
     elif intervalo <= 14:
-        return "Curto", 7
+        return "Curto", 2
     elif intervalo <= 30:
-        return "Médio", 5
+        return "Médio", 1.5
     elif intervalo <= 60:
-        return "Longo", 3
+        return "Longo", 1
     else:
         return "Muito Longo", 1
 def preprocessar_dados(dados_1, dados_2):
@@ -847,7 +847,7 @@ def calcular_probabilidades_vencedor_e_exibir(dados):
             dados['desempenho_historico'] = (
                 ((dados['Wins'] + dados['2nds'] + dados['3rds']) / (dados['Runs'] + 1e-6))
             )
-            dados['probabilidade_vitoria'] = (((1 / dados['desempenho_historico'] + dados['experiencia_jet']) + (1 / dados['Odds']) * 0.15) * ((dados['Intervalo_Peso'] * 0.15) - (dados['Going_encoded'] * 0.15)))
+             dados['probabilidade_vitoria'] = (((1 / dados['desempenho_historico'] - dados['experiencia_jet']) + (1 + dados['Odds']) * 1.768) * ((dados['Intervalo_Peso'] * 0.127) - (dados['Going_encoded'] * 0.685)))
 # Normalizar as probabilidades
             prob_min = dados['probabilidade_vitoria'].min()
             prob_max = dados['probabilidade_vitoria'].max()
