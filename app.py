@@ -698,10 +698,11 @@ except Exception as e:
     st.error(f"Erro ao carregar ou processar os dados: {str(e)}")
     
 #4.4.2.Gráficos de Evolução do Bankroll: Monitorar o crescimento ou retração ao longo do tempo.
-with tab4:    
-    if st.session_state["bankroll_data"]:
-        df_bankroll = pd.DataFrame(st.session_state["bankroll_data"])
-        df_bankroll["Data"] = pd.to_datetime(df_bankroll["Data"])  # Garantir formato datetime
+with tab4:
+    if "Lucro Total" in df_cavalos.columns:  # Verificar se a coluna existe
+        df_bankroll = pd.DataFrame(df_cavalos[["Lucro Total"]])  
+        df_bankroll["Data"] = pd.to_datetime(df_cavalos["Data"])  # Garantir formato datetime
+        
         st.write("#### Evolução do Bankroll")
         fig_line = px.line(
             df_bankroll,
@@ -713,7 +714,6 @@ with tab4:
         st.plotly_chart(fig_line, use_container_width=True)
     else:
         st.warning("Dados insuficientes para gerar o gráfico de evolução do bankroll.")
-
 # --- Aba 5: Análise de Probabilidades ---
 # Configuração de logging
 logging.basicConfig(level=logging.INFO)
