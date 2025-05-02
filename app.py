@@ -601,10 +601,10 @@ with tab4:
 # 4.3.1 Histórico de Performance Pessoal
         if {"Nome", "Lucro", "Valor Apostado", "Odds"}.issubset(df_cavalos.columns):
 # Criar a coluna "Lucro Total" com a subtração de "Lucro" e "Valor Apostado"
-            df_cavalos["Lucro"] = df_cavalos["Lucro"] - df_cavalos["Valor Apostado"]
+            df_cavalos["Lucro Total"] = df_cavalos["Lucro"] - df_cavalos["Valor Apostado"]
 # Agrupar por "Nome" e calcular os agregados
             performance_pessoal = df_cavalos.groupby("Nome").agg({
-                "Lucro": "sum",
+                "Lucro Total": "sum",
                 "Valor Apostado": "sum",
                 "Lucro Total": "sum",
                 "Odds": "mean"
@@ -615,11 +615,10 @@ with tab4:
 # Exibir a tabela no Streamlit
             st.write("##### Histórico de Performance Pessoal")
             st.dataframe(performance_pessoal)
+            lucro_total = performance_pessoal["Lucro Total"].sum()
+            st.write(f""""" 💰Lucro Total de Apostas: R$ {lucro_total:,.2f}")
         else:
             st.warning("As colunas 'Nome', 'Lucro', 'Valor Apostado' e 'Odds' são necessárias para calcular o Histórico de Performance Pessoal.")
-            lucro_total = performance_pessoal["Lucro Total"].sum()
-# Exibir o lucro total abaixo da tabela
-            st.write(f"##### Lucro Total: R$ {lucro_total:,.2f}")
 #4.3.2 Índice de Recuperação
         if "Data" in df_cavalos.columns:
             df_cavalos["Data"] = pd.to_datetime(df_cavalos["Data"], errors='coerce')  # Garantir formato datetime
@@ -639,16 +638,16 @@ nome_arquivo = "https://raw.githubusercontent.com/vbautistacode/app/main/apostas
 try:
     with tab4:
 # Carregar os dados do arquivo
-        df_cavalos = pd.read_csv(nome_arquivo)
+        df_cavalos = pd.read_excel(nome_arquivo)    
 # Verificar se as colunas necessárias estão disponíveis
-        if {"Nome", "Lucro", "Valor Apostado"}.issubset(df_cavalos.columns):
+        if {"Nome", "Lucro", "Valor Apostado", "Local"}.issubset(df_cavalos.columns):
 # Calcular "Lucro Total"
-            df_cavalos["Lucro Total"] = df_cavalos["Lucro"] - df_cavalos["Valor Apostado"]
+            df_cavalos["Lucro Total"] = df_cavalos["Lucro"] - df_cavalos["Valor Apostado"]    
 # Agrupar por "Nome" e calcular os valores de "Lucro Total"
-            lucro_por_cavalo = df_cavalos.groupby("Nome")["Lucro Total"].sum().reset_index()
-# Gerar o gráfico de barras
-            st.write("##### Gráficos")
-            fig_bar = px.bar(
+            lucro_por_cavalo = df_cavalos.groupby("Nome")["Lucro Total"].sum().reset_index()    
+# Gerar o gráfico de Lucro Total por Cavalo
+            st.write("### Gráficos")
+            fig_bar_cavalo = px.bar(
                 lucro_por_cavalo,
                 x="Nome",
                 y="Lucro Total",
@@ -657,24 +656,47 @@ try:
                 text="Lucro Total",
                 labels={"Nome": "Cavalo", "Lucro Total": "Lucro Total (R$)"}
             )
-# Ajustar layout do gráfico
-            fig_bar.update_traces(texttemplate='%{text:.2f}', textposition='outside')
-            fig_bar.update_layout(
+# Ajustar layout do gráfico de cavalos
+            fig_bar_cavalo.update_traces(texttemplate='%{text:.2f}', textposition='outside')
+            fig_bar_cavalo.update_layout(
                 uniformtext_minsize=8,
                 uniformtext_mode='hide',
                 xaxis_title="Cavalo",
                 yaxis_title="Lucro Total (R$)",
                 title_x=0.5  # Centralizar título
             )
-# Exibir o gráfico
-            st.plotly_chart(fig_bar, use_container_width=True)
+# Exibir o gráfico de cavalos
+            st.plotly_chart(fig_bar_cavalo, use_container_width=True)    
+# Agrupar por "Local" e calcular os valores de "Lucro Total"
+            lucro_por_local = df_cavalos.groupby("Local")["Lucro Total"].sum().reset_index()    
+# Gerar o gráfico de Lucro Total por Local
+            fig_bar_local = px.bar(
+                lucro_por_local,
+                x="Local",
+                y="Lucro Total",
+                title="Lucro Total por Local",
+                color="Lucro Total",
+                text="Lucro Total",
+                labels={"Local": "Local", "Lucro Total": "Lucro Total (R$)"}
+            )    
+# Ajustar layout do gráfico de locais
+            fig_bar_local.update_traces(texttemplate='%{text:.2f}', textposition='outside')
+            fig_bar_local.update_layout(
+                uniformtext_minsize=8,
+                uniformtext_mode='hide',
+                xaxis_title="Local",
+                yaxis_title="Lucro Total (R$)",
+                title_x=0.5  # Centralizar título
+            )    
+# Exibir o gráfico de locais
+            st.plotly_chart(fig_bar_local, use_container_width=True)    
         else:
-            st.warning("As colunas 'Nome', 'Lucro' e 'Valor Apostado' são necessárias para gerar o gráfico.")
+            st.warning("As colunas 'Nome', 'Lucro', 'Valor Apostado' e 'Local' são necessárias para gerar os gráficos.")
 except FileNotFoundError:
     st.error(f"O arquivo '{nome_arquivo}' não foi encontrado. Certifique-se de que ele está na mesma pasta do aplicativo.")
 except Exception as e:
     st.error(f"Erro ao carregar ou processar os dados: {str(e)}")
-        
+    
 #4.4.2.Gráficos de Evolução do Bankroll: Monitorar o crescimento ou retração ao longo do tempo.
 with tab4:    
     if st.session_state["bankroll_data"]:
