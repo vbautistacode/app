@@ -1149,281 +1149,144 @@ with tab6:
         st.info("Nenhuma aposta registrada ainda.")
 
 # #---Aba 7: Machine Learning ---
-# Configuração de logging
 logging.basicConfig(level=logging.INFO)
-# Função para integrar o histórico ao conjunto de dados de corridas
-with tab7:
-    def integrar_retroalimentacao(dados_corridas, historico):
-        try:
-    # Carregar resultados_corridas na tab7
-            caminho_resultados = "https://raw.githubusercontent.com/vbautistacode/app/main/resultados_corridas.csv"
-            dados_resultados = pd.read_csv(caminho_resultados)
-            colunas_esperadas = ['Nome', 'Resultado_Oficial']
-            colunas_faltantes = [col for col in colunas_esperadas if col not in dados_resultados.columns]
-            if colunas_faltantes:
-                st.error(f"Colunas faltantes em 'resultados_corridas': {colunas_faltantes}")
-            else:
-                st.success("Arquivo carregado corretamente com todas as colunas presentes!")
-                return dados_corridas
-    # Merge do histórico com os dados de corridas
-            dados_corridas = pd.merge(
-                dados_corridas,
-                historico[['Nome', 'Resultado_Oficial']],
-                on="Nome",
-                how="left"
-            )
-            if dados_corridas.empty:
-                st.error("O conjunto de dados ficou vazio após o merge. Verifique os valores no arquivo histórico.")
-                logging.error("Erro: o conjunto de dados ficou vazio após o merge.")
-                return dados_corridas
-    # Criar coluna `Acerto` para validar previsões
-            if 'Previsao' in dados_corridas.columns:
-                dados_corridas['Acerto'] = (dados_corridas['Previsao'] == dados_corridas['Resultado_Oficial']).astype(int)
-            else:
-                st.warning("A coluna 'Previsao' não está presente em `dados_corridas`. Não foi possível calcular acertos.")
-                logging.warning("A coluna 'Previsao' está ausente em `dados_corridas`.")
-            return dados_corridas
-        except Exception as e:
-            st.error(f"Erro ao integrar retroalimentação: {e}")
-            logging.error(f"Erro ao integrar retroalimentação: {e}")
-            return dados_corridas
-    # Função para treinar o modelo e calcular métricas
-    def treinar_e_calcular_metricas(X, y, tab7):
-        try:
-    # Validar os dados antes de prosseguir
-                if X.isnull().values.any() or y.isnull().values.any():
-                    st.error("Os dados contêm valores nulos. Preprocessamento necessário antes do treinamento.")
-                    logging.error("Valores nulos detectados em `X` ou `y`.")
-                    return None, None
-    # Divisão dos dados em treino e teste
-                X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-                logging.info("Divisão dos dados concluída.")
-    # Configuração do pipeline de pré-processamento e modelo
-                preprocessor = ColumnTransformer(
-                    transformers=[
-                        ('num', StandardScaler(), [
-                            'Local_encoded', 'Intervalo', 'Nome', 'Idade', 'Runs', 'Wins', 'Odds', 'Distancia', 'experiencia_jet'
-                        ]),
-                        ('cat', OneHotEncoder(handle_unknown='ignore'), ['Going_encoded'])
-                    ])
-                pipeline = Pipeline(steps=[
-                    ('preprocessor', preprocessor),
-                    ('modelo', RandomForestClassifier(random_state=42))
-                ])
-                logging.info("Pipeline configurado.")
-    # Treinamento do modelo
-                pipeline.fit(X_train, y_train)
-                logging.info("Modelo treinado com sucesso.")
-    # Predição e cálculo de métricas
-                y_pred = pipeline.predict(X_test)
-                precision = precision_score(y_test, y_pred, average='weighted')
-                recall = recall_score(y_test, y_pred, average='weighted')
-                precisao = accuracy_score(y_test, y_pred)
-                f1 = f1_score(y_test, y_pred, average='weighted')
-    # Exibir métricas na aba
-                st.write("#### Métricas de Desempenho do Modelo")
-                col1, col2, col3, col4 = st.columns(4)
-                with col1:
-                    st.metric(label="Acurácia (Accuracy)", value=f"{precisao:.2f}")
-                with col2:
-                    st.metric(label="Recall", value=f"{recall:.2f}")
-                with col3:
-                    st.metric(label="Precisão (Precision)", value=f"{precision:.2f}")
-                with col4:
-                    st.metric(label="F1-Score", value=f"{f1:.2f}")
-    # Exibir relatório detalhado
-                try:
-                    report = classification_report(y_test, y_pred, output_dict=True)
-                    report_df = pd.DataFrame(report).transpose()
-                    st.write("#### Relatório de Classificação")
-                    st.dataframe(report_df)
-                except Exception as e:
-                    st.error("Erro ao gerar relatório detalhado.")
-                    logging.error(f"Erro ao gerar relatório: {e}")
-                    report_df = None
-                return pipeline, report_df
-        except Exception as e:
-            st.error(f"Erro ao calcular métricas ou treinar o modelo: {e}")
-            logging.error(f"Erro ao calcular métricas ou treinar o modelo: {e}")
-            return None, None
-    # Função principal para retroalimentação e acompanhamento
-    def retroalimentacao_e_historico(X, y, tab7):
-            try:
-    # Caminhos para os arquivos de dados
-                caminho_resultados = "https://raw.githubusercontent.com/vbautistacode/app/main/resultados_corridas.csv"
-                caminho_historico = "https://raw.githubusercontent.com/vbautistacode/app/main/historico_modelo.csv"
-    # Verificar se o arquivo existe e carregar os dados
-                if os.path.exists(caminho_historico):
-                    historico_existente = pd.read_csv(caminho_historico)
-                else:
-                    historico_existente = pd.DataFrame(columns=dados_corridas.columns)  # Criar histórico vazio com as mesmas colunas
-    # Carregar os dados de resultados
-                dados_corridas = pd.read_csv(caminho_resultados)
-    # Verificar se a coluna 'Nome' existe em dados_corridas
-                if 'Nome' not in dados_corridas.columns:
-                    st.error("A coluna 'Nome' não está presente em 'dados_corridas'. Verifique os dados de entrada.")
-                    return
-                if dados_corridas.empty:
-                    st.error("O arquivo 'dados_corridas' está vazio. Nenhum dado disponível para processar.")
-                    return
-    # Obter os nomes já cadastrados dos cavalos
-                cavalos_cadastrados = dados_corridas['Nome'].unique()
-    # Entradas do usuário - selecionar cavalo previsto e vencedor oficial
-                previsao = st.selectbox("Escolha o cavalo previsto como vencedor:", cavalos_cadastrados, help="Selecione o cavalo que você acredita ser o vencedor.")
-                resultado_oficial = st.selectbox("Escolha o cavalo vencedor oficial:", cavalos_cadastrados, help="Selecione o cavalo que venceu oficialmente a corrida.")
-                acerto_manual = st.selectbox("A previsão foi correta?", ["Sim", "Não"], help="Indique se a previsão estava correta com base nos resultados oficiais.")
-    # Definir filtro para previsão
-                filtro_previsao = dados_corridas['Nome'] == previsao
-    # Atualizar os resultados com as seleções do usuário
-                if filtro_previsao.any():
-                    dados_corridas.loc[filtro_previsao, 'Previsao'] = previsao
-                    logging.info(f"Atualização feita: Previsão - {previsao}")
-                else:
-                    st.warning(f"Nenhum registro encontrado para o cavalo previsto '{previsao}'.")
-    # Definir filtro para resultado oficial
-                filtro_resultado = dados_corridas['Nome'] == resultado_oficial
-    # Atualizar os resultados com as seleções do usuário
-                if filtro_resultado.any():
-                    dados_corridas.loc[filtro_resultado, 'Resultado_Oficial'] = resultado_oficial
-                    logging.info(f"Atualização feita: Resultado Oficial - {resultado_oficial}")
-                else:
-                    st.warning(f"Nenhum registro encontrado para o cavalo vencedor '{resultado_oficial}'.")
-                dados_corridas['Acerto'] = 1 if acerto_manual == "Sim" else 0
-    # Criar um botão para salvar os resultados
-                if st.button("Confirmar Atualização do Histórico"):
-                    try:
-    # Validar antes de salvar
-                        if dados_corridas.empty:
-                            st.error("O DataFrame está vazio. Não há nada para salvar.")
-                            return
-                        dados_corridas.to_csv(caminho_resultados, index=False)
-                        st.success("Resultados atualizados com sucesso!")
-                        logging.info(f"Resultados salvos no arquivo: {caminho_resultados}")
-                    except Exception as e:
-                        st.error(f"Erro ao salvar os resultados: {e}")
-                        logging.error(f"Erro ao salvar os resultados: {e}")
-    # Criar o histórico com todas as colunas de resultados_corridas
-                colunas_necessarias = dados_corridas.columns  # Pega todas as colunas existentes
-                historico = pd.DataFrame(columns=colunas_necessarias)
-    # Adicionar os valores do usuário
-                historico.loc[0] = dados_corridas.iloc[0]  # Adiciona uma linha baseada no DataFrame original
-                historico.at[0, 'Nome'] = st.session_state.get('Nome')
-                historico.at[0, 'Previsao'] = previsao
-                historico.at[0, 'Resultado Oficial'] = resultado_oficial
-                historico.at[0, 'Acerto'] = 1 if acerto_manual == "Sim" else 0
-    # Preencher valores ausentes para evitar colunas em branco
-                historico.fillna("None", inplace=True)
-    # Garantir que todas as colunas estão presentes no histórico
-                colunas_faltantes = [col for col in colunas_necessarias if col not in historico_existente.columns]
-                for coluna in colunas_faltantes:
-                    historico_existente[coluna] = "None"
-    # Concatenar o novo histórico com o existente
-                historico_atualizado = pd.concat([historico_existente, historico], ignore_index=True)
-    # Remover duplicatas para evitar repetições e salvar no arquivo
-                historico_atualizado.drop_duplicates(subset=['Nome', 'Previsao'], keep='last', inplace=True)
-                historico_atualizado.to_csv(caminho_historico, index=False)
-                st.success("Histórico atualizado e salvo com sucesso!")
-    # Integrar histórico aos dados de corridas
-                dados_corridas = integrar_retroalimentacao(dados_corridas, historico)
-            except Exception as e:
-                st.error(f"Erro ao carregar ou atualizar resultados: {e}")
-    # Função para preprocessamento
-    def preprocessar_dados(dados_1, dados_2):
-        try:
-    # Validar arquivos vazios
-            if dados_1.empty:
-                st.error("O arquivo de corridas está vazio. Adicione dados antes de prosseguir.")
-                logging.error("O arquivo 'dados_corridas.csv' está vazio.")
-                return None, None
-            if dados_2.empty:
-                st.error("O arquivo de equipes está vazio. Adicione dados antes de prosseguir.")
-                logging.error("O arquivo 'dados_equipe.csv' está vazio.")
-                return None, None
-    # Codificação da coluna 'Nome'
-            label_encoder = LabelEncoder()
-            if 'Nome' in dados_1.columns:
-                dados_1['Nome_encoded'] = label_encoder.fit_transform(dados_1['Nome'])
-                logging.info("Codificação da coluna 'Nome' concluída.")
-            else:
-                st.error("A coluna 'Nome' está ausente no arquivo de corridas.")
-                logging.error("A coluna 'Nome' está ausente no arquivo de corridas.")
-                return None, None
-    # Codificação da coluna 'Going'
-            if 'Going' in dados_1.columns:
-                pesos_going = {
-                    "Firm": 3, "Good to Firm": 2, "Good": 1, "Good to Soft": 4,
-                    "Soft": 6, "Heavy": 9, "Yielding": 5, "Standard": 1, "Slow": 9,
-                    "All-Wether": 2
-                }
-                dados_1['Going_encoded'] = dados_1['Going'].map(pesos_going).fillna(0)
-                logging.info("Codificação da coluna 'Going' concluída.")
-            else:
-                st.error("A coluna 'Going' está ausente no arquivo de corridas.")
-                logging.error("A coluna 'Going' está ausente no arquivo de corridas.")
-                return None, None
-    # Validar colunas esperadas
-            colunas_features = ['Local', 'Nome_encoded', 'Idade', 'Runs', 'Wins', '2nds', '3rds', 'Odds',
-                                'Intervalo', 'Ranking', 'Going_encoded', 'Distancia', 'experiencia_jet',
-                                'Previsao', 'Resultado_Oficial', 'Acerto']
-            colunas_faltantes = [col for col in colunas_features if col not in dados_1.columns]
-            if colunas_faltantes:
-                st.error(f"Colunas ausentes no arquivo de corridas: {colunas_faltantes}")
-                logging.error(f"Colunas ausentes: {colunas_faltantes}")
-                return None, None
-    # Criar conjuntos X e y
-            X = dados_1[colunas_features]
-            y = dados_1['Ranking']
-            logging.info("Preprocessamento concluído com sucesso.")
-            return X, y
-        except Exception as e:
-            st.error(f"Erro no preprocessamento: {e}")
-            logging.error(f"Erro no preprocessamento: {e}")
-            return None, None
-    
 
-with tab7:
-# Função para verificar se o arquivo existe no GitHub
-        def verificar_arquivo_github(url):
-            try:
-                response = requests.get(url)
-                return response.status_code == 200
-            except Exception as e:
-                return False
+# 🔹 Função para verificar se o arquivo existe no GitHub
+def verificar_arquivo_github(url):
+    try:
+        response = requests.get(url)
+        return response.status_code == 200
+    except Exception as e:
+        return False
+
+# 🔹 Função para carregar CSV remoto com validação
+def carregar_csv_remoto(url):
+    try:
+        response = requests.get(url)
+        response.raise_for_status()  # Verifica se houve erro na requisição
+        return pd.read_csv(url)
+    except requests.exceptions.RequestException as e:
+        st.error(f"Erro ao carregar {url}: {e}")
+        return None
+
+# 🔹 Função principal para execução do fluxo
+def main():
+    caminho_corridas = "https://raw.githubusercontent.com/vbautistacode/app/main/resultados_corridas.csv"
+    caminho_equipes = "https://raw.githubusercontent.com/vbautistacode/app/main/dados_equipe.csv"
+
+    try:
+        # ✅ Verificar se os arquivos existem antes de carregá-los
+        if not verificar_arquivo_github(caminho_corridas):
+            st.error(f"O arquivo '{caminho_corridas}' não foi encontrado no GitHub.")
+            return
+        if not verificar_arquivo_github(caminho_equipes):
+            st.error(f"O arquivo '{caminho_equipes}' não foi encontrado no GitHub.")
+            return
+
+        # ✅ Carregar os dados corretamente
+        dados_1 = carregar_csv_remoto(caminho_corridas)
+        dados_2 = carregar_csv_remoto(caminho_equipes)
         
-        # Função principal para execução do fluxo
-        def main():
-            caminho_corridas = "https://raw.githubusercontent.com/vbautistacode/app/main/resultados_corridas.csv"
-            caminho_equipes = "https://raw.githubusercontent.com/vbautistacode/app/main/dados_equipe.csv"
+        if dados_1 is None or dados_2 is None or dados_1.empty or dados_2.empty:
+            st.error("Erro ao carregar os arquivos. Verifique se eles existem e contêm dados.")
+            return
+
+        # ✅ Preprocessamento dos dados
+        X, y = preprocessar_dados(dados_1, dados_2)
+
+        if X is None or y is None:
+            st.error("Erro no preprocessamento. Certifique-se de que os arquivos de dados estão corretos.")
+            return
+
+        st.success("Preprocessamento concluído com sucesso!")
+
+    except Exception as e:
+        st.error(f"Erro ao carregar os arquivos: {e}")
+        return
+
+    # 🔹 Retroalimentação e métricas
+    try:
+        retroalimentacao_e_historico(X, y)
+    except Exception as e:
+        st.error(f"Erro na retroalimentação ou métricas: {e}")
+
+# 🔹 Função para preprocessamento de dados
+def preprocessar_dados(dados_1, dados_2):
+    try:
+        if dados_1.empty or dados_2.empty:
+            st.error("Os arquivos de dados estão vazios. Não foi possível preprocessar.")
+            return None, None
+
+        # ✅ Codificação de variáveis categóricas
+        label_encoder = LabelEncoder()
+        if 'Nome' in dados_1.columns:
+            dados_1['Nome_encoded'] = label_encoder.fit_transform(dados_1['Nome'])
+        if 'Going' in dados_1.columns:
+            pesos_going = {
+                "Firm": 3, "Good to Firm": 2, "Good": 1, "Good to Soft": 4,
+                "Soft": 6, "Heavy": 9, "Yielding": 5, "Standard": 1, "Slow": 9,
+                "All-Wether": 2
+            }
+            dados_1['Going_encoded'] = dados_1['Going'].map(pesos_going).fillna(0)
+
+        # ✅ Criação do conjunto X e y
+        colunas_features = ['Nome_encoded', 'Idade', 'Runs', 'Wins', 'Odds', 'Intervalo', 
+                            'Ranking', 'Going_encoded', 'Distancia', 'experiencia_jet']
         
-            try:
-                # Verificar se os arquivos existem no GitHub
-                if not verificar_arquivo_github(caminho_corridas):
-                    st.error(f"O arquivo '{caminho_corridas}' não foi encontrado no GitHub.")
-                    return
-                if not verificar_arquivo_github(caminho_equipes):
-                    st.error(f"O arquivo '{caminho_equipes}' não foi encontrado no GitHub.")
-                    return
-        
-                # Carregar e preprocessar os dados
-                dados_1 = pd.read_csv(caminho_corridas)
-                dados_2 = pd.read_csv(caminho_equipes)
-                X, y = preprocessar_dados(dados_1, dados_2)
-        
-                if X is None or y is None:
-                    st.error("Erro no preprocessamento. Certifique-se de que os arquivos de dados estão corretos.")
-                    return
-        
-                st.success("Preprocessamento concluído com sucesso!")
-            
-            except Exception as e:
-                st.error(f"Erro ao carregar os arquivos: {e}")
-                return
-        
-            # Retroalimentação e métricas
-            try:
-                retroalimentacao_e_historico(X, y, tab7)
-            except Exception as e:
-                st.error(f"Erro na retroalimentação ou métricas: {e}")
-        
-        if __name__ == "__main__":
-            main()
+        colunas_faltantes = [col for col in colunas_features if col not in dados_1.columns]
+        if colunas_faltantes:
+            st.error(f"Colunas ausentes nos dados de corridas: {colunas_faltantes}")
+            return None, None
+
+        X = dados_1[colunas_features]
+        y = dados_1['Ranking']
+
+        return X, y
+    except Exception as e:
+        st.error(f"Erro no preprocessamento: {e}")
+        return None, None
+
+# 🔹 Função para treinar o modelo com validação no tamanho dos dados
+def treinar_e_calcular_metricas(X, y):
+    try:
+        if X.shape[0] <= 1:  # Evita erro com menos de 2 amostras
+            st.warning("Poucos dados para treinar o modelo. Avaliação limitada.")
+            return None
+
+        # ✅ Ajuste na divisão do dataset
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+        preprocessor = ColumnTransformer(
+            transformers=[
+                ('num', StandardScaler(), X.columns)
+            ]
+        )
+        pipeline = Pipeline(steps=[
+            ('preprocessor', preprocessor),
+            ('modelo', RandomForestClassifier(random_state=42))
+        ])
+
+        pipeline.fit(X_train, y_train)
+
+        # ✅ Cálculo de métricas
+        y_pred = pipeline.predict(X_test)
+        precisao = accuracy_score(y_test, y_pred)
+        recall = recall_score(y_test, y_pred, average='weighted')
+        precision = precision_score(y_test, y_pred, average='weighted')
+        f1 = f1_score(y_test, y_pred, average='weighted')
+
+        # ✅ Exibir métricas na interface Streamlit
+        st.write("#### Métricas de Desempenho do Modelo")
+        col1, col2, col3, col4 = st.columns(4)
+        with col1: st.metric(label="Acurácia", value=f"{precisao:.2f}")
+        with col2: st.metric(label="Recall", value=f"{recall:.2f}")
+        with col3: st.metric(label="Precisão", value=f"{precision:.2f}")
+        with col4: st.metric(label="F1-Score", value=f"{f1:.2f}")
+
+        return pipeline
+    except Exception as e:
+        st.error(f"Erro ao treinar o modelo: {e}")
+        return None
+
+if __name__ == "__main__":
+    main()
