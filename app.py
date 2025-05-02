@@ -601,7 +601,7 @@ with tab4:
 # 4.3.1 Histórico de Performance Pessoal
         if {"Nome", "Lucro", "Valor Apostado", "Odds"}.issubset(df_cavalos.columns):
 # Criar a coluna "Lucro Total" com a subtração de "Lucro" e "Valor Apostado"
-            df_cavalos["Lucro Total"] = df_cavalos["Lucro"] - df_cavalos["Valor Apostado"]
+            df_cavalos["Lucro"] = df_cavalos["Lucro"] - df_cavalos["Valor Apostado"]
 # Agrupar por "Nome" e calcular os agregados
             performance_pessoal = df_cavalos.groupby("Nome").agg({
                 "Lucro": "sum",
@@ -617,6 +617,9 @@ with tab4:
             st.dataframe(performance_pessoal)
         else:
             st.warning("As colunas 'Nome', 'Lucro', 'Valor Apostado' e 'Odds' são necessárias para calcular o Histórico de Performance Pessoal.")
+            lucro_total = performance_pessoal["Lucro Total"].sum()
+# Exibir o lucro total abaixo da tabela
+            st.write(f"##### Lucro Total: R$ {lucro_total:,.2f}")
 #4.3.2 Índice de Recuperação
         if "Data" in df_cavalos.columns:
             df_cavalos["Data"] = pd.to_datetime(df_cavalos["Data"], errors='coerce')  # Garantir formato datetime
