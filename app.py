@@ -707,7 +707,7 @@ with tab4:
         fig_line = px.line(
             df_bankroll,
             x="Data",
-            y="Bankroll",
+            y="Lucro Total",
             title="Evolução do Bankroll ao Longo do Tempo",
             markers=True
         )
