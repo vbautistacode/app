@@ -1392,7 +1392,7 @@ def verificar_arquivo_github(url):
 def main():
     caminho_corridas = "https://raw.githubusercontent.com/vbautistacode/app/main/resultados_corridas.csv"
     caminho_equipes = "https://raw.githubusercontent.com/vbautistacode/app/main/dados_equipe.csv"
-
+with tab7:
     try:
         # Verificar se os arquivos existem no GitHub
         if not verificar_arquivo_github(caminho_corridas):
