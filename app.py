@@ -398,19 +398,19 @@ def salvar_csv_no_github(dataframe):
 
 with tab3:
 # 🔹 Exibir equipes já cadastradas
-if "team_data" not in st.session_state:
-    st.session_state["team_data"] = []
-
-if st.session_state["team_data"]:
-    st.write("### Equipes Cadastradas")
-    df_teams = pd.DataFrame(st.session_state["team_data"])
-    st.dataframe(df_teams)
-
-    # ✅ Botão para salvar no GitHub
-    if st.button("Salvar em CSV", key="unique_key_2"):
-        salvar_csv_no_github(df_teams)
-else:
-    st.warning("Ainda não há equipes cadastradas.")
+    if "team_data" not in st.session_state:
+        st.session_state["team_data"] = []
+    
+    if st.session_state["team_data"]:
+        st.write("### Equipes Cadastradas")
+        df_teams = pd.DataFrame(st.session_state["team_data"])
+        st.dataframe(df_teams)
+    
+        # ✅ Botão para salvar no GitHub
+        if st.button("Salvar em CSV", key="unique_key_2"):
+            salvar_csv_no_github(df_teams)
+    else:
+        st.warning("Ainda não há equipes cadastradas.")
 
 # --- Aba 4: Resultados ---
 with tab4:
