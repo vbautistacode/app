@@ -1380,48 +1380,50 @@ with tab7:
             logging.error(f"Erro no preprocessamento: {e}")
             return None, None
     
+
+with tab7:
 # Função para verificar se o arquivo existe no GitHub
-def verificar_arquivo_github(url):
-    try:
-        response = requests.get(url)
-        return response.status_code == 200
-    except Exception as e:
-        return False
-
-# Função principal para execução do fluxo
-def main():
-    caminho_corridas = "https://raw.githubusercontent.com/vbautistacode/app/main/resultados_corridas.csv"
-    caminho_equipes = "https://raw.githubusercontent.com/vbautistacode/app/main/dados_equipe.csv"
-
-    try:
-        # Verificar se os arquivos existem no GitHub
-        if not verificar_arquivo_github(caminho_corridas):
-            st.error(f"O arquivo '{caminho_corridas}' não foi encontrado no GitHub.")
-            return
-        if not verificar_arquivo_github(caminho_equipes):
-            st.error(f"O arquivo '{caminho_equipes}' não foi encontrado no GitHub.")
-            return
-
-        # Carregar e preprocessar os dados
-        dados_1 = pd.read_csv(caminho_corridas)
-        dados_2 = pd.read_csv(caminho_equipes)
-        X, y = preprocessar_dados(dados_1, dados_2)
-
-        if X is None or y is None:
-            st.error("Erro no preprocessamento. Certifique-se de que os arquivos de dados estão corretos.")
-            return
-
-        st.success("Preprocessamento concluído com sucesso!")
-    
-    except Exception as e:
-        st.error(f"Erro ao carregar os arquivos: {e}")
-        return
-
-    # Retroalimentação e métricas
-    try:
-        retroalimentacao_e_historico(X, y, tab7)
-    except Exception as e:
-        st.error(f"Erro na retroalimentação ou métricas: {e}")
-
-    if __name__ == "__main__":
-main()
+        def verificar_arquivo_github(url):
+            try:
+                response = requests.get(url)
+                return response.status_code == 200
+            except Exception as e:
+                return False
+        
+        # Função principal para execução do fluxo
+        def main():
+            caminho_corridas = "https://raw.githubusercontent.com/vbautistacode/app/main/resultados_corridas.csv"
+            caminho_equipes = "https://raw.githubusercontent.com/vbautistacode/app/main/dados_equipe.csv"
+        
+            try:
+                # Verificar se os arquivos existem no GitHub
+                if not verificar_arquivo_github(caminho_corridas):
+                    st.error(f"O arquivo '{caminho_corridas}' não foi encontrado no GitHub.")
+                    return
+                if not verificar_arquivo_github(caminho_equipes):
+                    st.error(f"O arquivo '{caminho_equipes}' não foi encontrado no GitHub.")
+                    return
+        
+                # Carregar e preprocessar os dados
+                dados_1 = pd.read_csv(caminho_corridas)
+                dados_2 = pd.read_csv(caminho_equipes)
+                X, y = preprocessar_dados(dados_1, dados_2)
+        
+                if X is None or y is None:
+                    st.error("Erro no preprocessamento. Certifique-se de que os arquivos de dados estão corretos.")
+                    return
+        
+                st.success("Preprocessamento concluído com sucesso!")
+            
+            except Exception as e:
+                st.error(f"Erro ao carregar os arquivos: {e}")
+                return
+        
+            # Retroalimentação e métricas
+            try:
+                retroalimentacao_e_historico(X, y, tab7)
+            except Exception as e:
+                st.error(f"Erro na retroalimentação ou métricas: {e}")
+        
+        if __name__ == "__main__":
+            main()
