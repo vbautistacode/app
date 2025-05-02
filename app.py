@@ -1424,5 +1424,5 @@ with tab7:
         except Exception as e:
             st.error(f"Erro na retroalimentação ou métricas: {e}")
     
-    if __name__ == "__main__":
+        if __name__ == "__main__":
     main()
