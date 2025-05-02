@@ -396,6 +396,7 @@ def salvar_csv_no_github(dataframe):
     except Exception as e:
         st.error(f"❌ Erro inesperado: {e}")
 
+with tab3:
 # 🔹 Exibir equipes já cadastradas
 if "team_data" not in st.session_state:
     st.session_state["team_data"] = []
@@ -925,7 +926,7 @@ with tab5:
             return None
 # Certifique-se de que 'dados' está carregado
     melhores_oportunidades = calcular_valor_real(dados)
-    st.write("##### Melhores Oportunidades de Aposta")
+    st.write("##### Melhores Retornos | based real value")
     st.dataframe(melhores_oportunidades)
 # Comparação de condições em mesmas pistas
 def comparar_condicoes_corrida(dados_corridas):
@@ -1036,7 +1037,7 @@ def main():
 # 3. Gerar insights de valor real e boas oportunidades de aposta
             boas_oportunidades = calcular_boa_aposta(dados_resultados)
             if boas_oportunidades is not None:
-                st.write("##### Melhor Escolha")
+                st.write("##### Boas Oportunidades")
                 st.dataframe(boas_oportunidades)
         except FileNotFoundError as e:
             st.error(f"Erro: Arquivo necessário não encontrado ({e.filename}). Verifique os caminhos dos arquivos.")
