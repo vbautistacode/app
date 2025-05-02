@@ -1150,143 +1150,143 @@ with tab6:
 
 # #---Aba 7: Machine Learning ---
 logging.basicConfig(level=logging.INFO)
-
-# 🔹 Função para verificar se o arquivo existe no GitHub
-def verificar_arquivo_github(url):
-    try:
-        response = requests.get(url)
-        return response.status_code == 200
-    except Exception as e:
-        return False
-
-# 🔹 Função para carregar CSV remoto com validação
-def carregar_csv_remoto(url):
-    try:
-        response = requests.get(url)
-        response.raise_for_status()  # Verifica se houve erro na requisição
-        return pd.read_csv(url)
-    except requests.exceptions.RequestException as e:
-        st.error(f"Erro ao carregar {url}: {e}")
-        return None
-
-# 🔹 Função principal para execução do fluxo
-def main():
-    caminho_corridas = "https://raw.githubusercontent.com/vbautistacode/app/main/resultados_corridas.csv"
-    caminho_equipes = "https://raw.githubusercontent.com/vbautistacode/app/main/dados_equipe.csv"
-
-    try:
-        # ✅ Verificar se os arquivos existem antes de carregá-los
-        if not verificar_arquivo_github(caminho_corridas):
-            st.error(f"O arquivo '{caminho_corridas}' não foi encontrado no GitHub.")
-            return
-        if not verificar_arquivo_github(caminho_equipes):
-            st.error(f"O arquivo '{caminho_equipes}' não foi encontrado no GitHub.")
-            return
-
-        # ✅ Carregar os dados corretamente
-        dados_1 = carregar_csv_remoto(caminho_corridas)
-        dados_2 = carregar_csv_remoto(caminho_equipes)
-        
-        if dados_1 is None or dados_2 is None or dados_1.empty or dados_2.empty:
-            st.error("Erro ao carregar os arquivos. Verifique se eles existem e contêm dados.")
-            return
-
-        # ✅ Preprocessamento dos dados
-        X, y = preprocessar_dados(dados_1, dados_2)
-
-        if X is None or y is None:
-            st.error("Erro no preprocessamento. Certifique-se de que os arquivos de dados estão corretos.")
-            return
-
-        st.success("Preprocessamento concluído com sucesso!")
-
-    except Exception as e:
-        st.error(f"Erro ao carregar os arquivos: {e}")
-        return
-
-    # 🔹 Retroalimentação e métricas
-    try:
-        retroalimentacao_e_historico(X, y)
-    except Exception as e:
-        st.error(f"Erro na retroalimentação ou métricas: {e}")
-
-# 🔹 Função para preprocessamento de dados
-def preprocessar_dados(dados_1, dados_2):
-    try:
-        if dados_1.empty or dados_2.empty:
-            st.error("Os arquivos de dados estão vazios. Não foi possível preprocessar.")
-            return None, None
-
-        # ✅ Codificação de variáveis categóricas
-        label_encoder = LabelEncoder()
-        if 'Nome' in dados_1.columns:
-            dados_1['Nome_encoded'] = label_encoder.fit_transform(dados_1['Nome'])
-        if 'Going' in dados_1.columns:
-            pesos_going = {
-                "Firm": 3, "Good to Firm": 2, "Good": 1, "Good to Soft": 4,
-                "Soft": 6, "Heavy": 9, "Yielding": 5, "Standard": 1, "Slow": 9,
-                "All-Wether": 2
-            }
-            dados_1['Going_encoded'] = dados_1['Going'].map(pesos_going).fillna(0)
-
-        # ✅ Criação do conjunto X e y
-        colunas_features = ['Nome_encoded', 'Idade', 'Runs', 'Wins', 'Odds', 'Intervalo', 
-                            'Ranking', 'Going_encoded', 'Distancia', 'experiencia_jet']
-        
-        colunas_faltantes = [col for col in colunas_features if col not in dados_1.columns]
-        if colunas_faltantes:
-            st.error(f"Colunas ausentes nos dados de corridas: {colunas_faltantes}")
-            return None, None
-
-        X = dados_1[colunas_features]
-        y = dados_1['Ranking']
-
-        return X, y
-    except Exception as e:
-        st.error(f"Erro no preprocessamento: {e}")
-        return None, None
-
-# 🔹 Função para treinar o modelo com validação no tamanho dos dados
-def treinar_e_calcular_metricas(X, y):
-    try:
-        if X.shape[0] <= 1:  # Evita erro com menos de 2 amostras
-            st.warning("Poucos dados para treinar o modelo. Avaliação limitada.")
+with tab7:
+    # 🔹 Função para verificar se o arquivo existe no GitHub
+    def verificar_arquivo_github(url):
+        try:
+            response = requests.get(url)
+            return response.status_code == 200
+        except Exception as e:
+            return False
+    
+    # 🔹 Função para carregar CSV remoto com validação
+    def carregar_csv_remoto(url):
+        try:
+            response = requests.get(url)
+            response.raise_for_status()  # Verifica se houve erro na requisição
+            return pd.read_csv(url)
+        except requests.exceptions.RequestException as e:
+            st.error(f"Erro ao carregar {url}: {e}")
             return None
-
-        # ✅ Ajuste na divisão do dataset
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-        preprocessor = ColumnTransformer(
-            transformers=[
-                ('num', StandardScaler(), X.columns)
-            ]
-        )
-        pipeline = Pipeline(steps=[
-            ('preprocessor', preprocessor),
-            ('modelo', RandomForestClassifier(random_state=42))
-        ])
-
-        pipeline.fit(X_train, y_train)
-
-        # ✅ Cálculo de métricas
-        y_pred = pipeline.predict(X_test)
-        precisao = accuracy_score(y_test, y_pred)
-        recall = recall_score(y_test, y_pred, average='weighted')
-        precision = precision_score(y_test, y_pred, average='weighted')
-        f1 = f1_score(y_test, y_pred, average='weighted')
-
-        # ✅ Exibir métricas na interface Streamlit
-        st.write("#### Métricas de Desempenho do Modelo")
-        col1, col2, col3, col4 = st.columns(4)
-        with col1: st.metric(label="Acurácia", value=f"{precisao:.2f}")
-        with col2: st.metric(label="Recall", value=f"{recall:.2f}")
-        with col3: st.metric(label="Precisão", value=f"{precision:.2f}")
-        with col4: st.metric(label="F1-Score", value=f"{f1:.2f}")
-
-        return pipeline
-    except Exception as e:
-        st.error(f"Erro ao treinar o modelo: {e}")
-        return None
-
-if __name__ == "__main__":
-    main()
+    
+    # 🔹 Função principal para execução do fluxo
+    def main():
+        caminho_corridas = "https://raw.githubusercontent.com/vbautistacode/app/main/resultados_corridas.csv"
+        caminho_equipes = "https://raw.githubusercontent.com/vbautistacode/app/main/dados_equipe.csv"
+    
+        try:
+            # ✅ Verificar se os arquivos existem antes de carregá-los
+            if not verificar_arquivo_github(caminho_corridas):
+                st.error(f"O arquivo '{caminho_corridas}' não foi encontrado no GitHub.")
+                return
+            if not verificar_arquivo_github(caminho_equipes):
+                st.error(f"O arquivo '{caminho_equipes}' não foi encontrado no GitHub.")
+                return
+    
+            # ✅ Carregar os dados corretamente
+            dados_1 = carregar_csv_remoto(caminho_corridas)
+            dados_2 = carregar_csv_remoto(caminho_equipes)
+            
+            if dados_1 is None or dados_2 is None or dados_1.empty or dados_2.empty:
+                st.error("Erro ao carregar os arquivos. Verifique se eles existem e contêm dados.")
+                return
+    
+            # ✅ Preprocessamento dos dados
+            X, y = preprocessar_dados(dados_1, dados_2)
+    
+            if X is None or y is None:
+                st.error("Erro no preprocessamento. Certifique-se de que os arquivos de dados estão corretos.")
+                return
+    
+            st.success("Preprocessamento concluído com sucesso!")
+    
+        except Exception as e:
+            st.error(f"Erro ao carregar os arquivos: {e}")
+            return
+    
+        # 🔹 Retroalimentação e métricas
+        try:
+            retroalimentacao_e_historico(X, y)
+        except Exception as e:
+            st.error(f"Erro na retroalimentação ou métricas: {e}")
+    
+    # 🔹 Função para preprocessamento de dados
+    def preprocessar_dados(dados_1, dados_2):
+        try:
+            if dados_1.empty or dados_2.empty:
+                st.error("Os arquivos de dados estão vazios. Não foi possível preprocessar.")
+                return None, None
+    
+            # ✅ Codificação de variáveis categóricas
+            label_encoder = LabelEncoder()
+            if 'Nome' in dados_1.columns:
+                dados_1['Nome_encoded'] = label_encoder.fit_transform(dados_1['Nome'])
+            if 'Going' in dados_1.columns:
+                pesos_going = {
+                    "Firm": 3, "Good to Firm": 2, "Good": 1, "Good to Soft": 4,
+                    "Soft": 6, "Heavy": 9, "Yielding": 5, "Standard": 1, "Slow": 9,
+                    "All-Wether": 2
+                }
+                dados_1['Going_encoded'] = dados_1['Going'].map(pesos_going).fillna(0)
+    
+            # ✅ Criação do conjunto X e y
+            colunas_features = ['Nome_encoded', 'Idade', 'Runs', 'Wins', 'Odds', 'Intervalo', 
+                                'Ranking', 'Going_encoded', 'Distancia', 'experiencia_jet']
+            
+            colunas_faltantes = [col for col in colunas_features if col not in dados_1.columns]
+            if colunas_faltantes:
+                st.error(f"Colunas ausentes nos dados de corridas: {colunas_faltantes}")
+                return None, None
+    
+            X = dados_1[colunas_features]
+            y = dados_1['Ranking']
+    
+            return X, y
+        except Exception as e:
+            st.error(f"Erro no preprocessamento: {e}")
+            return None, None
+    
+    # 🔹 Função para treinar o modelo com validação no tamanho dos dados
+    def treinar_e_calcular_metricas(X, y):
+        try:
+            if X.shape[0] <= 1:  # Evita erro com menos de 2 amostras
+                st.warning("Poucos dados para treinar o modelo. Avaliação limitada.")
+                return None
+    
+            # ✅ Ajuste na divisão do dataset
+            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    
+            preprocessor = ColumnTransformer(
+                transformers=[
+                    ('num', StandardScaler(), X.columns)
+                ]
+            )
+            pipeline = Pipeline(steps=[
+                ('preprocessor', preprocessor),
+                ('modelo', RandomForestClassifier(random_state=42))
+            ])
+    
+            pipeline.fit(X_train, y_train)
+    
+            # ✅ Cálculo de métricas
+            y_pred = pipeline.predict(X_test)
+            precisao = accuracy_score(y_test, y_pred)
+            recall = recall_score(y_test, y_pred, average='weighted')
+            precision = precision_score(y_test, y_pred, average='weighted')
+            f1 = f1_score(y_test, y_pred, average='weighted')
+    
+            # ✅ Exibir métricas na interface Streamlit
+            st.write("#### Métricas de Desempenho do Modelo")
+            col1, col2, col3, col4 = st.columns(4)
+            with col1: st.metric(label="Acurácia", value=f"{precisao:.2f}")
+            with col2: st.metric(label="Recall", value=f"{recall:.2f}")
+            with col3: st.metric(label="Precisão", value=f"{precision:.2f}")
+            with col4: st.metric(label="F1-Score", value=f"{f1:.2f}")
+    
+            return pipeline
+        except Exception as e:
+            st.error(f"Erro ao treinar o modelo: {e}")
+            return None
+    
+    if __name__ == "__main__":
+        main()
