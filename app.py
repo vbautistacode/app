@@ -1388,12 +1388,11 @@ def verificar_arquivo_github(url):
     except Exception as e:
         return False
 
-with tab7:
-    # Função principal para execução do fluxo
-    def main():
-        caminho_corridas = "https://raw.githubusercontent.com/vbautistacode/app/main/resultados_corridas.csv"
-        caminho_equipes = "https://raw.githubusercontent.com/vbautistacode/app/main/dados_equipe.csv"
-    
+# Função principal para execução do fluxo
+def main():
+    caminho_corridas = "https://raw.githubusercontent.com/vbautistacode/app/main/resultados_corridas.csv"
+    caminho_equipes = "https://raw.githubusercontent.com/vbautistacode/app/main/dados_equipe.csv"
+    with tab7:
         try:
             # Verificar se os arquivos existem no GitHub
             if not verificar_arquivo_github(caminho_corridas):
@@ -1424,5 +1423,5 @@ with tab7:
         except Exception as e:
             st.error(f"Erro na retroalimentação ou métricas: {e}")
     
-        if __name__ == "__main__":
-        main()
+    if __name__ == "__main__":
+main()
