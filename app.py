@@ -21,9 +21,16 @@ import pandas as pd
 # Configurar Pandas para aceitar futuras mudanças no tratamento de objetos
 pd.set_option('future.no_silent_downcasting', True)
 
-# --- Funções para persistência ---
-diretorio_base = "https://raw.githubusercontent.com/vbautistacode/app/main/"
+# Configuração do GitHub
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+REPO_OWNER = "vbautistacode"
+REPO_NAME = "app"
+BRANCH = "main"
 
+# Diretório do repositório no GitHub
+diretorio_base = f"https://raw.githubusercontent.com/{REPO_OWNER}/{REPO_NAME}/{BRANCH}/"
+
+# Função para carregar dados direto do GitHub
 def load_data():
     arquivos = ["horse_data.json", "team_data.json", "bet_data.json"]
     
@@ -34,7 +41,44 @@ def load_data():
             response.raise_for_status()  # Verifica erros na requisição
             st.session_state[arquivo.replace(".json", "")] = response.json()
         except requests.exceptions.RequestException:
-            st.session_state[arquivo.replace(".json", "")] = []  # Retorna lista vazia se houver erro
+            st.session_state[arquivo.replace(".json", "")] = []  # Retorna lista vazia em caso de erro
+
+# Função para salvar dados no GitHub
+def salvar_csv_no_github(dataframe, nome_arquivo):
+    try:
+        if dataframe.empty:
+            st.warning(f"⚠️ O arquivo '{nome_arquivo}' está vazio! Não será salvo.")
+            return
+        
+        csv_content = dataframe.to_csv(index=False, encoding="utf-8")
+        encoded_content = base64.b64encode(csv_content.encode()).decode()
+        github_api_url = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/contents/{nome_arquivo}"
+        headers = {"Authorization": f"token {GITHUB_TOKEN}"}
+        
+        response = requests.get(github_api_url, headers=headers)
+        sha = response.json().get("sha", None)
+
+        payload = {
+            "message": f"Atualizando {nome_arquivo} via API",
+            "content": encoded_content,
+            "branch": BRANCH
+        }
+        if sha:
+            payload["sha"] = sha  # Atualiza arquivo existente
+
+        response = requests.put(github_api_url, json=payload, headers=headers)
+        if response.status_code in [200, 201]:
+            st.success(f"✅ {nome_arquivo} salvo no GitHub com sucesso!")
+        else:
+            st.error(f"❌ Erro ao salvar {nome_arquivo}: {response.json()}")
+
+    except Exception as e:
+        st.error(f"❌ Erro inesperado: {e}")
+
+# Inicialização dos dados no session_state
+if "initialized" not in st.session_state:
+    load_data()
+    st.session_state["initialized"] = True
 
 # Inicializa os dados no session_state
 if "horse_data" not in st.session_state:
@@ -51,46 +95,6 @@ if not st.session_state.get("initialized", False):
 
 if "Nome" not in st.session_state:
     st.session_state["Nome"] = "Cavalo_Default"  # Nome padrão ou escolha inicial
-
-# 🔹 Configuração do repositório GitHub
-GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
-GITHUB_API_URL = "https://api.github.com/user"
-REPO_OWNER = "vbautistacode"
-REPO_NAME = "app"
-BRANCH = "main"
-
-# ✅ Função para salvar CSV no GitHub
-def salvar_csv_no_github(dataframe, nome_arquivo):
-    try:
-        if dataframe.empty:
-            print(f"⚠️ O arquivo '{nome_arquivo}' está vazio! Não será salvo.")
-            return
-        
-        csv_content = dataframe.to_csv(index=False, encoding="utf-8")
-        encoded_content = base64.b64encode(csv_content.encode()).decode()
-        GITHUB_API_URL = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/contents/{nome_arquivo}"
-        headers = {"Authorization": f"token {GITHUB_TOKEN}"}
-        
-        response = requests.get(GITHUB_API_URL, headers=headers)
-        sha = response.json().get("sha", None)
-
-        payload = {
-            "message": f"Atualizando {nome_arquivo} via API",
-            "content": encoded_content,
-            "branch": BRANCH
-        }
-        if sha:
-            payload["sha"] = sha
-
-        response = requests.put(GITHUB_API_URL, json=payload, headers=headers)
-        if response.status_code in [200, 201]:
-            print(f"✅ {nome_arquivo} salvo no GitHub com sucesso!")
-        else:
-            print(f"❌ Erro ao salvar {nome_arquivo}: {response.json()}")
-
-    except Exception as e:
-        print(f"❌ Erro inesperado: {e}")
-
 
 # --- Funções de cálculo ---
 def kelly_criterion(b, implied_probability):
