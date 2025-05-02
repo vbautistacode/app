@@ -1113,8 +1113,8 @@ with tab6:
             else:
 # Criar novo DataFrame se o arquivo não existir
                 df_final = pd.DataFrame([nova_aposta])
-# Salvar no arquivo .xlsx
-            df_final.to_excel(file_path, index=False)
+# Salvar no arquivo .csv
+            df_final.to_csv(file_path.replace(".xlsx", ".csv"), index=False)
             st.success(f"As informações foram salvas em '{file_path}'!")
     else:
         st.warning(
