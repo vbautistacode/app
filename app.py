@@ -521,4 +521,4 @@ with tab4:
         else:
             st.warning("Dados de equipe indisponíveis para análise.")
 #4.2 Métricas Financeiras
-            st.write("### Distribuição das Apostas")
+st.write("### Distribuição das Apostas")
