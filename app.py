@@ -410,9 +410,11 @@ with tab3:
 # --- Aba 4: Resultados ---
 with tab4:
 #4.0. Dutching e Kelly
-    if st.session_state["horse_data"]:
+    if "horse_data" in st.session_state and st.session_state["horse_data"]:
         df_cavalos = pd.DataFrame(st.session_state["horse_data"])
         bankroll = st.number_input("Digite o valor do Bankroll", min_value=1.00, step=1.0)
+    else:
+        st.warning("⚠️ Nenhum dado de cavalos disponível. Verifique as entradas e tente novamente.")
 
     if "Odds" in df_cavalos.columns and not df_cavalos["Odds"].isnull().all():
         df_cavalos["Probability"] = (1 / df_cavalos["Odds"]).round(2)
