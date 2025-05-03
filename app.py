@@ -1169,7 +1169,7 @@ with tab6:
 # #---Aba 7: Machine Learning ---
 logging.basicConfig(level=logging.INFO)
 with tab7:
-# 🔹 Função para verificar se o arquivo existe no GitHub
+    # 🔹 Função para verificar se o arquivo existe no GitHub
     def verificar_arquivo_github(url):
         try:
             response = requests.get(url)
@@ -1182,45 +1182,44 @@ with tab7:
         try:
             response = requests.get(url)
             response.raise_for_status()  # Verifica se houve erro na requisição
-    
+        
             # Converter resposta para formato CSV
             return pd.read_csv(io.StringIO(response.text))
         except requests.exceptions.RequestException as e:
             st.error(f"Erro ao carregar {url}: {e}")
-            return None
+            return pd.DataFrame()  # Retorna DataFrame vazio em vez de None
     
     # 🔹 Função principal para execução do fluxo
     def main():
         caminho_corridas = "https://raw.githubusercontent.com/vbautistacode/app/main/resultados_corridas.csv"
         caminho_equipes = "https://raw.githubusercontent.com/vbautistacode/app/main/dados_equipe.csv"
     
-        try:
-            # ✅ Verificar se os arquivos existem antes de carregá-los
-            if not verificar_arquivo_github(caminho_corridas):
-                st.error(f"O arquivo '{caminho_corridas}' não foi encontrado no GitHub.")
-                return
-            if not verificar_arquivo_github(caminho_equipes):
-                st.error(f"O arquivo '{caminho_equipes}' não foi encontrado no GitHub.")
-                return
+        # ✅ Verificar se os arquivos existem antes de carregá-los
+        if not verificar_arquivo_github(caminho_corridas):
+            st.error(f"O arquivo '{caminho_corridas}' não foi encontrado no GitHub.")
+            return
+        if not verificar_arquivo_github(caminho_equipes):
+            st.error(f"O arquivo '{caminho_equipes}' não foi encontrado no GitHub.")
+            return
     
+        try:
             # ✅ Carregar os dados corretamente
             dados_1 = carregar_csv_remoto(caminho_corridas)
             dados_2 = carregar_csv_remoto(caminho_equipes)
-    
-            if dados_1 is None or dados_2 is None or dados_1.empty or dados_2.empty:
+
+            if dados_1.empty or dados_2.empty:
                 st.error("Erro ao carregar os arquivos. Verifique se eles existem e contêm dados.")
                 return
-    
-        except Exception as e:
-            st.error(f"Erro inesperado: {e}")
 
             # ✅ Preprocessamento dos dados
             X, y = preprocessar_dados(dados_1, dados_2)
-    
+
             if X is None or y is None:
                 st.error("Erro no preprocessamento. Certifique-se de que os arquivos de dados estão corretos.")
                 return
-    
+
+        except Exception as e:
+            st.error(f"Erro inesperado durante a execução: {e}")    
             st.success("Preprocessamento concluído com sucesso!")
     
         except Exception as e:
