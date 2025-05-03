@@ -29,6 +29,18 @@
         "Description": "Termo usado na Irlanda, equivalente ao 'Good to Soft'. Indica que o solo cede sob a pressão dos cascos."
       },
       {
+        "Type": "Standard",
+        "Description": "Solo padrão, geralmente usado em pistas de corrida artificiais. Proporciona uma superfície uniforme e previsível."
+      },
+      {
+        "Type": "Standard to Slow",
+        "Description": "Solo padrão, mas com mais umidade. Pode ser mais lento do que o 'Standard'."  
+      },
+      {
+        "Type": "Slow",
+        "Description": "Solo mais profundo e úmido, exigindo mais esforço dos cavalos. As corridas tendem a ser mais lentas."
+      },
+      {
         "Type": "All-Weather",
         "Description": "Superfície artificial com classificações como 'Fast', 'Standard' ou 'Slow'. Proporciona consistência, independentemente do clima."
       }
