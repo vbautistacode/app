@@ -1072,6 +1072,7 @@ if __name__ == "__main__":
 # --- Aba 6: Registro de Apostas ---
 with tab6:
     st.subheader("Registro de Apostas")
+    
     # Inicializar 'bet_data' e 'metrics' no estado global, se necessário
     if "bet_data" not in st.session_state:
         st.session_state["bet_data"] = []
@@ -1084,33 +1085,33 @@ with tab6:
         }
     if "bankroll_data" not in st.session_state:
         st.session_state["bankroll_data"] = []
-# Verificar se há dados de cavalos registrados
+
+    # Verificar se há dados de cavalos registrados
     if "horse_data" in st.session_state and st.session_state["horse_data"]:
         df_cavalos = pd.DataFrame(st.session_state["horse_data"])
-# Selectbox para selecionar o cavalo
-        nome = st.selectbox(
-            "Escolha o Cavalo",
-            df_cavalos["Nome"]
-        )
-# Atualizar as odds conforme o cavalo selecionado
-        odds_selecionadas = df_cavalos.loc[
-            df_cavalos["Nome"] == nome, "Odds"
-        ].values[0]
+
+        # Selectbox para selecionar o cavalo
+        nome = st.selectbox("Escolha o Cavalo", df_cavalos["Nome"])
+
+        # Atualizar as odds conforme o cavalo selecionado
+        odds_selecionadas = df_cavalos.loc[df_cavalos["Nome"] == nome, "Odds"].values[0]
         st.write(f"**Odds do Cavalo Selecionado:** {odds_selecionadas:.2f}")
-# Recuperar local ou usar padrão
+
+        # Recuperar local ou usar padrão
         local = st.session_state.get("local_atual", "Não definido")
-# Formulário para registrar nova aposta
+
+        # Formulário para registrar nova aposta
         with st.form("form_aposta"):
-            valor_apostado = st.number_input(
-                "Valor Apostado", min_value=1.0, step=1.0)
+            valor_apostado = st.number_input("Valor Apostado", min_value=1.0, step=1.0)
             resultado = st.selectbox("Resultado", ["Vitória", "Derrota"])
             lucro = st.number_input("Lucro", min_value=0.0, step=1.0)
             data = st.date_input("Data da Aposta")
             hora = st.time_input("Hora da Corrida")
-# tipo = st.text_input("Tipo de Pista")
+
             submit_button = st.form_submit_button("Registrar Aposta")
+
         if submit_button:
-# Criar a nova aposta
+            # Criar a nova aposta
             nova_aposta = {
                 "Local": local,
                 "Nome": nome,
@@ -1120,49 +1121,46 @@ with tab6:
                 "Lucro": lucro,
                 "Data": data,
                 "Hora": hora,
-# "Tipo de Pista": tipo,
             }
             st.session_state["bet_data"].append(nova_aposta)
             st.success("Aposta registrada com sucesso!")
+
             file_path = "https://raw.githubusercontent.com/vbautistacode/app/main/apostas_registradas.csv"
-    if os.path.exists(file_path):
-# Ler os dados existentes
-        df_existente = pd.read_csv(file_path)
-        df_nova_aposta = pd.DataFrame([nova_aposta])
-        df_final = pd.concat(
-            [df_existente, df_nova_aposta], ignore_index=True
-        )
+
+            if os.path.exists(file_path):
+                # Ler os dados existentes
+                df_existente = pd.read_csv(file_path)
+                df_nova_aposta = pd.DataFrame([nova_aposta])
+                df_final = pd.concat([df_existente, df_nova_aposta], ignore_index=True)
+            else:
+                df_final = pd.DataFrame([nova_aposta])
+                csv_path = file_path.replace(".xlsx", ".csv")
+                df_final.to_csv(csv_path, index=False)
+                st.success(f"As informações foram salvas em '{csv_path}'!")
+
     else:
-        df_final = pd.DataFrame([nova_aposta])
-        csv_path = file_path.replace(".xlsx", ".csv")
-        df_final.to_csv(csv_path, index=False)
-        st.success(f"As informações foram salvas em '{csv_path}'!")    
-    else:
-        st.warning("Nenhum dado de cavalos registrado. Cadastre os cavalos na aba Dados dos Cavalos antes de realizar apostas."
-        )
-# Garantir que há apostas antes de calcular as métricas
+        st.warning("Nenhum dado de cavalos registrado. Cadastre os cavalos na aba Dados dos Cavalos antes de realizar apostas.")
+
+    # Garantir que há apostas antes de calcular as métricas
     if st.session_state["bet_data"]:
-# Criar DataFrame a partir das apostas registradas
         df_apostas = pd.DataFrame(st.session_state["bet_data"])
-# Calcular métricas de apostas
+
+        # Calcular métricas de apostas
         total_apostas = len(df_apostas)
-        apostas_vencedoras = len(
-            df_apostas[df_apostas["Resultado"] == "Vitória"])
-        taxa_sucesso = (
-            (apostas_vencedoras / total_apostas) * 100
-            if total_apostas > 0
-            else 0
-        )
+        apostas_vencedoras = len(df_apostas[df_apostas["Resultado"] == "Vitória"])
+        taxa_sucesso = ((apostas_vencedoras / total_apostas) * 100 if total_apostas > 0 else 0)
         odds_media = df_apostas["Odds"].mean() if total_apostas > 0 else 0
         lucro_medio = df_apostas["Lucro"].mean() if total_apostas > 0 else 0
-# Salvar as métricas calculadas em 'metrics'
+
+        # Salvar as métricas calculadas em 'metrics'
         st.session_state["metrics"] = {
             "total_apostas": total_apostas,
             "taxa_sucesso": taxa_sucesso,
             "odds_media": odds_media,
             "lucro_medio": lucro_medio,
         }
-# Exibir apostas registradas
+
+        # Exibir apostas registradas
         st.write("### Apostas Realizadas")
         st.dataframe(df_apostas)
     else:
