@@ -91,19 +91,20 @@ if "Nome" not in st.session_state:
     st.session_state["Nome"] = "Cavalo_Default"  # Nome padrão ou escolha inicial
 
 # --- Funções de cálculo ---
-def kelly_criterion(b, implied_probability):
-    kelly_fraction = (b * implied_probability - ((1 - implied_probability)) / b)
-    return max(0, kelly_fraction)
+def kelly_criterion(odds, probability, bankroll):
+#Calcula a fração de Kelly para apostas estratégicas.
     b = odds - 1
+    kelly_fraction = (b * probability - (1 - probability)) / b
+    return max(0, round(bankroll * kelly_fraction, 2))
+
 def calculate_dutching(odds, bankroll):
-# Calcula as probabilidades implícitas com base nas odds fornecidas
-    implied_probabilities = [1 / odd for odd in odds]
-    total_probability = sum(implied_probabilities)
-# Normaliza as probabilidades se a soma delas exceder 1
+#Distribui aposta usando Dutching com ajuste para odds e desempenho da equipe.
+    probabilities = [1 / odd for odd in odds]
+    total_probability = sum(probabilities)
     if total_probability > 1:
-        implied_probabilities = [p / total_probability for p in implied_probabilities]
-# Usa o valor do bankroll como o total a ser investido
-    return [bankroll * p for p in implied_probabilities]
+        probabilities = [p / total_probability for p in probabilities]
+    apostas = [round(bankroll * p, 2) for p in probabilities]
+    return apostas
 
 # --- Interface Streamlit ---
 st.title("Apostas | Estratégias Dutching")
