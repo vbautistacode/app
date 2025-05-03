@@ -87,7 +87,7 @@ if "team_data" not in st.session_state:
     st.session_state["team_data"] = []
 if "going_conditions" not in st.session_state:  # 🔹 Evita erro de chave não definida
     st.session_state["going_conditions"] = ["Firm", "Good to Firm", "Good", "Good to Soft", "Soft", "Heavy", 
-                                            "Yielding", "Standard", "Slow", "All-Weather"]
+                                            "Yielding", "Standard", "Standard to Slow", "Slow", "All-Weather"]
 
 if not st.session_state.get("initialized", False):
     load_data()
@@ -797,6 +797,7 @@ def preprocessar_dados(dados_1, dados_2):
                 "Heavy": 9,
                 "Yielding": 5,
                 "Standard": 1,
+                "Standard to Slow": 7,
                 "Slow": 9,
                 "All-Wether": 2,
             }
@@ -1251,9 +1252,17 @@ with tab7:
                 dados_1['Nome_encoded'] = label_encoder.fit_transform(dados_1['Nome'])
             if 'Going' in dados_1.columns:
                 pesos_going = {
-                    "Firm": 3, "Good to Firm": 2, "Good": 1, "Good to Soft": 4,
-                    "Soft": 6, "Heavy": 9, "Yielding": 5, "Standard": 1, "Slow": 9,
-                    "All-Wether": 2
+                    "Firm": 3,
+                    "Good to Firm": 2,
+                    "Good": 1,
+                    "Good to Soft": 4,
+                    "Soft": 6,
+                    "Heavy": 9,
+                    "Yielding": 5,
+                    "Standard": 1,
+                    "Standard to Slow": 7,
+                    "Slow": 9,
+                    "All-Wether": 2,
                 }
                 dados_1['Going_encoded'] = dados_1['Going'].map(pesos_going).fillna(0)
     
