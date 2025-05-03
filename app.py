@@ -1132,13 +1132,13 @@ with tab6:
         df_final = pd.concat(
             [df_existente, df_nova_aposta], ignore_index=True
         )
-        else:
-            df_final = pd.DataFrame([nova_aposta])
-            csv_path = file_path.replace(".xlsx", ".csv")
-            df_final.to_csv(csv_path, index=False)
-            st.success(f"As informações foram salvas em '{csv_path}'!")    
-        else:
-            st.warning("Nenhum dado de cavalos registrado. Cadastre os cavalos na aba Dados dos Cavalos antes de realizar apostas."
+    else:
+        df_final = pd.DataFrame([nova_aposta])
+        csv_path = file_path.replace(".xlsx", ".csv")
+        df_final.to_csv(csv_path, index=False)
+        st.success(f"As informações foram salvas em '{csv_path}'!")    
+    else:
+        st.warning("Nenhum dado de cavalos registrado. Cadastre os cavalos na aba Dados dos Cavalos antes de realizar apostas."
         )
 # Garantir que há apostas antes de calcular as métricas
     if st.session_state["bet_data"]:
