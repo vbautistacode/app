@@ -1211,10 +1211,9 @@ with tab7:
                 st.error("Erro ao carregar os arquivos. Verifique se eles existem e contêm dados.")
                 return
     
-    except Exception as e:
-        st.error(f"Erro inesperado: {e}")
+        except Exception as e:
+            st.error(f"Erro inesperado: {e}")
 
-    
             # ✅ Preprocessamento dos dados
             X, y = preprocessar_dados(dados_1, dados_2)
     
