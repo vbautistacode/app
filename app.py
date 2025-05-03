@@ -1127,22 +1127,18 @@ with tab6:
             file_path = "https://raw.githubusercontent.com/vbautistacode/app/main/apostas_registradas.csv"
             if os.path.exists(file_path):
 # Ler os dados existentes
-                df_existente = pd.read_csv(file_path)
-                df_nova_aposta = pd.DataFrame([nova_aposta])
-                df_final = pd.concat(
-                    [df_existente, df_nova_aposta], ignore_index=True
-                )
+            df_existente = pd.read_csv(file_path)
+            df_nova_aposta = pd.DataFrame([nova_aposta])
+            df_final = pd.concat(
+                [df_existente, df_nova_aposta], ignore_index=True
+            )
             else:
-# Criar novo DataFrame se o arquivo não existir
                 df_final = pd.DataFrame([nova_aposta])
-# Salvar no arquivo .csv
                 csv_path = file_path.replace(".xlsx", ".csv")
                 df_final.to_csv(csv_path, index=False)
-# Exibir a mensagem com o nome correto
                 st.success(f"As informações foram salvas em '{csv_path}'!")    
             else:
-                st.warning(
-                    "Nenhum dado de cavalos registrado. Cadastre os cavalos na aba Dados dos Cavalos antes de realizar apostas."
+                st.warning("Nenhum dado de cavalos registrado. Cadastre os cavalos na aba Dados dos Cavalos antes de realizar apostas."
         )
 # Garantir que há apostas antes de calcular as métricas
     if st.session_state["bet_data"]:
