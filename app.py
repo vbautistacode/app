@@ -714,6 +714,7 @@ with tab4:
         st.plotly_chart(fig_line, use_container_width=True)
     else:
         st.warning("Dados insuficientes para gerar o gráfico de evolução do bankroll.")
+
 # --- Aba 5: Análise de Probabilidades ---
 # Configuração de logging
 logging.basicConfig(level=logging.INFO)
