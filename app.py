@@ -1141,8 +1141,8 @@ with tab6:
 # Exibir a mensagem com o nome correto
                 st.success(f"As informações foram salvas em '{csv_path}'!")    
             else:
-        st.warning(
-            "Nenhum dado de cavalos registrado. Cadastre os cavalos na aba Dados dos Cavalos antes de realizar apostas."
+                st.warning(
+                    "Nenhum dado de cavalos registrado. Cadastre os cavalos na aba Dados dos Cavalos antes de realizar apostas."
         )
 # Garantir que há apostas antes de calcular as métricas
     if st.session_state["bet_data"]:
