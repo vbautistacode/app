@@ -877,39 +877,51 @@ def calcular_probabilidades_vencedor_e_exibir(dados):
             st.error("O conjunto de dados está vazio. Não é possível calcular probabilidades.")
             st.stop()
         with tab5:
-# Cálculos de probabilidade
-            dados['desempenho_historico'] = (
-                ((dados['Wins'] + dados['2nds'] + dados['3rds']) / (dados['Runs'] + 1e-6))
-            )
-            dados['probabilidade_vitoria'] = (((1 / dados['desempenho_historico'] - dados['experiencia_jet']) + (1 + dados['Odds']) * 1.768) * ((dados['Intervalo_Peso'] * 0.127) - (dados['Going_encoded'] * 0.685)))
-# Normalizar as probabilidades
-            prob_min = dados['probabilidade_vitoria'].min()
-            prob_max = dados['probabilidade_vitoria'].max()
-            if prob_max - prob_min == 0:
-                st.error("Erro: As probabilidades calculadas são todas iguais.")
-            else:
-                num_cavalos = dados['Nome'].nunique()
-                dados['probabilidade_vitoria_normalizada'] = (
-                    ((dados['probabilidade_vitoria'] - prob_min) / (prob_max - prob_min)) * 100
-                ) / num_cavalos
-# Cavalo vencedor
-            vencedor = dados.loc[dados['probabilidade_vitoria_normalizada'].idxmax(), 'Nome']
-            prob_vencedor = dados['probabilidade_vitoria_normalizada'].max()
-            st.success(f"O cavalo com maior probabilidade de vencer é *{vencedor}* com *{prob_vencedor:.2f}%* de chance!")
+# Preencher valores nulos antes dos cálculos
+                colunas_prob = ['Wins', '2nds', '3rds', 'Runs', 'experiencia_jet', 'Odds', 'Intervalo_Peso', 'Going_encoded']
+                dados[colunas_prob] = dados[colunas_prob].fillna(0)
+# Cálculo do desempenho histórico
+                dados['desempenho_historico'] = (dados['Wins'] + dados['2nds'] + dados['3rds']) / dados['Runs'].replace(0, 1)
+# Cálculo da probabilidade de vitória
+                dados['probabilidade_vitoria'] = (((1 / (dados['desempenho_historico'] + 1e-6) - dados['experiencia_jet']) + (1 + dados['Odds']) * 1.768) * ((dados['Intervalo_Peso'] * 0.127) - (dados['Going_encoded'] * 0.685)))
+# Verificar se há valores válidos para normalização
+                if not dados['probabilidade_vitoria'].isna().all():
+                    prob_min = dados['probabilidade_vitoria'].min()
+                    prob_max = dados['probabilidade_vitoria'].max()
+                    if prob_max - prob_min == 0:
+                        st.error("Erro: As probabilidades calculadas são todas iguais.")
+                        dados['probabilidade_vitoria_normalizada'] = 100 / dados['Nome'].nunique()  # Distribui uniformemente
+                    else:
+                        dados['probabilidade_vitoria_normalizada'] = (
+                            ((dados['probabilidade_vitoria'] - prob_min) / (prob_max - prob_min)) * 100
+                        )
+                else:
+                    st.error("Erro: Não há valores válidos para calcular a probabilidade.")
+# Cavalo vencedor - verificar se há dados válidos
+                if "probabilidade_vitoria_normalizada" in dados.columns and not dados["probabilidade_vitoria_normalizada"].isna().all():
+                    prob_vencedor_max = dados["probabilidade_vitoria_normalizada"].max()
+                    vencedores = dados[dados["probabilidade_vitoria_normalizada"] == prob_vencedor_max]["Nome"].tolist()
+                    if len(vencedores) == 1:
+                        st.success(f"O cavalo com maior probabilidade de vencer é *{vencedores[0]}* com *{prob_vencedor_max:.2f}%* de chance!")
+                    else:
+                        st.success(f"Cavalos com maior probabilidade de vencer: {', '.join(vencedores)} com *{prob_vencedor_max:.2f}%* de chance!")
+                else:
+                    st.warning("Não foi possível determinar um cavalo vencedor. Verifique os dados de entrada.")
 # Exibir gráfico
-            st.write("##### Análise de Probabilidade Composta")
-            plt.figure(figsize=(8, 6))
-            plt.barh(dados['Nome'], dados['probabilidade_vitoria_normalizada'], color='lightgreen')
-            plt.xlabel('Probabilidade de Vitória (%)')
-            plt.ylabel('Cavalos')
-            plt.grid(axis='x', linestyle='--', alpha=0.7)
-            st.pyplot(plt)
+                st.write("##### Análise de Probabilidade Composta")
+                plt.figure(figsize=(8, 6))
+                plt.barh(dados['Nome'], dados['probabilidade_vitoria_normalizada'].fillna(0), color='lightgreen')
+                plt.xlabel('Probabilidade de Vitória (%)')
+                plt.ylabel('Cavalos')
+                plt.grid(axis='x', linestyle='--', alpha=0.7)
+                st.pyplot(plt)
 # Exibir probabilidades em formato de tabela
-            st.write("##### Probabilidades de Cada Cavalo")
-            tabela_probabilidades = dados[['Nome', 'probabilidade_vitoria_normalizada']].sort_values(by='probabilidade_vitoria_normalizada', ascending=False)
-            st.dataframe(tabela_probabilidades)
+                st.write("##### Probabilidades de Cada Cavalo")
+                tabela_probabilidades = dados[['Nome', 'probabilidade_vitoria_normalizada']].sort_values(by='probabilidade_vitoria_normalizada', ascending=False)
+                st.dataframe(tabela_probabilidades)
     except Exception as e:
-            st.error(f"Erro ao calcular ou exibir as probabilidades: {e}")
+        st.error(f"Erro ao calcular as probabilidades: {e}")
+        
 def treinar_e_avaliar_modelo(X, y):
     try:
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
