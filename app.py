@@ -1169,20 +1169,22 @@ with tab6:
 # #---Aba 7: Machine Learning ---
 logging.basicConfig(level=logging.INFO)
 with tab7:
-    # 🔹 Função para verificar se o arquivo existe no GitHub
+# 🔹 Função para verificar se o arquivo existe no GitHub
     def verificar_arquivo_github(url):
         try:
             response = requests.get(url)
             return response.status_code == 200
-        except Exception as e:
+        except Exception:
             return False
     
-    # 🔹 Função para carregar CSV remoto com validação
+    # 🔹 Função para carregar CSV remoto corretamente
     def carregar_csv_remoto(url):
         try:
             response = requests.get(url)
             response.raise_for_status()  # Verifica se houve erro na requisição
-            return pd.read_csv(url)
+    
+            # Converter resposta para formato CSV
+            return pd.read_csv(io.StringIO(response.text))
         except requests.exceptions.RequestException as e:
             st.error(f"Erro ao carregar {url}: {e}")
             return None
@@ -1204,10 +1206,14 @@ with tab7:
             # ✅ Carregar os dados corretamente
             dados_1 = carregar_csv_remoto(caminho_corridas)
             dados_2 = carregar_csv_remoto(caminho_equipes)
-            
+    
             if dados_1 is None or dados_2 is None or dados_1.empty or dados_2.empty:
                 st.error("Erro ao carregar os arquivos. Verifique se eles existem e contêm dados.")
                 return
+    
+    except Exception as e:
+        st.error(f"Erro inesperado: {e}")
+
     
             # ✅ Preprocessamento dos dados
             X, y = preprocessar_dados(dados_1, dados_2)
