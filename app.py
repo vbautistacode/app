@@ -616,7 +616,7 @@ with tab4:
             st.write("##### Histórico de Performance Pessoal")
             st.dataframe(performance_pessoal)
             lucro_total = performance_pessoal["Lucro Total"].sum()
-            st.write("#### 💰Lucro Total de Apostas: R$ {lucro_total:,.2f}")
+            st.write(f"#### 💰Lucro Total de Apostas: R$ {lucro_total:,.2f}")
         else:
             st.warning("As colunas 'Nome', 'Lucro', 'Valor Apostado' e 'Odds' são necessárias para calcular o Histórico de Performance Pessoal.")
 #4.3.2 Índice de Recuperação
@@ -1142,7 +1142,6 @@ with tab6:
             }
             st.session_state["bet_data"].append(nova_aposta)
             st.success("Aposta registrada com sucesso!")
-# Salvar aposta em um arquivo Excel
             file_path = "https://raw.githubusercontent.com/vbautistacode/app/main/apostas_registradas.csv"
             if os.path.exists(file_path):
 # Ler os dados existentes
