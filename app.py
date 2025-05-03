@@ -1139,7 +1139,8 @@ with tab6:
                 csv_path = file_path.replace(".xlsx", ".csv")
                 df_final.to_csv(csv_path, index=False)
 # Exibir a mensagem com o nome correto
-                st.success(f"As informações foram salvas em '{csv_path}'!")    else:
+                st.success(f"As informações foram salvas em '{csv_path}'!")    
+            else:
         st.warning(
             "Nenhum dado de cavalos registrado. Cadastre os cavalos na aba Dados dos Cavalos antes de realizar apostas."
         )
