@@ -638,7 +638,7 @@ nome_arquivo = "https://raw.githubusercontent.com/vbautistacode/app/main/apostas
 try:
     with tab4:
 # Carregar os dados do arquivo
-        df_cavalos = pd.read_excel(nome_arquivo)    
+        df_cavalos = pd.read_csv(nome_arquivo)    
 # Verificar se as colunas necessárias estão disponíveis
         if {"Nome", "Lucro", "Valor Apostado", "Local"}.issubset(df_cavalos.columns):
 # Calcular "Lucro Total"
