@@ -439,7 +439,7 @@ with tab4:
         total_dutching = round(df_cavalos["Dutching Bet"].sum(), 2)
 
 # --- Ajuste das apostas baseado na performance das equipes ---
-st.write("### Análise de Performance por Equipe")
+    st.write("### Análise de Performance por Equipe")
 
 if "team_data" in st.session_state and st.session_state["team_data"]:
     df_desempenho = []
