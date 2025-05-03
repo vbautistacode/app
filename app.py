@@ -10,12 +10,6 @@ import plotly.graph_objects as go
 import matplotlib.pyplot as plt
 import logging
 from datetime import datetime, timedelta
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder, StandardScaler, OneHotEncoder
-from sklearn.compose import ColumnTransformer
-from sklearn.pipeline import Pipeline
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, classification_report, precision_score, recall_score, f1_score
 import pandas as pd
 
 # Configurar Pandas para aceitar futuras mudanças no tratamento de objetos
@@ -526,3 +520,4 @@ with tab4:
         else:
             st.warning("Dados de equipe indisponíveis para análise.")
 #4.2 Métricas Financeiras
+            st.write("### Distribuição das Apostas")
