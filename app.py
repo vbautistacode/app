@@ -696,24 +696,6 @@ except FileNotFoundError:
     st.error(f"O arquivo '{nome_arquivo}' não foi encontrado. Certifique-se de que ele está na mesma pasta do aplicativo.")
 except Exception as e:
     st.error(f"Erro ao carregar ou processar os dados: {str(e)}")
-    
-#4.4.2.Gráficos de Evolução do Bankroll: Monitorar o crescimento ou retração ao longo do tempo.
-with tab4:
-    if "Lucro Total" in df_cavalos.columns:  # Verificar se a coluna existe
-        df_bankroll = pd.DataFrame(df_cavalos[["Lucro Total"]])  
-        df_bankroll["Data"] = pd.to_datetime(df_cavalos["Data"])  # Garantir formato datetime
-        
-        st.write("#### Evolução do Bankroll")
-        fig_line = px.line(
-            df_bankroll,
-            x="Data",
-            y="Lucro Total",
-            title="Evolução do Bankroll ao Longo do Tempo",
-            markers=True
-        )
-        st.plotly_chart(fig_line, use_container_width=True)
-    else:
-        st.warning("Dados insuficientes para gerar o gráfico de evolução do bankroll.")
 
 # --- Aba 5: Análise de Probabilidades ---
 # Configuração de logging
@@ -1154,9 +1136,10 @@ with tab6:
 # Criar novo DataFrame se o arquivo não existir
                 df_final = pd.DataFrame([nova_aposta])
 # Salvar no arquivo .csv
-            df_final.to_csv(file_path.replace(".xlsx", ".csv"), index=False)
-            st.success(f"As informações foram salvas em '{file_path}'!")
-    else:
+                csv_path = file_path.replace(".xlsx", ".csv")
+                df_final.to_csv(csv_path, index=False)
+# Exibir a mensagem com o nome correto
+                st.success(f"As informações foram salvas em '{csv_path}'!")    else:
         st.warning(
             "Nenhum dado de cavalos registrado. Cadastre os cavalos na aba Dados dos Cavalos antes de realizar apostas."
         )
