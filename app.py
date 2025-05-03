@@ -616,7 +616,7 @@ with tab4:
             st.write("##### Histórico de Performance Pessoal")
             st.dataframe(performance_pessoal)
             lucro_total = performance_pessoal["Lucro Total"].sum()
-            st.write(f""""" 💰Lucro Total de Apostas: R$ {lucro_total:,.2f}")
+            st.write("#### 💰Lucro Total de Apostas: R$ {lucro_total:,.2f}")
         else:
             st.warning("As colunas 'Nome', 'Lucro', 'Valor Apostado' e 'Odds' são necessárias para calcular o Histórico de Performance Pessoal.")
 #4.3.2 Índice de Recuperação
@@ -1338,4 +1338,4 @@ with tab7:
             return None
     
     if __name__ == "__main__":
-        main()
+main()
