@@ -148,7 +148,7 @@ with tab1:
 
 # --- Aba 2: Dados dos Cavalos ---
 with tab2:
-    st.subheader("Informações Técnicas de Cavalos")
+    st.subheader("Dados Históricos | Cavalos")
 # ✅ Verifica se 'horse_data' já foi inicializado
     if "horse_data" not in st.session_state:
         st.session_state["horse_data"] = []
@@ -265,7 +265,7 @@ with tab2:
 
 # --- Aba 3: Dados das Equipes ---
 with tab3:
-    st.subheader("Informações Técnicas de Equipes")
+    st.subheader("Dados Históricos | Equipes")
 # Inicializa o estado das equipes
     if "team_data" not in st.session_state:
         st.session_state["team_data"] = []
