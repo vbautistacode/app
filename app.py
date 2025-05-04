@@ -183,19 +183,19 @@ with tab2:
         with col2:
             odds = st.number_input("Odds (Probabilidades)", min_value=0.01, step=0.01, value=cavalo_dados["Odds"] if cavalo_dados else 0.01)
 # ✅ Ajuste de cálculo de intervalo de dias
-            data_anterior = st.date_input("Data Última Corrida", value=datetime.today().date())
-            data_anterior = datetime.combine(data_anterior, datetime.min.time())
-            data_atual = datetime.now()
-            diferenca_dias = (data_atual - data_anterior).days
-            st.session_state["diferenca_dias"] = diferenca_dias
-            intervalo_corridas = st.number_input("Intervalo", min_value=0, step=1, value=diferenca_dias)
-            Ranking = st.number_input("Ranking (Colocação)", min_value=0, step=1, value=cavalo_dados["Ranking"] if cavalo_dados else 0)
+            # data_anterior = st.date_input("Data Última Corrida", value=datetime.today().date())
+            # data_anterior = datetime.combine(data_anterior, datetime.min.time())
+            # data_atual = datetime.now()
+            # diferenca_dias = (data_atual - data_anterior).days
+            # st.session_state["diferenca_dias"] = diferenca_dias
+            # intervalo_corridas = st.number_input("Intervalo", min_value=0, step=1, value=diferenca_dias)
+            # Ranking = st.number_input("Ranking (Colocação)", min_value=0, step=1, value=cavalo_dados["Ranking"] if cavalo_dados else 0)
 # ✅ Corrige o acesso ao tipo de pista
-            going = st.selectbox("Going", st.session_state.get("going_conditions", 
-                ["Firm", "Good to Firm", "Good", "Good to Soft", "Soft", "Heavy", "Yielding", "Standard", "Slow", "All-Weather"]), 
-                key="select_going_2"
-            )
-            distancia = st.number_input("Distancia", min_value=0.00, step=0.01, value=cavalo_dados["Distancia"] if cavalo_dados else 0.00)
+            # going = st.selectbox("Going", st.session_state.get("going_conditions", 
+            #     ["Firm", "Good to Firm", "Good", "Good to Soft", "Soft", "Heavy", "Yielding", "Standard", "Slow", "All-Weather"]), 
+            #     key="select_going_2"
+            # )
+            # distancia = st.number_input("Distancia", min_value=0.00, step=0.01, value=cavalo_dados["Distancia"] if cavalo_dados else 0.00)
 # ✅ Botão para salvar dados do cavalo
         if st.button("Salvar Dados do Cavalo"):
             novo_cavalo = {
