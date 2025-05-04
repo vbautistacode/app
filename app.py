@@ -483,3 +483,53 @@ if "team_data" in st.session_state and st.session_state["team_data"]:
     # Exibir apostas ajustadas
     st.write("### Apostas Ajustadas")
     st.dataframe(df_cavalos[["Nome", "Adjusted Bet"]])
+
+# Função para simular retornos
+    def simulate_returns(df_cavalos, bankroll):
+        """
+        Simula os possíveis retornos com base nos valores apostados e nas odds.
+        Retorna um DataFrame com os resultados esperados.
+        """
+        resultados = []
+    
+        for _, row in df_cavalos.iterrows():
+            cavalo = row["Nome"]
+            odd = row["Odds"]
+            dutching_bet = row["Dutching Bet"]
+            kelly_bet = row["Kelly Bet"]
+    
+            # Lucros esperados se este cavalo vencer
+            lucro_dutching = (odd * dutching_bet) - bankroll
+            lucro_kelly = (odd * kelly_bet) - bankroll
+    
+            resultados.append({
+                "Cavalo": cavalo,
+                "Odd": odd,
+                "Dutching Bet": dutching_bet,
+                "Kelly Bet": kelly_bet,
+                "Lucro Dutching ($)": round(lucro_dutching, 2),
+                "Lucro Kelly ($)": round(lucro_kelly, 2),
+                "ROI Dutching (%)": round((lucro_dutching / bankroll) * 100, 2),
+                "ROI Kelly (%)": round((lucro_kelly / bankroll) * 100, 2),
+            })
+    
+        return pd.DataFrame(resultados)
+    
+    # Interface Streamlit
+    st.write("### Simulação de Retornos Esperados")
+    if "horse_data" in st.session_state and st.session_state["horse_data"]:
+        df_cavalos = pd.DataFrame(st.session_state["horse_data"])
+        bankroll = st.number_input("Digite o valor do Bankroll", min_value=1.00, step=1.0)
+    
+        if "Odds" in df_cavalos.columns and not df_cavalos["Odds"].isnull().all():
+            df_cavalos["Probability"] = (1 / df_cavalos["Odds"]).round(2)
+            df_cavalos["Dutching Bet"] = calculate_dutching(df_cavalos["Odds"], bankroll)
+            df_cavalos["Kelly Bet"] = df_cavalos.apply(
+                lambda row: kelly_criterion(row["Odds"], row["Probability"], bankroll), axis=1
+            )
+    
+            # Executa a simulação
+            df_simulacao = simulate_returns(df_cavalos, bankroll)
+    
+            # Exibir os resultados na interface
+            st.dataframe(df_simulacao)
