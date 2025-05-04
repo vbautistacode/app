@@ -426,13 +426,13 @@ with tab4:
                 lambda row: kelly_criterion(row["Odds"], row["Probability"], bankroll), axis=1
             )
             df_cavalos["Lucro KB"] = round(df_cavalos["Odds"] * df_cavalos["Kelly Bet"], 2)
-            df_cavalos["Lucro DB"] = round(df_cavalos["Odds"] * df_cavalos["Dutching Bet"], 2)
+            df_cavalos["Lucro Dutch"] = round(df_cavalos["Odds"] * df_cavalos["Dutching Bet"], 2)
             df_cavalos["ROI-kb($)"] = round((df_cavalos["Lucro KB"] - df_cavalos["Kelly Bet"]), 2)
-            df_cavalos["ROI-db($)"] = round((df_cavalos["Lucro DB"] - df_cavalos["Dutching Bet"]), 2)
+            df_cavalos["ROI-Dutch($)"] = round((df_cavalos["Lucro DB"] - df_cavalos["Dutching Bet"]), 2)
             df_cavalos["ROI (%)"] = round((df_cavalos["Lucro DB"] / df_cavalos["Dutching Bet"]) * 100, 2)
 
         # Exibir tabela formatada no Streamlit
-        st.dataframe(df_cavalos[["Nome", "Odds", "Probability", "Kelly Bet", "Dutching Bet", "Lucro KB", "Lucro DB", "ROI (%)"]])
+        st.dataframe(df_cavalos[["Nome", "Odds", "Probability", "Dutching Bet", "Lucro DB", "ROI-Dutch($)", "ROI (%)"]])
 
         # Cálculo do somatório da coluna "Dutching Bet"
         total_dutching = round(df_cavalos["Dutching Bet"].sum(), 2)
