@@ -80,7 +80,7 @@ def calculate_dutching(odds, bankroll):
         probabilities = [p / total_probability for p in probabilities]
     apostas = [round(bankroll * p, 2) for p in probabilities]
     return apostas
-def rebalance_bets(df_cavalos, bankroll, min_performance=0.18):
+def rebalance_bets(df_cavalos, bankroll, min_performance=0.19):
 # Rebalanceia as apostas removendo cavalos com desempenho abaixo do limite.
     df_filtrado = df_cavalos[df_cavalos["Probability"] >= min_performance]
     if df_filtrado.empty:
@@ -468,33 +468,3 @@ with tab4:
 # Exibir apostas ajustadas
         st.write("### Apostas Ajustadas")
         st.dataframe(df_cavalos[["Nome", "Adjusted Bet"]])
-# --- Simulação de Retornos Esperados ---
-    def simulate_returns(df_cavalos, bankroll):
-#Simula os possíveis retornos com base nos valores apostados e nas odds.
-        resultados = []    
-        for _, row in df_cavalos.iterrows():
-            cavalo = row["Nome"]
-            odd = row["Odds"]
-            dutching_bet = row["Dutching Bet"]
-# Lucros esperados se este cavalo vencer
-            lucro_dutching = (odd * dutching_bet) - bankroll    
-            resultados.append({
-                "Cavalo": cavalo,
-                "Odd": odd,
-                "Dutching Bet": dutching_bet,
-                "Lucro Dutching ($)": round(lucro_dutching, 2),
-                "ROI Dutching (%)": round((lucro_dutching / bankroll) * 100, 2),
-            })
-        return pd.DataFrame(resultados)
-    st.write("### Simulação de Retornos Esperados")
-    if "horse_data" in st.session_state and st.session_state["horse_data"]:
-        df_cavalos = pd.DataFrame(st.session_state["horse_data"])    
-# Usando o slider para ajustar dinamicamente o bankroll
-        bankroll = st.slider("Ajuste o valor do Bankroll", min_value=10.0, max_value=5000.0, step=10.0, value=100.0, key="bankroll_slider_simulacao")
-        if "Odds" in df_cavalos.columns and not df_cavalos["Odds"].isnull().all():
-            df_cavalos["Probability"] = (1 / df_cavalos["Odds"]).round(2)
-            df_cavalos["Dutching Bet"] = calculate_dutching(df_cavalos["Odds"], bankroll)    
-# Executa a simulação
-            df_simulacao = simulate_returns(df_cavalos, bankroll)
-# Exibir os resultados na interface
-            st.dataframe(df_simulacao)
