@@ -429,7 +429,7 @@ with tab4:
             df_cavalos["Lucro Dutch"] = round(df_cavalos["Odds"] * df_cavalos["Dutching Bet"], 2)
             df_cavalos["ROI-kb($)"] = round((df_cavalos["Lucro KB"] - df_cavalos["Kelly Bet"]), 2)
             df_cavalos["ROI-Dutch($)"] = round((df_cavalos["Lucro Dutch"] - df_cavalos["Dutching Bet"]), 2)
-            df_cavalos["ROI (%)"] = round((df_cavalos["Lucro DB"] / df_cavalos["Dutching Bet"]) * 100, 2)
+            df_cavalos["ROI (%)"] = round((df_cavalos["Lucro Dutch"] / df_cavalos["Dutching Bet"]) * 100, 2)
 
         # Exibir tabela formatada no Streamlit
         st.dataframe(df_cavalos[["Nome", "Odds", "Probability", "Dutching Bet", "Lucro Dutch", "ROI-Dutch($)", "ROI (%)"]])
