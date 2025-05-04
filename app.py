@@ -80,8 +80,7 @@ if "horse_data" not in st.session_state:
 if "team_data" not in st.session_state:
     st.session_state["team_data"] = []
 #if "going_conditions" not in st.session_state:  # 🔹 Evita erro de chave não definida
-    #st.session_state["going_conditions"] = ["Firm", "Good to Firm", "Good", "Good to Soft", "Soft", "Heavy", 
-                                            "Yielding", "Standard", "Standard to Slow", "Slow", "All-Weather"]
+    #st.session_state["going_conditions"] = ["Firm", "Good to Firm", "Good", "Good to Soft", "Soft", "Heavy", "Yielding", "Standard", "Standard to Slow", "Slow", "All-Weather"]
 
 if not st.session_state.get("initialized", False):
     load_data()
