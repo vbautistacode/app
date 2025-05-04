@@ -79,8 +79,8 @@ if "horse_data" not in st.session_state:
     st.session_state["horse_data"] = []
 if "team_data" not in st.session_state:
     st.session_state["team_data"] = []
-if "going_conditions" not in st.session_state:  # 🔹 Evita erro de chave não definida
-    st.session_state["going_conditions"] = ["Firm", "Good to Firm", "Good", "Good to Soft", "Soft", "Heavy", 
+#if "going_conditions" not in st.session_state:  # 🔹 Evita erro de chave não definida
+    #st.session_state["going_conditions"] = ["Firm", "Good to Firm", "Good", "Good to Soft", "Soft", "Heavy", 
                                             "Yielding", "Standard", "Standard to Slow", "Slow", "All-Weather"]
 
 if not st.session_state.get("initialized", False):
@@ -141,11 +141,11 @@ with tab1:
             st.warning("Este local já está registrado.")
 
     # Lista de opções de "Going"
-    tipo_pista = st.selectbox("Escolha o tipo de pista (Going):", st.session_state["going_conditions"], key="select_going_1")
+    #tipo_pista = st.selectbox("Escolha o tipo de pista (Going):", st.session_state["going_conditions"], key="select_going_1")
 
     # Salvar o tipo de pista selecionado no `session_state`
-    st.session_state["tipo_pista_atual"] = tipo_pista
-    st.session_state["distance"] = st.number_input("Distância da Pista", min_value=0.00, step=0.01)
+    #st.session_state["tipo_pista_atual"] = tipo_pista
+    #st.session_state["distance"] = st.number_input("Distância da Pista", min_value=0.00, step=0.01)
 
 # --- Aba 2: Dados dos Cavalos ---
 with tab2:
