@@ -411,7 +411,7 @@ with tab4:
 #4.0. Dutching e Kelly
     if "horse_data" in st.session_state and st.session_state["horse_data"]:
         df_cavalos = pd.DataFrame(st.session_state["horse_data"])
-        bankroll = st.number_input("Digite o valor do Bankroll", min_value=1.00, step=1.0)
+        bankroll = st.number_input("Digite o valor do Bankroll", min_value=1.00, step=1.0 key="bankroll_input")
     else:
         st.warning("⚠️ Nenhum dado de cavalos disponível. Verifique as entradas e tente novamente.")
         df_cavalos = pd.DataFrame()  # Criação de um DataFrame vazio para evitar erro
@@ -484,7 +484,7 @@ with tab4:
             st.dataframe(pd.DataFrame(df_desempenho))
         else:
             st.warning(f"Nenhum dado encontrado para a equipe '{equipe_selecionada}'.")
-# 4.1.1. Melhor Equipe com Base na Performance
+# 4.1. Melhor Equipe com Base na Performance
         if "team_data" in st.session_state and st.session_state["team_data"]:
             df_desempenho = []
             for team in st.session_state["team_data"]:
@@ -566,7 +566,7 @@ with tab4:
         st.write("### Simulação de Retornos Esperados")
         if "horse_data" in st.session_state and st.session_state["horse_data"]:
             df_cavalos = pd.DataFrame(st.session_state["horse_data"])
-            bankroll = st.number_input("Digite o valor do Bankroll", min_value=1.00, step=1.0 key="bankroll_input")
+            bankroll = st.number_input("Digite o valor do Bankroll", min_value=1.00, step=1.0 key="bankroll_input_simulacao")
         
             if "Odds" in df_cavalos.columns and not df_cavalos["Odds"].isnull().all():
                 df_cavalos["Probability"] = (1 / df_cavalos["Odds"]).round(2)
