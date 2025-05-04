@@ -432,7 +432,7 @@ with tab4:
             df_cavalos["ROI (%)"] = round((df_cavalos["Lucro DB"] / df_cavalos["Dutching Bet"]) * 100, 2)
 
         # Exibir tabela formatada no Streamlit
-        st.dataframe(df_cavalos[["Nome", "Odds", "Probability", "Dutching Bet", "Lucro DB", "ROI-Dutch($)", "ROI (%)"]])
+        st.dataframe(df_cavalos[["Nome", "Odds", "Probability", "Dutching Bet", "Lucro Dutch", "ROI-Dutch($)", "ROI (%)"]])
 
         # Cálculo do somatório da coluna "Dutching Bet"
         total_dutching = round(df_cavalos["Dutching Bet"].sum(), 2)
