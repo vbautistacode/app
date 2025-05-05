@@ -427,52 +427,52 @@ with tab4:
     elif opcao_visualizacao == "Desempenho das Equipes" and not df_desempenho.empty:
         st.dataframe(df_desempenho)
 
-    # # Cálculo de probabilidades e apostas Dutching
-    # if not df_cavalos.empty:
-    #     df_cavalos["Probability"] = (1 / df_cavalos["Odds"]).round(2)
-    #     df_cavalos["Dutching Bet"] = calculate_dutching(df_cavalos["Odds"], bankroll, np.ones(len(df_cavalos)))
-    #     df_cavalos["Lucro Dutch"] = round(df_cavalos["Odds"] * df_cavalos["Dutching Bet"], 2)
-    #     df_cavalos["ROI-Dutch($)"] = round((df_cavalos["Lucro Dutch"] - df_cavalos["Dutching Bet"]), 2)
-    #     df_cavalos["ROI (%)"] = round((df_cavalos["Lucro Dutch"] / df_cavalos["Dutching Bet"]) * 100, 2)
+    # Cálculo de probabilidades e apostas Dutching
+    if not df_cavalos.empty:
+        df_cavalos["Probability"] = (1 / df_cavalos["Odds"]).round(2)
+        df_cavalos["Dutching Bet"] = calculate_dutching(df_cavalos["Odds"], bankroll, np.ones(len(df_cavalos)))
+        df_cavalos["Lucro Dutch"] = round(df_cavalos["Odds"] * df_cavalos["Dutching Bet"], 2)
+        df_cavalos["ROI-Dutch($)"] = round((df_cavalos["Lucro Dutch"] - df_cavalos["Dutching Bet"]), 2)
+        df_cavalos["ROI (%)"] = round((df_cavalos["Lucro Dutch"] / df_cavalos["Dutching Bet"]) * 100, 2)
         
-    #     melhor_equipe = df_desempenho.iloc[0]
-    #     ajuste_percentual = melhor_equipe["Desempenho Médio Ajustado"] / 100
-    #     df_cavalos["Adjusted Bet"] = df_cavalos["Dutching Bet"] * (1 + ajuste_percentual)
+        melhor_equipe = df_desempenho.iloc[0]
+        ajuste_percentual = melhor_equipe["Desempenho Médio Ajustado"] / 100
+        df_cavalos["Adjusted Bet"] = df_cavalos["Dutching Bet"] * (1 + ajuste_percentual)
 
-    #     st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
-    #     st.dataframe(df_desempenho)
-    #     st.write("### Apostas Ajustadas")
-    #     st.dataframe(df_cavalos[["Nome", "Adjusted Bet"]])
+        st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
+        st.dataframe(df_desempenho)
+        st.write("### Apostas Ajustadas")
+        st.dataframe(df_cavalos[["Nome", "Adjusted Bet"]])
 
-#         df_desempenho = calcular_desempenho_equipes(st.session_state["team_data"])
+        df_desempenho = calcular_desempenho_equipes(st.session_state["team_data"])
 
-#         df_cavalos_filtrado = rebalance_bets(df_cavalos, bankroll, df_desempenho)
+        df_cavalos_filtrado = rebalance_bets(df_cavalos, bankroll, df_desempenho)
 
-#     # 🔹 Adicionar um selectbox para escolher entre visualizar "Resultados" ou "Desempenho das Equipes"
-#     opcao_visualizacao = st.selectbox(
-#         "Selecione o que deseja visualizar:",
-#         ["Resultados das Apostas", "Desempenho das Equipes"]
-#     )
+    # 🔹 Adicionar um selectbox para escolher entre visualizar "Resultados" ou "Desempenho das Equipes"
+    opcao_visualizacao = st.selectbox(
+        "Selecione o que deseja visualizar:",
+        ["Resultados das Apostas", "Desempenho das Equipes"]
+    )
 
-#     if opcao_visualizacao == "Resultados das Apostas":
-#         if not df_cavalos_filtrado.empty:
-#             st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Probability", "Dutching Bet", "Lucro Dutch", "ROI-Dutch($)", "ROI (%)"]])
+    if opcao_visualizacao == "Resultados das Apostas":
+        if not df_cavalos_filtrado.empty:
+            st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Probability", "Dutching Bet", "Lucro Dutch", "ROI-Dutch($)", "ROI (%)"]])
     
-#     elif opcao_visualizacao == "Desempenho das Equipes":
-#         st.write("### Análise de Performance por Equipe")
-#         if not df_desempenho.empty:
-#             st.dataframe(df_desempenho)
-#         else:
-#             st.warning("Nenhum dado de desempenho disponível.")
+    elif opcao_visualizacao == "Desempenho das Equipes":
+        st.write("### Análise de Performance por Equipe")
+        if not df_desempenho.empty:
+            st.dataframe(df_desempenho)
+        else:
+            st.warning("Nenhum dado de desempenho disponível.")
 
             
-# # Exibir tabela final ajustada
-#         st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
-#         st.dataframe(df_desempenho)    
+# Exibir tabela final ajustada
+        st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
+        st.dataframe(df_desempenho)    
         
-# # Exibir apostas ajustadas
-#         st.write("### Apostas Ajustadas")
-#         st.dataframe(df_cavalos[["Nome", "Adjusted Bet"]])
+# Exibir apostas ajustadas
+        st.write("### Apostas Ajustadas")
+        st.dataframe(df_cavalos[["Nome", "Adjusted Bet"]])
 
 # Função para gerar PDF
     def generate_pdf(locais_prova, df_cavalos, df_simulacao):
