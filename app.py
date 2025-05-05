@@ -440,12 +440,12 @@ with tab4:
     else:
         df_cavalos_filtrado = rebalance_bets(df_cavalos, bankroll, df_desempenho)
 
-    # Exibir resultados
-    st.write("#### Resultados das Apostas")
-    st.dataframe(df_cavalos_filtrado)
+    # # Exibir resultados
+    # st.write("#### Resultados das Apostas")
+    # st.dataframe(df_cavalos_filtrado)
 
-    st.write("#### Desempenho das Equipes")
-    st.dataframe(df_desempenho)
+    # st.write("#### Desempenho das Equipes")
+    # st.dataframe(df_desempenho)
 
     # Cálculo de probabilidades e apostas Dutching
     if not df_cavalos.empty and "Odds" in df_cavalos.columns:
