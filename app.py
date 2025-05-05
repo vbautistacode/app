@@ -474,36 +474,3 @@ with tab4:
             df_cavalos_filtrado = df_cavalos  # Mantém os dados sem ajuste
         else:
             df_cavalos_filtrado = rebalance_bets(df_cavalos, bankroll, df_desempenho)
-    
-# Função para gerar PDF
-    if df_cavalos_filtrado is None or df_cavalos_filtrado.empty:
-        st.warning("⚠️ Nenhum dado de cavalos filtrado disponível! Gerando um DataFrame padrão.")
-        df_cavalos_filtrado = pd.DataFrame(columns=["Nome", "Odds", "Dutching Bet"])
-    def generate_pdf(locais_prova, df_cavalos, df_desempenho):
-        pdf = FPDF()
-        pdf.set_auto_page_break(auto=True, margin=15)
-        pdf.add_page()
-        pdf.set_font("Arial", "B", 16)
-        pdf.cell(200, 10, "Relatório de Apostas - Dutching", ln=True, align="C")
-        pdf.set_font("Arial", "B", 12)
-        pdf.cell(200, 10, f"Local da Prova: {locais_prova}", ln=True)
-        pdf.cell(200, 10, "Detalhes das Apostas", ln=True)
-
-        for _, row in df_cavalos.iterrows():
-            pdf.set_font("Arial", "", 10)
-            pdf.cell(200, 7, f"{row['Nome']} - Odds: {row['Odds']} - Bet: {row['Dutching Bet']}", ln=True)
-
-        pdf.cell(200, 10, "Simulação de Retornos", ln=True)
-        for _, row in df_desempenho.iterrows():
-            pdf.set_font("Arial", "", 10)
-            pdf.cell(200, 7, f"{row['Cavalo']} - ROI: {row['ROI Dutching (%)']}%", ln=True)
-
-        pdf_filename = "relatorio_apostas.pdf"
-        pdf.output(pdf_filename)
-        return pdf_filename
-
-# Botão para baixar o relatório em PDF
-    if st.button("Baixar Relatório em PDF"):
-        pdf_file = generate_pdf(df_cavalos_filtrado, df_desempenho, locais_prova)
-        with open(pdf_file, "rb") as f:
-            st.download_button(label="Clique aqui para baixar o PDF", data=f, file_name=pdf_file, mime="application/pdf")
