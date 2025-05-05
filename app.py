@@ -477,6 +477,6 @@ with tab4:
         st.warning("⚠️ Ainda sem dados de desempenho! Apostas permanecerão sem ajustes.")
         df_cavalos_filtrado = df_cavalos
 
-    if not df_desempenho.empty:
+    if not df_cavalos_filtrado.empty:
     st.write("### Apostas Rebalanceadas")
     st.dataframe(df_cavalos_filtrado)
