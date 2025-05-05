@@ -511,23 +511,6 @@ with tab4:
 # Exibir apostas ajustadas
         st.write("### Apostas Ajustadas")
         st.dataframe(df_cavalos[["Nome", "Adjusted Bet"]])
-        
-# Simulação de Retornos
-    def simulate_returns(df_cavalos, bankroll):
-        resultados = []
-        for _, row in df_cavalos.iterrows():
-            lucro_dutching = (row["Odds"] * row["Dutching Bet"]) - bankroll
-            resultados.append({
-                "Cavalo": row["Nome"],
-                "Odd": row["Odds"],
-                "Dutching Bet": row["Dutching Bet"],
-                "Lucro Dutching ($)": round(lucro_dutching, 2),
-                "ROI Dutching (%)": round((lucro_dutching / bankroll) * 100, 2),
-            })
-        return pd.DataFrame(resultados)
-    if not df_cavalos_filtrado.empty:
-        df_simulacao = simulate_returns(df_cavalos_filtrado, bankroll)
-        st.dataframe(df_simulacao)
 
 # Função para gerar PDF
     def generate_pdf(locais_prova, df_cavalos, df_simulacao):
