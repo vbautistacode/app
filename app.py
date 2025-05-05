@@ -367,7 +367,7 @@ with tab4:
         bankroll = st.slider("Ajuste o valor do Bankroll", min_value=10.0, max_value=5000.0, step=10.0, value=100.0, key="bankroll_slider")
     else:
         st.warning("⚠️ Nenhum dado de cavalos disponível. Verifique as entradas e tente novamente.")
-        df_cavalos = pd.DataFrame()  # Criação de um DataFrame vazio para evitar erro
+        df_cavalos = pd.DataFrame(columns=["Nome", "Odds", "Wins", "2nds", "3rds", "Runs"])# Definir colunas vazias
     if "Odds" in df_cavalos.columns and not df_cavalos["Odds"].isnull().all():
         df_cavalos["Probability"] = (1 / df_cavalos["Odds"]).round(2)
         df_cavalos["Dutching Bet"] = calculate_dutching(df_cavalos["Odds"], bankroll)
