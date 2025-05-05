@@ -1,16 +1,14 @@
+from datetime import datetime, timedelta
 import streamlit as st
+from fpdf import FPDF
+import pandas as pd
 import numpy as np
 import requests
+import logging
+import joblib
 import base64
 import json
-import joblib
 import os
-import plotly.express as px
-import plotly.graph_objects as go
-import matplotlib.pyplot as plt
-import logging
-from datetime import datetime, timedelta
-import pandas as pd
 # Configurar Pandas para aceitar futuras mudanças no tratamento de objetos
 pd.set_option('future.no_silent_downcasting', True)
 # Configuração do GitHub
@@ -503,3 +501,29 @@ with tab4:
             df_simulacao = simulate_returns(df_cavalos_filtrado, bankroll)    
 # Exibir os resultados na interface
             st.dataframe(df_simulacao)
+# Função para gerar PDF
+    def generate_pdf(df_cavalos, df_simulacao):
+        pdf = FPDF()
+        pdf.set_auto_page_break(auto=True, margin=15)
+        pdf.add_page()
+        pdf.set_font("Arial", "B", 16)
+        pdf.cell(200, 10, "Relatório de Apostas - Dutching", ln=True, align="C")
+        pdf.set_font("Arial", "B", 12)
+        pdf.cell(200, 10, "Detalhes das Apostas", ln=True)
+        for index, row in df_cavalos.iterrows():
+            pdf.set_font("Arial", "", 10)
+            pdf.cell(200, 7, f"{row['Nome']} - Odds: {row['Odds']} - Bet: {row['Dutching Bet']}", ln=True)
+        pdf.set_font("Arial", "B", 12)
+        pdf.cell(200, 10, "Simulação de Retornos", ln=True)
+        for index, row in df_simulacao.iterrows():
+            pdf.set_font("Arial", "", 10)
+            pdf.cell(200, 7, f"{row['Cavalo']} - ROI: {row['ROI Dutching (%)']}%", ln=True)
+# Salvar o PDF temporário e permitir o download
+        pdf_filename = "relatorio_apostas.pdf"
+        pdf.output(pdf_filename)
+        return pdf_filename    
+# Interface Streamlit para geração do PDF
+    if st.button("Baixar Relatório em PDF"):
+        pdf_file = generate_pdf(df_cavalos_filtrado, df_simulacao)
+        with open(pdf_file, "rb") as f:
+            st.download_button(label="Clique aqui para baixar o PDF", data=f, file_name=pdf_file, mime="application/pdf")
