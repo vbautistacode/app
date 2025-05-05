@@ -423,6 +423,23 @@ with tab4:
         else:
             st.warning("⚠️ Nenhuma equipe cadastrada! Criando DataFrame vazio.")
             df_desempenho = pd.DataFrame(columns=["Nome da Equipe", "Desempenho Médio Ajustado"])
+            
+# Cálculo de probabilidades e apostas Dutching
+    if not df_cavalos.empty and "Odds" in df_cavalos.columns:
+        df_cavalos["Dutching Bet"] = calculate_dutching(df_cavalos["Odds"], bankroll, np.ones(len(df_cavalos)))
+        df_cavalos["Lucro Dutch"] = round(df_cavalos["Odds"] * df_cavalos["Dutching Bet"], 2)
+        df_cavalos["ROI-Dutch($)"] = round((df_cavalos["Lucro Dutch"] - df_cavalos["Dutching Bet"]), 2)
+        df_cavalos["ROI (%)"] = round((df_cavalos["Lucro Dutch"] / df_cavalos["Dutching Bet"]) * 100, 2)
+
+# Evitar erro ao acessar `melhor_equipe`
+    if not df_desempenho.empty:
+        melhor_equipe = df_desempenho.iloc[0]
+        ajuste_percentual = melhor_equipe["Desempenho Médio Ajustado"] / 100
+        df_cavalos["Adjusted Bet"] = df_cavalos["Dutching Bet"] * (1 + ajuste_percentual)
+    
+# Exibir melhor equipe
+        st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
+        st.dataframe(df_desempenho)
 
 # Garantir que há dados antes de calcular apostas
     if "horse_data" in st.session_state and st.session_state["horse_data"]:
@@ -457,23 +474,6 @@ with tab4:
             df_cavalos_filtrado = df_cavalos  # Mantém os dados sem ajuste
         else:
             df_cavalos_filtrado = rebalance_bets(df_cavalos, bankroll, df_desempenho)
-
-# Cálculo de probabilidades e apostas Dutching
-    if not df_cavalos.empty and "Odds" in df_cavalos.columns:
-        df_cavalos["Dutching Bet"] = calculate_dutching(df_cavalos["Odds"], bankroll, np.ones(len(df_cavalos)))
-        df_cavalos["Lucro Dutch"] = round(df_cavalos["Odds"] * df_cavalos["Dutching Bet"], 2)
-        df_cavalos["ROI-Dutch($)"] = round((df_cavalos["Lucro Dutch"] - df_cavalos["Dutching Bet"]), 2)
-        df_cavalos["ROI (%)"] = round((df_cavalos["Lucro Dutch"] / df_cavalos["Dutching Bet"]) * 100, 2)
-
-# Evitar erro ao acessar `melhor_equipe`
-    if not df_desempenho.empty:
-        melhor_equipe = df_desempenho.iloc[0]
-        ajuste_percentual = melhor_equipe["Desempenho Médio Ajustado"] / 100
-        df_cavalos["Adjusted Bet"] = df_cavalos["Dutching Bet"] * (1 + ajuste_percentual)
-    
-# Exibir melhor equipe
-        st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
-        st.dataframe(df_desempenho)
     
 # Função para gerar PDF
     if df_cavalos_filtrado is None or df_cavalos_filtrado.empty:
