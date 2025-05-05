@@ -101,30 +101,30 @@ def rebalance_bets(df_cavalos, bankroll, df_desempenho):
 # Função para calcular desempenho
 def calcular_desempenho_equipes(team_data):
         df_desempenho_lista = []
-    for team in team_data:
-        podiums_horse = team.get("Wins", 0) + team.get("2nds", 0) + team.get("3rds", 0)
-        runs_horse = team.get("Runs", 1)
-        desempenho_horse = podiums_horse / max(runs_horse, 1)
-
-        podiums_jockey = team.get("Jockey Wins", 0) + team.get("Jockey 2nds", 0) + team.get("Jockey 3rds", 0)
-        rides_jockey = team.get("Jockey Rides", 1)
-        desempenho_jockey = podiums_jockey / max(rides_jockey, 1)
-
-        podiums_trainer = team.get("Treinador Placed", 0) + team.get("Treinador Wins", 0)
-        runs_trainer = team.get("Treinador Runs", 1)
-        desempenho_trainer = podiums_trainer / max(runs_trainer, 1)
-
-        desempenhos = [desempenho_horse, desempenho_jockey, desempenho_trainer]
-        media_desempenho = sum(desempenhos) / len(desempenhos)
-        variancia_desempenho = np.var(desempenhos)
-        resultado_ajustado = media_desempenho - variancia_desempenho
-
-        df_desempenho_lista.append({
-            "Nome da Equipe": team["Nome da Equipe"],
-            "Desempenho Médio Ajustado": round(resultado_ajustado, 2)
-        })
-        return pd.DataFrame(df_desempenho_lista).sort_values(by="Desempenho Médio Ajustado", ascending=False)
-        
+        for team in team_data:
+            podiums_horse = team.get("Wins", 0) + team.get("2nds", 0) + team.get("3rds", 0)
+            runs_horse = team.get("Runs", 1)
+            desempenho_horse = podiums_horse / max(runs_horse, 1)
+    
+            podiums_jockey = team.get("Jockey Wins", 0) + team.get("Jockey 2nds", 0) + team.get("Jockey 3rds", 0)
+            rides_jockey = team.get("Jockey Rides", 1)
+            desempenho_jockey = podiums_jockey / max(rides_jockey, 1)
+    
+            podiums_trainer = team.get("Treinador Placed", 0) + team.get("Treinador Wins", 0)
+            runs_trainer = team.get("Treinador Runs", 1)
+            desempenho_trainer = podiums_trainer / max(runs_trainer, 1)
+    
+            desempenhos = [desempenho_horse, desempenho_jockey, desempenho_trainer]
+            media_desempenho = sum(desempenhos) / len(desempenhos)
+            variancia_desempenho = np.var(desempenhos)
+            resultado_ajustado = media_desempenho - variancia_desempenho
+    
+            df_desempenho_lista.append({
+                "Nome da Equipe": team["Nome da Equipe"],
+                "Desempenho Médio Ajustado": round(resultado_ajustado, 2)
+            })
+            return pd.DataFrame(df_desempenho_lista).sort_values(by="Desempenho Médio Ajustado", ascending=False)
+            
 #Ajusta aposta com base no risco: odds muito altas com baixo desempenho reduzem a alocação.
 def assess_risk(odds, performance_score):
     risk_factor = np.where((odds > 5) & (performance_score < 0.2), 0.5, 1)  # Redução de 50% para alto risco
