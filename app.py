@@ -427,20 +427,19 @@ with tab3:
         
 # --- Aba 4: Resultados ---
 with tab4:
-    st.subheader("##### Resultados | Dutching e Performance de Equipes")
+    st.write("##### Resultados | Dutching e Performance de Equipes")
     
 # Garantir que há dados antes de calcular o desempenho
-    if "team_data" in st.session_state: 
-        if st.session_state["team_data"]:
-            df_desempenho = calcular_desempenho_equipes(st.session_state["team_data"])
-        else:
-            st.warning("⚠️ Nenhuma equipe cadastrada! Criando DataFrame vazio.")
-            df_desempenho = pd.DataFrame(columns=["Nome da Equipe", "Desempenho Médio Ajustado"])
+        if "team_data" in st.session_state and st.session_state["team_data"]:
+        df_desempenho = calcular_desempenho_equipes(st.session_state["team_data"])
+    else:
+        st.warning("⚠️ Nenhuma equipe cadastrada! Criando DataFrame vazio.")
+        df_desempenho = pd.DataFrame(columns=["Nome da Equipe", "Desempenho Médio Ajustado"])
 
 # Garantir que há dados antes de calcular apostas
     if "horse_data" in st.session_state and st.session_state["horse_data"]:
         df_cavalos = pd.DataFrame(st.session_state["horse_data"])
-        bankroll = st.number_input("Digite o valor do Bankroll:", min_value=10.0, max_value=5000.0, step=10.0, value=100.0, key="bankroll_input")
+        bankroll = st.number_input("Digite o valor do Bankroll:", min_value=100.0, max_value=100000.0, step=10.0, value=1000.0, key="bankroll_input")
     else:
         st.warning("⚠️ Nenhum dado de cavalos disponível.")
         df_cavalos = pd.DataFrame(columns=["Nome", "Odds", "Dutching Bet", "Lucro Dutch"])
@@ -465,25 +464,18 @@ with tab4:
         st.dataframe(df_desempenho)
 
 # Rebalancear apostas com base no desempenho das equipes
-    if "team_data" in st.session_state and st.session_state["team_data"]:
-        df_desempenho = calcular_desempenho_equipes(st.session_state["team_data"])
+    if not df_desempenho.empty:
+        if "Nome" in df_cavalos.columns and "Nome" in df_desempenho.columns:
+            df_cavalos_filtrado = df_cavalos.merge(df_desempenho, on="Nome", how="left")
+            df_cavalos_filtrado["Desempenho Médio Ajustado"] = df_cavalos_filtrado["Desempenho Médio Ajustado"].fillna(0)
+            df_cavalos_filtrado["Dutching Bet"] *= (1 + df_cavalos_filtrado["Desempenho Médio Ajustado"] / 100)
+        else:
+            st.warning("⚠️ A coluna 'Nome' não foi encontrada! O merge não será realizado.")
+            df_cavalos_filtrado = df_cavalos
     else:
-        st.warning("⚠️ Nenhuma equipe cadastrada! Criando DataFrame vazio.")
-        df_desempenho = pd.DataFrame(columns=["Nome da Equipe", "Desempenho Médio Ajustado"])
-    
-    if df_desempenho.empty:
-        st.warning("⚠️ Nenhuma equipe cadastrada! Recarregando dados das abas anteriores.")
-        if "team_data" in st.session_state and not st.session_state["team_data"]:
-            st.session_state["team_data"] = []  # Inicializa como lista vazia
-            df_desempenho = calcular_desempenho_equipes(st.session_state["team_data"])
-
-# 🔹 Somente agora, chamar rebalance_bets após garantir que df_desempenho tem dados válidos
-    if df_desempenho.empty:
         st.warning("⚠️ Ainda sem dados de desempenho! Apostas permanecerão sem ajustes.")
-        df_cavalos_filtrado = df_cavalos  # Mantém os dados sem ajuste
-    else:
-        df_cavalos_filtrado = rebalance_bets(df_cavalos, bankroll, df_desempenho)
+        df_cavalos_filtrado = df_cavalos
 
-# 🔹 Exibir o DataFrame atualizado no Streamlit para conferir os dados
-    st.write("### Desempenho das Equipes")
-    st.dataframe(df_desempenho)
+    # 🔹 Exibir o DataFrame atualizado no Streamlit para conferir os dados
+    st.write("### Apostas Rebalanceadas")
+    st.dataframe(df_cavalos_filtrado)
