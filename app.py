@@ -478,5 +478,5 @@ with tab4:
         df_cavalos_filtrado = df_cavalos
 
     if not df_cavalos_filtrado.empty:
-    st.write("### Apostas Rebalanceadas")
-    st.dataframe(df_cavalos_filtrado)
+        st.write("### Apostas Rebalanceadas")
+        st.dataframe(df_cavalos_filtrado)
