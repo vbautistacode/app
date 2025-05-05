@@ -368,7 +368,7 @@ with tab4:
         df_cavalos = df_cavalos.dropna(subset=["Odds"])  # Remove linhas inválidas
 # Verificar se há Odds válidas antes de aplicar cálculos
     odds_list = df_cavalos["Odds"].dropna().astype(float).tolist() if "Odds" in df_cavalos.columns else []    
-    if odds_list and all(isinstance(odd, (int, float)) for odd in odds_list):
+    if not odds_list or any(pd.isna(odd) for odd in odds_list):
         df_cavalos["Probability"] = (1 / df_cavalos["Odds"]).round(2)
         df_cavalos["Dutching Bet"] = calculate_dutching(odds_list, bankroll)
         df_cavalos["Dutching Bet"] = df_cavalos["Dutching Bet"].round(2)
