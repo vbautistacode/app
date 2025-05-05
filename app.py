@@ -433,7 +433,7 @@ with tab4:
     if "team_data" in st.session_state and st.session_state["team_data"]:
         df_desempenho = calcular_desempenho_equipes(st.session_state["team_data"])
     else:
-        st.warning("⚠️ Nenhuma equipe cadastrada! Criando DataFrame vazio.")
+        st.warning("⚠️ Nenhuma equipe cadastrada!.")
         df_desempenho = pd.DataFrame(columns=["Nome da Equipe", "Desempenho Médio Ajustado"])
 
 # Garantir que há dados antes de calcular apostas
@@ -506,11 +506,11 @@ def generate_pdf(df_cavalos_filtrado, df_desempenho, locais_prova):
     pdf.output(pdf_filename)
     return pdf_filename
 # 🔹 Criar botão de download no Streamlit, garantindo que o relatório inclua locais de prova
-if not df_cavalos_filtrado.empty:
-    locais_prova = st.text_input("Digite o local da prova:", key="local_prova_input")  # Entrada do usuário
-    if locais_prova:  # Garante que o local foi preenchido
-        pdf_file = generate_pdf(df_cavalos_filtrado, df_desempenho, locais_prova)
-        with open(pdf_file, "rb") as f:
-            st.download_button(label="📄 Baixar Relatório em PDF", data=f, file_name=pdf_file, mime="application/pdf")
-    else:
-        st.warning("⚠️ Preencha o local da prova antes de gerar o relatório.")
+    if not df_cavalos_filtrado.empty:
+        if "locais_prova" in st.session_state and st.session_state["locais_prova"]:
+            locais_prova = st.session_state["locais_prova"]  # Recupera local da prova da aba1
+            pdf_file = generate_pdf(df_cavalos_filtrado, df_desempenho, locais_prova)
+            with open(pdf_file, "rb") as f:
+                st.download_button(label="📄 Baixar Relatório em PDF", data=f, file_name=pdf_file, mime="application/pdf")
+        else:
+            st.warning("⚠️ O local da prova ainda não foi definido na aba1! Adicione antes de gerar o relatório.")
