@@ -449,9 +449,9 @@ with tab4:
 # Ordenar DataFrame por Desempenho Médio em ordem decrescente
                 df_desempenho = df_desempenho.sort_values(by="Desempenho Médio Ajustado", ascending=False)
 # Ajustar valores de aposta com base no desempenho médio
-            melhor_equipe = df_desempenho.iloc[0]
-            ajuste_percentual = melhor_equipe["Desempenho Médio Ajustado"] / 100
-            df_cavalos["Adjusted Bet"] = df_cavalos["Dutching Bet"] * (1 + ajuste_percentual)    
+                melhor_equipe = df_desempenho.iloc[0]
+                ajuste_percentual = melhor_equipe["Desempenho Médio Ajustado"] / 100
+                df_cavalos["Adjusted Bet"] = df_cavalos["Dutching Bet"] * (1 + ajuste_percentual)    
 # Exibir tabela final ajustada
         st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
         st.dataframe(df_desempenho)    
