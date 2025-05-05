@@ -482,7 +482,7 @@ with tab4:
         st.dataframe(df_cavalos_filtrado)
 
 #Função PDF    
-    def generate_pdf(df_cavalos_filtrado, df_desempenho, locais_prova):
+def generate_pdf(df_cavalos_filtrado, df_desempenho, locais_prova):
     pdf = FPDF()
     pdf.set_auto_page_break(auto=True, margin=15)
     pdf.add_page()
