@@ -416,14 +416,15 @@ with tab3:
 with tab4:
     st.subheader("🏇 Resultados | Dutching e Performance de Equipes")
     
-    # Garantir que há dados antes de calcular o desempenho
-    if "team_data" in st.session_state and st.session_state["team_data"]:
-        df_desempenho = calcular_desempenho_equipes(st.session_state["team_data"])
-    else:
-        st.warning("⚠️ Nenhuma equipe cadastrada! Criando DataFrame vazio.
-        df_desempenho = pd.DataFrame(columns=["Nome da Equipe", "Desempenho Médio Ajustado"])
+# Garantir que há dados antes de calcular o desempenho
+    if "team_data" in st.session_state: 
+        if st.session_state["team_data"]:
+            df_desempenho = calcular_desempenho_equipes(st.session_state["team_data"])
+        else:
+            st.warning("⚠️ Nenhuma equipe cadastrada! Criando DataFrame vazio.
+            df_desempenho = pd.DataFrame(columns=["Nome da Equipe", "Desempenho Médio Ajustado"])
 
-    # Garantir que há dados antes de calcular apostas
+# Garantir que há dados antes de calcular apostas
     if "horse_data" in st.session_state and st.session_state["horse_data"]:
         df_cavalos = pd.DataFrame(st.session_state["horse_data"])
         bankroll = st.number_input("Digite o valor do Bankroll:", min_value=10.0, max_value=5000.0, step=10.0, value=100.0, key="bankroll_input")
@@ -432,37 +433,36 @@ with tab4:
         df_cavalos = pd.DataFrame(columns=["Nome", "Odds", "Wins", "2nds", "3rds", "Runs"])
 
 # Rebalancear apostas com base no desempenho das equipes
-       # Garantir que df_desempenho seja criado corretamente
     if "team_data" in st.session_state and st.session_state["team_data"]:
         df_desempenho = calcular_desempenho_equipes(st.session_state["team_data"])
     else:
         st.warning("⚠️ Nenhuma equipe cadastrada! Criando DataFrame vazio.")
         df_desempenho = pd.DataFrame(columns=["Nome da Equipe", "Desempenho Médio Ajustado"])
     
-    # Teste se df_desempenho está correto antes de usar
+# Teste se df_desempenho está correto antes de usar
     if df_desempenho is None or df_desempenho.empty:
         st.error("❌ Erro: df_desempenho não foi gerado corretamente.")
     else:
         df_cavalos_filtrado = rebalance_bets(df_cavalos, bankroll, df_desempenho)
 
-    # Cálculo de probabilidades e apostas Dutching
+# Cálculo de probabilidades e apostas Dutching
     if not df_cavalos.empty and "Odds" in df_cavalos.columns:
         df_cavalos["Dutching Bet"] = calculate_dutching(df_cavalos["Odds"], bankroll, np.ones(len(df_cavalos)))
         df_cavalos["Lucro Dutch"] = round(df_cavalos["Odds"] * df_cavalos["Dutching Bet"], 2)
         df_cavalos["ROI-Dutch($)"] = round((df_cavalos["Lucro Dutch"] - df_cavalos["Dutching Bet"]), 2)
         df_cavalos["ROI (%)"] = round((df_cavalos["Lucro Dutch"] / df_cavalos["Dutching Bet"]) * 100, 2)
 
-    # Evitar erro ao acessar `melhor_equipe`
+# Evitar erro ao acessar `melhor_equipe`
     if not df_desempenho.empty:
         melhor_equipe = df_desempenho.iloc[0]
         ajuste_percentual = melhor_equipe["Desempenho Médio Ajustado"] / 100
         df_cavalos["Adjusted Bet"] = df_cavalos["Dutching Bet"] * (1 + ajuste_percentual)
     
-        # Exibir melhor equipe
+# Exibir melhor equipe
         st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
         st.dataframe(df_desempenho)
     
-    # Função para gerar PDF
+# Função para gerar PDF
     def generate_pdf(locais_prova, df_cavalos, df_simulacao):
         pdf = FPDF()
         pdf.set_auto_page_break(auto=True, margin=15)
@@ -486,7 +486,7 @@ with tab4:
         pdf.output(pdf_filename)
         return pdf_filename
 
-    # Botão para baixar o relatório em PDF
+# Botão para baixar o relatório em PDF
     if st.button("Baixar Relatório em PDF"):
         pdf_file = generate_pdf(df_cavalos_filtrado, df_simulacao, locais_prova)
         with open(pdf_file, "rb") as f:
