@@ -418,12 +418,10 @@ with tab4:
         df_cavalos = pd.DataFrame(columns=["Nome", "Odds", "Wins", "2nds", "3rds", "Runs"])
 
     df_cavalos_filtrado = rebalance_bets(df_cavalos, bankroll, df_desempenho)
-
-    opcao_visualizacao = st.selectbox("Selecione o que deseja visualizar:", ["Resultados das Apostas", "Desempenho das Equipes"])
     
-    if opcao_visualizacao == "Resultados das Apostas" and not df_cavalos_filtrado.empty:
+        st.write("#### Resultados das Apostas")
         st.dataframe(df_cavalos_filtrado)
-    elif opcao_visualizacao == "Desempenho das Equipes" and not df_desempenho.empty:
+        st.write("#### Desempenho das Equipes")
         st.dataframe(df_desempenho)
 
     # Cálculo de probabilidades e apostas Dutching
