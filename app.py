@@ -395,7 +395,6 @@ with tab4:
 
     if "horse_data" in st.session_state and st.session_state["horse_data"]:
         df_cavalos = pd.DataFrame(st.session_state["horse_data"])
-        bankroll = st.session_state.get("bankroll", 100.0)  # Define um valor padrão caso não esteja armazenado
         bankroll = st.slider("Ajuste o valor do Bankroll", min_value=10.0, max_value=5000.0, step=10.0, value=100.0, key="bankroll_slider")
     else:
         st.warning("⚠️ Nenhum dado de cavalos disponível.")
@@ -417,8 +416,10 @@ with tab4:
         st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Probability", "Dutching Bet", "Lucro Dutch", "ROI-Dutch($)", "ROI (%)"]])
 
     # Aplicar rebalanceamento das apostas
-        if "bankroll" in locals() and not df_cavalos.empty:
-            df_cavalos_filtrado = rebalance_bets(df_cavalos, bankroll)
+        if "bankroll" not in st.session_state:
+            st.session_state["bankroll"] = 100.0  # Valor padrão
+        bankroll = st.session_state["bankroll"]
+        df_cavalos_filtrado = rebalance_bets(df_cavalos, bankroll)
         else:
             st.error("⚠️ Erro: `bankroll` não está definido corretamente!")
             
