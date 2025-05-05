@@ -421,7 +421,7 @@ with tab4:
         if st.session_state["team_data"]:
             df_desempenho = calcular_desempenho_equipes(st.session_state["team_data"])
         else:
-            st.warning("⚠️ Nenhuma equipe cadastrada! Criando DataFrame vazio.
+            st.warning("⚠️ Nenhuma equipe cadastrada! Criando DataFrame vazio.")
             df_desempenho = pd.DataFrame(columns=["Nome da Equipe", "Desempenho Médio Ajustado"])
 
 # Garantir que há dados antes de calcular apostas
