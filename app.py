@@ -384,13 +384,16 @@ with tab4:
         st.warning("⚠️ Nenhuma odd válida encontrada. Verifique os dados de entrada.")
 
     # Aplicar rebalanceamento das apostas
-        if "bankroll" in locals():
+        if "bankroll" in locals() and not df_cavalos.empty:
             df_cavalos_filtrado = rebalance_bets(df_cavalos, bankroll)
         else:
             st.error("⚠️ Erro: `bankroll` não está definido corretamente!")
     # Garantir que as colunas esperadas existem antes da exibição
     colunas_esperadas = ["Nome", "Odds", "Probability", "Dutching Bet", "Lucro Dutch", "ROI-Dutch($)", "ROI (%)"]
+        if not df_cavalos_filtrado.empty:
     colunas_disponiveis = df_cavalos_filtrado.columns.tolist()
+    else:
+        st.warning("⚠️ O DataFrame `df_cavalos_filtrado` está vazio ou não foi criado corretamente!")
     colunas_validas = [col for col in colunas_esperadas if col in colunas_disponiveis]
 
     if df_cavalos_filtrado.empty:
