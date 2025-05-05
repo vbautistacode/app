@@ -394,7 +394,7 @@ with tab4:
     st.subheader("Resultados | Dutching e Performance de Equipes")
     if "horse_data" in st.session_state and st.session_state["horse_data"]:
         df_cavalos = pd.DataFrame(st.session_state["horse_data"])
-        bankroll = st.slider("Ajuste o valor do Bankroll", min_value=10.0, max_value=5000.0, step=10.0, value=100.0, key="bankroll_slider")
+        bankroll = st.number_input("Digite o valor do Bankroll:", step=10.0, value=100.0, key="bankroll_input")
     else:
         st.warning("⚠️ Nenhum dado de cavalos disponível.")
         df_cavalos = pd.DataFrame(columns=["Nome", "Odds", "Wins", "2nds", "3rds", "Runs"])
