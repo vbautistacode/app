@@ -414,7 +414,7 @@ with tab3:
         
 # --- Aba 4: Resultados ---
 with tab4:
-    st.subheader("🏇 Resultados | Dutching e Performance de Equipes")
+    st.subheader("####🏇 Resultados | Dutching e Performance de Equipes")
     
 # Garantir que há dados antes de calcular o desempenho
     if "team_data" in st.session_state: 
@@ -438,7 +438,7 @@ with tab4:
         df_cavalos["Lucro Dutch"] = round(df_cavalos["Odds"] * df_cavalos["Dutching Bet"], 2)
         df_cavalos["ROI-Dutch($)"] = round((df_cavalos["Lucro Dutch"] - df_cavalos["Dutching Bet"]), 2)
         df_cavalos["ROI (%)"] = round((df_cavalos["Lucro Dutch"] / df_cavalos["Dutching Bet"]) * 100, 2)
-        st.write("### Resultados das Apostas | Dutching")
+        st.write("#### Resultados das Apostas | Dutching")
         st.dataframe(df_cavalos[["Nome", "Odds", "Dutching Bet", "Lucro Dutch", "ROI-Dutch($)", "ROI (%)"]])
 
 # Evitar erro ao acessar `melhor_equipe`
@@ -458,21 +458,19 @@ with tab4:
         st.warning("⚠️ Nenhuma equipe cadastrada! Criando DataFrame vazio.")
         df_desempenho = pd.DataFrame(columns=["Nome da Equipe", "Desempenho Médio Ajustado"])
     
-# Teste se df_desempenho está correto antes de usar
-    if df_desempenho is None or df_desempenho.empty:
+    if df_desempenho.empty:
         st.warning("⚠️ Nenhuma equipe cadastrada! Recarregando dados das abas anteriores.")
-        
-# Recarregar dados das equipes apenas se necessário
-        if "team_data" in st.session_state:
-            if not st.session_state["team_data"]:
-                st.session_state["team_data"] = []  # Inicializa como lista vazia
-        
-# Garantir que df_desempenho seja atualizado corretamente
+        if "team_data" in st.session_state and not st.session_state["team_data"]:
+        st.session_state["team_data"] = []  # Inicializa como lista vazia
         df_desempenho = calcular_desempenho_equipes(st.session_state["team_data"])
 
-# **Somente agora** chamar rebalance_bets, após df_desempenho ser preenchido corretamente
-        if df_desempenho.empty:
-            st.warning("⚠️ Ainda sem dados de desempenho! Apostas permanecerão sem ajustes.")
-            df_cavalos_filtrado = df_cavalos  # Mantém os dados sem ajuste
-        else:
-            df_cavalos_filtrado = rebalance_bets(df_cavalos, bankroll, df_desempenho)
+# 🔹 Somente agora, chamar rebalance_bets após garantir que df_desempenho tem dados válidos
+    if df_desempenho.empty:
+        st.warning("⚠️ Ainda sem dados de desempenho! Apostas permanecerão sem ajustes.")
+        df_cavalos_filtrado = df_cavalos  # Mantém os dados sem ajuste
+    else:
+        df_cavalos_filtrado = rebalance_bets(df_cavalos, bankroll, df_desempenho)
+
+# 🔹 Exibir o DataFrame atualizado no Streamlit para conferir os dados
+    st.write("### Desempenho das Equipes")
+    st.dataframe(df_desempenho)
