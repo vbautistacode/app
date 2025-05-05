@@ -420,15 +420,6 @@ with tab4:
             df_cavalos_filtrado = rebalance_bets(df_cavalos, bankroll)
         else:
             st.error("⚠️ Erro: `bankroll` não está definido corretamente!")
-            
-    # Garantir que as colunas esperadas existem antes da exibição
-    colunas_esperadas = ["Nome", "Odds", "Probability", "Dutching Bet", "Lucro Dutch", "ROI-Dutch($)", "ROI (%)"]
-    colunas_disponiveis = df_cavalos_filtrado.columns.tolist()
-    colunas_validas = [col for col in colunas_esperadas if col in colunas_disponiveis]
-    if df_cavalos_filtrado.empty:
-        st.warning("⚠️ Nenhum cavalo atende aos critérios. Ajuste os parâmetros!")
-    else:
-        st.dataframe(df_cavalos_filtrado[colunas_validas])
 
     # --- Análise de Performance das Equipes ---
     st.write("### Análise de Performance por Equipe")
