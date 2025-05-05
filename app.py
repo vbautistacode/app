@@ -1,4 +1,4 @@
-#Importações
+# --- Importações ---
 from datetime import datetime, timedelta
 import streamlit as st
 from fpdf import FPDF
@@ -14,7 +14,7 @@ import os
 # Configurar Pandas para aceitar futuras mudanças no tratamento de objetos
 pd.set_option('future.no_silent_downcasting', True)
 
-# Configuração do GitHub
+# --- Configuração do GitHub ---
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 REPO_OWNER = "vbautistacode"
 REPO_NAME = "app"
@@ -23,112 +23,102 @@ BRANCH = "main"
 # Diretório do repositório no GitHub
 diretorio_base = f"https://raw.githubusercontent.com/{REPO_OWNER}/{REPO_NAME}/{BRANCH}/"
 
-# Função para carregar dados direto do GitHub
+# --- Funções de carregamento e salvamento ---
 def load_data():
+    """ Carrega os dados do GitHub para o session_state """
     arquivos = ["horse_data.json", "team_data.json", "bet_data.json"]
     for arquivo in arquivos:
         url_arquivo = diretorio_base + arquivo
         try:
             response = requests.get(url_arquivo)
-            response.raise_for_status()  # Verifica erros na requisição
+            response.raise_for_status()
             st.session_state[arquivo.replace(".json", "")] = response.json()
         except requests.exceptions.RequestException:
-            st.session_state[arquivo.replace(".json", "")] = []  # Retorna lista vazia em caso de erro
+            st.session_state[arquivo.replace(".json", "")] = []
 
-# Função para salvar dados no GitHub
 def salvar_csv_no_github(dataframe, nome_arquivo):
+    """ Salva o dataframe como CSV no GitHub via API """
+    if dataframe.empty:
+        st.warning(f"⚠️ O arquivo '{nome_arquivo}' está vazio! Não será salvo.")
+        return
+
     try:
-        if dataframe.empty:
-            st.warning(f"⚠️ O arquivo '{nome_arquivo}' está vazio! Não será salvo.")
-            return
         csv_content = dataframe.to_csv(index=False, encoding="utf-8")
         encoded_content = base64.b64encode(csv_content.encode()).decode()
         github_api_url = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/contents/{nome_arquivo}"
         headers = {"Authorization": f"token {GITHUB_TOKEN}"}
         response = requests.get(github_api_url, headers=headers)
         sha = response.json().get("sha", None)
-        payload = {
-            "message": f"Atualizando {nome_arquivo} via API",
-            "content": encoded_content,
-            "branch": BRANCH
-        }
+
+        payload = {"message": f"Atualizando {nome_arquivo} via API", "content": encoded_content, "branch": BRANCH}
         if sha:
             payload["sha"] = sha  # Atualiza arquivo existente
         response = requests.put(github_api_url, json=payload, headers=headers)
+
         if response.status_code in [200, 201]:
             st.success(f"✅ {nome_arquivo} salvo no GitHub com sucesso!")
         else:
             st.error(f"❌ Erro ao salvar {nome_arquivo}: {response.json()}")
+
     except Exception as e:
         st.error(f"❌ Erro inesperado: {e}")
 
-# Inicialização dos dados no session_state
+# --- Inicialização de dados ---
 if "initialized" not in st.session_state:
     load_data()
     st.session_state["initialized"] = True
 
-# Inicializa os dados no session_state
-if "horse_data" not in st.session_state:
-    st.session_state["horse_data"] = []
-if "team_data" not in st.session_state:
-    st.session_state["team_data"] = []
-if not st.session_state.get("initialized", False):
-    load_data()
-    st.session_state["initialized"] = True
-if "Nome" not in st.session_state:
-    st.session_state["Nome"] = "Cavalo_Default"  # Nome padrão ou escolha inicial
+st.session_state.setdefault("horse_data", [])
+st.session_state.setdefault("team_data", [])
+st.session_state.setdefault("Nome", "Cavalo_Default")
 
-# Função para cálculo Dutching
+# --- Funções de cálculo ---
 def calculate_dutching(odds, bankroll, historical_factor):
+    """ Calcula a distribuição de apostas usando Dutching """
     probabilities = np.array([1 / odd for odd in odds])
     adjusted_probabilities = probabilities * historical_factor
     total_probability = adjusted_probabilities.sum()
     adjusted_probabilities /= total_probability if total_probability > 1 else 1
-    apostas = np.round(bankroll * adjusted_probabilities, 2)
-    return apostas
+    return np.round(bankroll * adjusted_probabilities, 2)
 
-# Função para rebalancear apostas
+def calcular_desempenho_equipes(team_data):
+    """ Calcula o desempenho das equipes com ajuste de variância """
+    df_desempenho_lista = []
+    for team in team_data:
+        podiums_horse = team.get("Wins", 0) + team.get("2nds", 0) + team.get("3rds", 0)
+        runs_horse = max(team.get("Runs", 1), 1)
+        desempenho_horse = podiums_horse / runs_horse
+
+        podiums_jockey = team.get("Jockey Wins", 0) + team.get("Jockey 2nds", 0) + team.get("Jockey 3rds", 0)
+        rides_jockey = max(team.get("Jockey Rides", 1), 1)
+        desempenho_jockey = podiums_jockey / rides_jockey
+
+        podiums_trainer = team.get("Treinador Placed", 0) + team.get("Treinador Wins", 0)
+        runs_trainer = max(team.get("Treinador Runs", 1), 1)
+        desempenho_trainer = podiums_trainer / runs_trainer
+
+        desempenhos = [desempenho_horse, desempenho_jockey, desempenho_trainer]
+        media_desempenho = sum(desempenhos) / len(desempenhos)
+        variancia_desempenho = np.var(desempenhos)
+        resultado_ajustado = media_desempenho - variancia_desempenho
+
+        df_desempenho_lista.append({
+            "Nome da Equipe": team["Nome da Equipe"],
+            "Desempenho Médio Ajustado": round(resultado_ajustado, 2)
+        })
+
+    return pd.DataFrame(df_desempenho_lista).sort_values(by="Desempenho Médio Ajustado", ascending=False)
+
 def rebalance_bets(df_cavalos, bankroll, df_desempenho):
+    """ Rebalanceia as apostas com base no desempenho das equipes """
     df_cavalos = df_cavalos.copy()
-    df_cavalos = df_cavalos.merge(df_desempenho, on="Nome", how="left")  # Junta com os dados de desempenho
+    df_cavalos = df_cavalos.merge(df_desempenho, on="Nome", how="left")
+
     if df_cavalos.empty or "Desempenho Médio Ajustado" not in df_cavalos.columns:
         return df_cavalos  
-        
-# Ajusta os valores com base no desempenho
+
     df_cavalos["Dutching Bet"] *= (1 + df_cavalos["Desempenho Médio Ajustado"] / 100)    
     return df_cavalos
-
-# Função para calcular desempenho
-def calcular_desempenho_equipes(team_data):
-        df_desempenho_lista = []
-        for team in team_data:
-            podiums_horse = team.get("Wins", 0) + team.get("2nds", 0) + team.get("3rds", 0)
-            runs_horse = team.get("Runs", 1)
-            desempenho_horse = podiums_horse / max(runs_horse, 1)
-    
-            podiums_jockey = team.get("Jockey Wins", 0) + team.get("Jockey 2nds", 0) + team.get("Jockey 3rds", 0)
-            rides_jockey = team.get("Jockey Rides", 1)
-            desempenho_jockey = podiums_jockey / max(rides_jockey, 1)
-    
-            podiums_trainer = team.get("Treinador Placed", 0) + team.get("Treinador Wins", 0)
-            runs_trainer = team.get("Treinador Runs", 1)
-            desempenho_trainer = podiums_trainer / max(runs_trainer, 1)
-    
-            desempenhos = [desempenho_horse, desempenho_jockey, desempenho_trainer]
-            media_desempenho = sum(desempenhos) / len(desempenhos)
-            variancia_desempenho = np.var(desempenhos)
-            resultado_ajustado = media_desempenho - variancia_desempenho
-    
-            df_desempenho_lista.append({
-                "Nome da Equipe": team["Nome da Equipe"],
-                "Desempenho Médio Ajustado": round(resultado_ajustado, 2)
-            })
-            return pd.DataFrame(df_desempenho_lista).sort_values(by="Desempenho Médio Ajustado", ascending=False)
-            
-#Ajusta aposta com base no risco: odds muito altas com baixo desempenho reduzem a alocação.
-def assess_risk(odds, performance_score):
-    risk_factor = np.where((odds > 5) & (performance_score < 0.2), 0.5, 1)  # Redução de 50% para alto risco
-    return risk_factor
 
 # --- Interface Streamlit ---
 st.title("Apostas | Estratégias Dutching")
@@ -419,7 +409,8 @@ with tab3:
 with tab4:
     st.subheader("Resultados das Apostas | Dutching e Performance de Equipes")
 
-    # Inicializar DataFrame dos cavalos
+    df_desempenho = calcular_desempenho_equipes(st.session_state["team_data"])
+
     if "horse_data" in st.session_state and st.session_state["horse_data"]:
         df_cavalos = pd.DataFrame(st.session_state["horse_data"])
         bankroll = st.number_input("Digite o valor do Bankroll:", min_value=10.0, max_value=5000.0, step=10.0, value=100.0, key="bankroll_input")
@@ -427,56 +418,61 @@ with tab4:
         st.warning("⚠️ Nenhum dado de cavalos disponível.")
         df_cavalos = pd.DataFrame(columns=["Nome", "Odds", "Wins", "2nds", "3rds", "Runs"])
 
-    # Garantir que Odds são numéricas e remover valores NaN
-    if "Odds" in df_cavalos.columns:
-        df_cavalos["Odds"] = pd.to_numeric(df_cavalos["Odds"], errors="coerce").dropna()
+    df_cavalos_filtrado = rebalance_bets(df_cavalos, bankroll, df_desempenho)
 
-    # Cálculo de probabilidades e apostas Dutching
-    if not df_cavalos.empty:
-        df_cavalos["Probability"] = (1 / df_cavalos["Odds"]).round(2)
-        df_cavalos["Dutching Bet"] = calculate_dutching(df_cavalos["Odds"], bankroll, np.ones(len(df_cavalos)))
-        df_cavalos["Lucro Dutch"] = round(df_cavalos["Odds"] * df_cavalos["Dutching Bet"], 2)
-        df_cavalos["ROI-Dutch($)"] = round((df_cavalos["Lucro Dutch"] - df_cavalos["Dutching Bet"]), 2)
-        df_cavalos["ROI (%)"] = round((df_cavalos["Lucro Dutch"] / df_cavalos["Dutching Bet"]) * 100, 2)
-        
-        melhor_equipe = df_desempenho.iloc[0]
-        ajuste_percentual = melhor_equipe["Desempenho Médio Ajustado"] / 100
-        df_cavalos["Adjusted Bet"] = df_cavalos["Dutching Bet"] * (1 + ajuste_percentual)
-
-        st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
-        st.dataframe(df_desempenho)
-        st.write("### Apostas Ajustadas")
-        st.dataframe(df_cavalos[["Nome", "Adjusted Bet"]])
-
-        df_desempenho = calcular_desempenho_equipes(st.session_state["team_data"])
-
-        df_cavalos_filtrado = rebalance_bets(df_cavalos, bankroll, df_desempenho)
-
-    # 🔹 Adicionar um selectbox para escolher entre visualizar "Resultados" ou "Desempenho das Equipes"
-    opcao_visualizacao = st.selectbox(
-        "Selecione o que deseja visualizar:",
-        ["Resultados das Apostas", "Desempenho das Equipes"]
-    )
-
-    if opcao_visualizacao == "Resultados das Apostas":
-        if not df_cavalos_filtrado.empty:
-            st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Probability", "Dutching Bet", "Lucro Dutch", "ROI-Dutch($)", "ROI (%)"]])
+    opcao_visualizacao = st.selectbox("Selecione o que deseja visualizar:", ["Resultados das Apostas", "Desempenho das Equipes"])
     
-    elif opcao_visualizacao == "Desempenho das Equipes":
-        st.write("### Análise de Performance por Equipe")
-        if not df_desempenho.empty:
-            st.dataframe(df_desempenho)
-        else:
-            st.warning("Nenhum dado de desempenho disponível.")
+    if opcao_visualizacao == "Resultados das Apostas" and not df_cavalos_filtrado.empty:
+        st.dataframe(df_cavalos_filtrado)
+    elif opcao_visualizacao == "Desempenho das Equipes" and not df_desempenho.empty:
+        st.dataframe(df_desempenho)
+
+    # # Cálculo de probabilidades e apostas Dutching
+    # if not df_cavalos.empty:
+    #     df_cavalos["Probability"] = (1 / df_cavalos["Odds"]).round(2)
+    #     df_cavalos["Dutching Bet"] = calculate_dutching(df_cavalos["Odds"], bankroll, np.ones(len(df_cavalos)))
+    #     df_cavalos["Lucro Dutch"] = round(df_cavalos["Odds"] * df_cavalos["Dutching Bet"], 2)
+    #     df_cavalos["ROI-Dutch($)"] = round((df_cavalos["Lucro Dutch"] - df_cavalos["Dutching Bet"]), 2)
+    #     df_cavalos["ROI (%)"] = round((df_cavalos["Lucro Dutch"] / df_cavalos["Dutching Bet"]) * 100, 2)
+        
+    #     melhor_equipe = df_desempenho.iloc[0]
+    #     ajuste_percentual = melhor_equipe["Desempenho Médio Ajustado"] / 100
+    #     df_cavalos["Adjusted Bet"] = df_cavalos["Dutching Bet"] * (1 + ajuste_percentual)
+
+    #     st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
+    #     st.dataframe(df_desempenho)
+    #     st.write("### Apostas Ajustadas")
+    #     st.dataframe(df_cavalos[["Nome", "Adjusted Bet"]])
+
+#         df_desempenho = calcular_desempenho_equipes(st.session_state["team_data"])
+
+#         df_cavalos_filtrado = rebalance_bets(df_cavalos, bankroll, df_desempenho)
+
+#     # 🔹 Adicionar um selectbox para escolher entre visualizar "Resultados" ou "Desempenho das Equipes"
+#     opcao_visualizacao = st.selectbox(
+#         "Selecione o que deseja visualizar:",
+#         ["Resultados das Apostas", "Desempenho das Equipes"]
+#     )
+
+#     if opcao_visualizacao == "Resultados das Apostas":
+#         if not df_cavalos_filtrado.empty:
+#             st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Probability", "Dutching Bet", "Lucro Dutch", "ROI-Dutch($)", "ROI (%)"]])
+    
+#     elif opcao_visualizacao == "Desempenho das Equipes":
+#         st.write("### Análise de Performance por Equipe")
+#         if not df_desempenho.empty:
+#             st.dataframe(df_desempenho)
+#         else:
+#             st.warning("Nenhum dado de desempenho disponível.")
 
             
-# Exibir tabela final ajustada
-        st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
-        st.dataframe(df_desempenho)    
+# # Exibir tabela final ajustada
+#         st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
+#         st.dataframe(df_desempenho)    
         
-# Exibir apostas ajustadas
-        st.write("### Apostas Ajustadas")
-        st.dataframe(df_cavalos[["Nome", "Adjusted Bet"]])
+# # Exibir apostas ajustadas
+#         st.write("### Apostas Ajustadas")
+#         st.dataframe(df_cavalos[["Nome", "Adjusted Bet"]])
 
 # Função para gerar PDF
     def generate_pdf(locais_prova, df_cavalos, df_simulacao):
