@@ -357,9 +357,7 @@ with tab4:
 # 4.0. Dutching
     if "horse_data" in st.session_state and st.session_state["horse_data"]:
         df_cavalos = pd.DataFrame(st.session_state["horse_data"])
-        if bankroll is None or not isinstance(bankroll, (int, float)):
-            bankroll = 100.0  # Define um valor padrão
-        bankroll = float(bankroll)
+        bankroll = 100.0  # Define um valor padrão
     else:
         st.warning("⚠️ Nenhum dado de cavalos disponível. Verifique as entradas e tente novamente.")
         df_cavalos = pd.DataFrame(columns=["Nome", "Odds", "Wins", "2nds", "3rds", "Runs"])  # Garante estrutura inicial
