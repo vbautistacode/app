@@ -441,7 +441,7 @@ with tab4:
     
 # Teste se df_desempenho está correto antes de usar
     if df_desempenho is None or df_desempenho.empty:
-    st.warning("⚠️ Nenhuma equipe cadastrada! Recarregando dados das abas anteriores.")
+        st.warning("⚠️ Nenhuma equipe cadastrada! Recarregando dados das abas anteriores.")
 
 # Recarregar dados das equipes
     if "team_data" in st.session_state and not st.session_state["team_data"]:
