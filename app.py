@@ -25,7 +25,7 @@ diretorio_base = f"https://raw.githubusercontent.com/{REPO_OWNER}/{REPO_NAME}/{B
 
 # --- Funções de carregamento e salvamento ---
 def load_data():
-    """ Carrega os dados do GitHub para o session_state """
+#Carrega os dados do GitHub para o session_state
     arquivos = ["horse_data.json", "team_data.json", "bet_data.json"]
     for arquivo in arquivos:
         url_arquivo = diretorio_base + arquivo
@@ -37,7 +37,7 @@ def load_data():
             st.session_state[arquivo.replace(".json", "")] = []
 
 def salvar_csv_no_github(dataframe, nome_arquivo):
-    """ Salva o dataframe como CSV no GitHub via API """
+#Salva o dataframe como CSV no GitHub via API
     if dataframe.empty:
         st.warning(f"⚠️ O arquivo '{nome_arquivo}' está vazio! Não será salvo.")
         return
@@ -74,7 +74,7 @@ st.session_state.setdefault("Nome", "Cavalo_Default")
 
 # --- Funções de cálculo ---
 def calculate_dutching(odds, bankroll, historical_factor):
-    """ Calcula a distribuição de apostas usando Dutching """
+#Calcula a distribuição de apostas usando Dutching
     probabilities = np.array([1 / odd for odd in odds])
     adjusted_probabilities = probabilities * historical_factor
     total_probability = adjusted_probabilities.sum()
@@ -82,7 +82,7 @@ def calculate_dutching(odds, bankroll, historical_factor):
     return np.round(bankroll * adjusted_probabilities, 2)
 
 def calcular_desempenho_equipes(team_data):
-    """ Calcula o desempenho das equipes com ajuste de variância """
+#Calcula o desempenho das equipes com ajuste de variância
     df_desempenho_lista = []
     for team in team_data:
         podiums_horse = team.get("Wins", 0) + team.get("2nds", 0) + team.get("3rds", 0)
@@ -109,15 +109,18 @@ def calcular_desempenho_equipes(team_data):
 
     return pd.DataFrame(df_desempenho_lista).sort_values(by="Desempenho Médio Ajustado", ascending=False)
 
+#Rebalanceia as apostas com base no desempenho das equipes
 def rebalance_bets(df_cavalos, bankroll, df_desempenho):
-    """ Rebalanceia as apostas com base no desempenho das equipes """
+    if df_desempenho.empty:
+        st.warning("⚠️ Nenhum dado de desempenho disponível. Retornando valores sem ajuste.")
+        return df_cavalos
     df_cavalos = df_cavalos.copy()
     df_cavalos = df_cavalos.merge(df_desempenho, on="Nome", how="left")
-
-    if df_cavalos.empty or "Desempenho Médio Ajustado" not in df_cavalos.columns:
-        return df_cavalos  
-
-    df_cavalos["Dutching Bet"] *= (1 + df_cavalos["Desempenho Médio Ajustado"] / 100)    
+    if "Desempenho Médio Ajustado" not in df_cavalos.columns:
+        st.warning("⚠️ A coluna 'Desempenho Médio Ajustado' não foi encontrada após o merge. Verifique os dados.")
+        return df_cavalos
+    df_cavalos["Desempenho Médio Ajustado"] = df_cavalos["Desempenho Médio Ajustado"].fillna(0)
+    df_cavalos["Dutching Bet"] *= (1 + df_cavalos["Desempenho Médio Ajustado"] / 100)
     return df_cavalos
 
 # --- Interface Streamlit ---
