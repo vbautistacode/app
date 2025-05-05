@@ -418,8 +418,8 @@ with tab4:
     # Aplicar rebalanceamento das apostas
         if "bankroll" not in st.session_state:
             st.session_state["bankroll"] = 100.0  # Valor padrão
-        bankroll = st.session_state["bankroll"]
-        df_cavalos_filtrado = rebalance_bets(df_cavalos, bankroll)
+            bankroll = st.session_state["bankroll"]
+            df_cavalos_filtrado = rebalance_bets(df_cavalos, bankroll)
         else:
             st.error("⚠️ Erro: `bankroll` não está definido corretamente!")
             
