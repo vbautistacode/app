@@ -476,6 +476,9 @@ if df_desempenho is None or df_desempenho.empty:
         st.dataframe(df_desempenho)
     
 # Função para gerar PDF
+    if df_cavalos_filtrado is None or df_cavalos_filtrado.empty:
+        st.warning("⚠️ Nenhum dado de cavalos filtrado disponível! Gerando um DataFrame padrão.")
+        df_cavalos_filtrado = pd.DataFrame(columns=["Nome", "Odds", "Dutching Bet"])
     def generate_pdf(locais_prova, df_cavalos, df_simulacao):
         pdf = FPDF()
         pdf.set_auto_page_break(auto=True, margin=15)
