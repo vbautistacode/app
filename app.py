@@ -477,6 +477,6 @@ with tab4:
         st.warning("⚠️ Ainda sem dados de desempenho! Apostas permanecerão sem ajustes.")
         df_cavalos_filtrado = df_cavalos
 
-    # 🔹 Exibir o DataFrame atualizado no Streamlit para conferir os dados
-    st.write("### Apostas Rebalanceadas")
-    st.dataframe(df_cavalos_filtrado)
+        if not df_desempenho.empty:
+        st.write("### Apostas Rebalanceadas")
+        st.dataframe(df_cavalos_filtrado)
