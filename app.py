@@ -115,16 +115,29 @@ def calcular_desempenho_equipes(team_data):
 
 #Rebalanceia as apostas com base no desempenho das equipes
 def rebalance_bets(df_cavalos, bankroll, df_desempenho):
+# 🔹 Verificar se os DataFrames estão vazios antes de processar
+    if df_cavalos.empty:
+        st.warning("⚠️ O DataFrame de cavalos está vazio! Retornando sem ajustes.")
+        return df_cavalos    
     if df_desempenho.empty:
         st.warning("⚠️ Nenhum dado de desempenho disponível. Retornando valores sem ajuste.")
         return df_cavalos
+# 🔹 Garantir que 'Nome' exista nos dois DataFrames antes do merge
+    if "Nome" not in df_cavalos.columns or "Nome" not in df_desempenho.columns:
+        st.error("❌ Erro: A coluna 'Nome' não foi encontrada em um dos DataFrames!")
+        return df_cavalos    
     df_cavalos = df_cavalos.copy()
     df_cavalos = df_cavalos.merge(df_desempenho, on="Nome", how="left")
+# 🔹 Certificar que 'Desempenho Médio Ajustado' foi criado corretamente
     if "Desempenho Médio Ajustado" not in df_cavalos.columns:
         st.warning("⚠️ A coluna 'Desempenho Médio Ajustado' não foi encontrada após o merge. Verifique os dados.")
         return df_cavalos
     df_cavalos["Desempenho Médio Ajustado"] = df_cavalos["Desempenho Médio Ajustado"].fillna(0)
-    df_cavalos["Dutching Bet"] *= (1 + df_cavalos["Desempenho Médio Ajustado"] / 100)
+# 🔹 Aplicar ajustes apenas se 'Dutching Bet' existir
+    if "Dutching Bet" in df_cavalos.columns:
+        df_cavalos["Dutching Bet"] *= (1 + df_cavalos["Desempenho Médio Ajustado"] / 100)
+    else:
+        st.warning("⚠️ A coluna 'Dutching Bet' não foi encontrada! Verifique os cálculos anteriores.")
     return df_cavalos
 
 # --- Interface Streamlit ---
@@ -414,7 +427,7 @@ with tab3:
         
 # --- Aba 4: Resultados ---
 with tab4:
-    st.subheader("####🏇 Resultados | Dutching e Performance de Equipes")
+    st.subheader("##### Resultados | Dutching e Performance de Equipes")
     
 # Garantir que há dados antes de calcular o desempenho
     if "team_data" in st.session_state: 
@@ -438,7 +451,7 @@ with tab4:
         df_cavalos["Lucro Dutch"] = round(df_cavalos["Odds"] * df_cavalos["Dutching Bet"], 2)
         df_cavalos["ROI-Dutch($)"] = round((df_cavalos["Lucro Dutch"] - df_cavalos["Dutching Bet"]), 2)
         df_cavalos["ROI (%)"] = round((df_cavalos["Lucro Dutch"] / df_cavalos["Dutching Bet"]) * 100, 2)
-        st.write("#### Resultados das Apostas | Dutching")
+        st.write("##### Resultados das Apostas | Dutching")
         st.dataframe(df_cavalos[["Nome", "Odds", "Dutching Bet", "Lucro Dutch", "ROI-Dutch($)", "ROI (%)"]])
 
 # Evitar erro ao acessar `melhor_equipe`
