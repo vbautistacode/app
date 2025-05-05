@@ -535,6 +535,6 @@ with tab4:
         
 # Botão para baixar o relatório com local da prova
     if st.button("Baixar Relatório em PDF"):
-        pdf_file = generate_pdf(df_cavalos_filtrado, df_simulacao, local_prova)
+        pdf_file = generate_pdf(df_cavalos_filtrado, df_simulacao, locais_prova)
         with open(pdf_file, "rb") as f:
             st.download_button(label="Clique aqui para baixar o PDF", data=f, file_name=pdf_file, mime="application/pdf")
