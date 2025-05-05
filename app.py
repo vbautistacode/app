@@ -81,8 +81,12 @@ def calculate_dutching(odds, bankroll, historical_factor):
     adjusted_probabilities /= total_probability if total_probability > 1 else 1
     return np.round(bankroll * adjusted_probabilities, 2)
 
-def calcular_desempenho_equipes(team_data):
 #Calcula o desempenho das equipes com ajuste de variância
+def calcular_desempenho_equipes(team_data):
+    if not team_data:
+        st.warning("⚠️ Nenhum dado de equipe disponível.")
+        return pd.DataFrame(columns=["Nome da Equipe", "Desempenho Médio Ajustado"])
+
     df_desempenho_lista = []
     for team in team_data:
         podiums_horse = team.get("Wins", 0) + team.get("2nds", 0) + team.get("3rds", 0)
@@ -416,6 +420,7 @@ with tab4:
     if "team_data" in st.session_state and st.session_state["team_data"]:
         df_desempenho = calcular_desempenho_equipes(st.session_state["team_data"])
     else:
+        st.warning("⚠️ Nenhuma equipe cadastrada! Criando DataFrame vazio.
         df_desempenho = pd.DataFrame(columns=["Nome da Equipe", "Desempenho Médio Ajustado"])
 
     # Garantir que há dados antes de calcular apostas
@@ -439,13 +444,6 @@ with tab4:
         st.error("❌ Erro: df_desempenho não foi gerado corretamente.")
     else:
         df_cavalos_filtrado = rebalance_bets(df_cavalos, bankroll, df_desempenho)
-
-    # # Exibir resultados
-    # st.write("#### Resultados das Apostas")
-    # st.dataframe(df_cavalos_filtrado)
-
-    # st.write("#### Desempenho das Equipes")
-    # st.dataframe(df_desempenho)
 
     # Cálculo de probabilidades e apostas Dutching
     if not df_cavalos.empty and "Odds" in df_cavalos.columns:
