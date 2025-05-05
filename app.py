@@ -461,8 +461,8 @@ with tab4:
     if df_desempenho.empty:
         st.warning("⚠️ Nenhuma equipe cadastrada! Recarregando dados das abas anteriores.")
         if "team_data" in st.session_state and not st.session_state["team_data"]:
-        st.session_state["team_data"] = []  # Inicializa como lista vazia
-        df_desempenho = calcular_desempenho_equipes(st.session_state["team_data"])
+            st.session_state["team_data"] = []  # Inicializa como lista vazia
+            df_desempenho = calcular_desempenho_equipes(st.session_state["team_data"])
 
 # 🔹 Somente agora, chamar rebalance_bets após garantir que df_desempenho tem dados válidos
     if df_desempenho.empty:
