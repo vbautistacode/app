@@ -407,7 +407,7 @@ with tab3:
         
 # --- Aba 4: Resultados ---
 with tab4:
-    st.subheader("Resultados das Apostas | Dutching e Performance de Equipes")
+    st.subheader("🏇 Resultados | Dutching e Performance de Equipes")
 
     df_desempenho = calcular_desempenho_equipes(st.session_state["team_data"])
 
