@@ -446,9 +446,8 @@ with tab4:
 # Recarregar dados das equipes
     if "team_data" in st.session_state and not st.session_state["team_data"]:
         st.session_state["team_data"] = []  # Inicializa uma lista vazia
-    df_desempenho = calcular_desempenho_equipes(st.session_state["team_data"])
-    df_cavalos_filtrado = rebalance_bets(df_cavalos, bankroll, df_desempenho)
-
+        df_desempenho = calcular_desempenho_equipes(st.session_state["team_data"])
+        df_cavalos_filtrado = rebalance_bets(df_cavalos, bankroll, df_desempenho)
 
 # Cálculo de probabilidades e apostas Dutching
     if not df_cavalos.empty and "Odds" in df_cavalos.columns:
