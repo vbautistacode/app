@@ -370,7 +370,7 @@ with tab4:
         df_cavalos = df_cavalos.dropna(subset=["Odds"])
     if "Odds" in df_cavalos.columns and not df_cavalos["Odds"].isnull().all():
         df_cavalos["Probability"] = (1 / df_cavalos["Odds"]).round(2)
-        df_cavalos["Dutching Bet"] = calculate_dutching(df_cavalos["Odds"].tolist, bankroll)
+        df_cavalos["Dutching Bet"] = calculate_dutching(df_cavalos["Odds"].tolist(), bankroll)
         df_cavalos["Dutching Bet"] = df_cavalos["Dutching Bet"].round(2)
         df_cavalos["Lucro Dutch"] = round(df_cavalos["Odds"] * df_cavalos["Dutching Bet"], 2)
         df_cavalos["ROI-Dutch($)"] = round((df_cavalos["Lucro Dutch"] - df_cavalos["Dutching Bet"]), 2)
