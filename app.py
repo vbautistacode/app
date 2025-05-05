@@ -391,36 +391,32 @@ with tab3:
         
 # --- Aba 4: Resultados ---
 with tab4:
+    st.subheader("Resultados das Apostas | Dutching e Performance de Equipes")
 
+    # Inicializar DataFrame dos cavalos
     if "horse_data" in st.session_state and st.session_state["horse_data"]:
         df_cavalos = pd.DataFrame(st.session_state["horse_data"])
-        bankroll = st.number_input("Digite o valor do Bankroll:", step=10.0, value=100.0, key="bankroll_input")
+        bankroll = st.number_input("Digite o valor do Bankroll:", min_value=10.0, max_value=5000.0, step=10.0, value=100.0, key="bankroll_input")
     else:
         st.warning("⚠️ Nenhum dado de cavalos disponível.")
         df_cavalos = pd.DataFrame(columns=["Nome", "Odds", "Wins", "2nds", "3rds", "Runs"])
 
-    # Verificação de dados antes dos cálculos
-    if not df_cavalos.empty and "Odds" in df_cavalos.columns:
+    # Garantir que Odds são numéricas e remover valores NaN
+    if "Odds" in df_cavalos.columns:
         df_cavalos["Odds"] = pd.to_numeric(df_cavalos["Odds"], errors="coerce").dropna()
-        if not df_cavalos["Odds"].isnull().all():
-            df_cavalos["Probability"] = (1 / df_cavalos["Odds"]).round(2)
-            df_cavalos["Dutching Bet"] = calculate_dutching(df_cavalos["Odds"], bankroll, np.ones(len(df_cavalos)))
-            df_cavalos["Lucro Dutch"] = round(df_cavalos["Odds"] * df_cavalos["Dutching Bet"], 2)
-            df_cavalos["ROI-Dutch($)"] = round((df_cavalos["Lucro Dutch"] - df_cavalos["Dutching Bet"]), 2)
-            df_cavalos["ROI (%)"] = round((df_cavalos["Lucro Dutch"] / df_cavalos["Dutching Bet"]) * 100, 2)
-            df_cavalos_filtrado = rebalance_bets(df_cavalos, bankroll) if "bankroll" in locals() else pd.DataFrame()
-        if not df_cavalos_filtrado.empty:
-            st.dataframe(df_cavalos_filtrado)
-        else:
-            st.warning("⚠️ Nenhum dado disponível após rebalanceamento.")
-    # Aplicar rebalanceamento das apostas
-        if "bankroll" not in st.session_state:
-            st.session_state["bankroll"] = 100.0  # Valor padrão
-            bankroll = st.session_state["bankroll"]
-            df_cavalos_filtrado = rebalance_bets(df_cavalos, bankroll)
-        else:
-            st.error("⚠️ Erro: `bankroll` não está definido corretamente!")
-    
+
+    # Cálculo de probabilidades e apostas Dutching
+    if not df_cavalos.empty:
+        df_cavalos["Probability"] = (1 / df_cavalos["Odds"]).round(2)
+        df_cavalos["Dutching Bet"] = calculate_dutching(df_cavalos["Odds"], bankroll, np.ones(len(df_cavalos)))
+        df_cavalos["Lucro Dutch"] = round(df_cavalos["Odds"] * df_cavalos["Dutching Bet"], 2)
+        df_cavalos["ROI-Dutch($)"] = round((df_cavalos["Lucro Dutch"] - df_cavalos["Dutching Bet"]), 2)
+        df_cavalos["ROI (%)"] = round((df_cavalos["Lucro Dutch"] / df_cavalos["Dutching Bet"]) * 100, 2)
+
+    df_cavalos_filtrado = rebalance_bets(df_cavalos, bankroll)
+    if not df_cavalos_filtrado.empty:
+        st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Probability", "Dutching Bet", "Lucro Dutch", "ROI-Dutch($)", "ROI (%)"]])
+
     # --- Análise de Performance das Equipes ---
     st.write("### Análise de Performance por Equipe")
     if "team_data" in st.session_state and st.session_state["team_data"]:
@@ -429,8 +425,7 @@ with tab4:
             [team["Nome da Equipe"] for team in st.session_state["team_data"]],
             key="selectbox_equipes"
         )
-        
-# Filtrar e calcular desempenho de equipe
+
         df_desempenho = []
         equipe_filtrada = [team for team in st.session_state["team_data"] if team["Nome da Equipe"] == equipe_selecionada]
         for team in equipe_filtrada:
@@ -457,52 +452,46 @@ with tab4:
         else:
             st.warning(f"Nenhum dado encontrado para a equipe '{equipe_selecionada}'.")
 
-# Melhor equipe baseada na performance
+    # Melhor equipe baseada na performance
     if "team_data" in st.session_state and st.session_state["team_data"]:
         df_desempenho = []
         for team in st.session_state["team_data"]:
-            
-# Calcular desempenho do cavalo
-                podiums_horse = team.get("Wins", 0) + team.get("2nds", 0) + team.get("3rds", 0)
-                runs_horse = team.get("Runs", 1)
-                desempenho_horse = podiums_horse / max(runs_horse, 1)
-                st.session_state["desempenho_horse"] = desempenho_horse
-            
-# Calcular desempenho do jóquei
-                podiums_jockey = team.get("Jockey Wins", 0) + team.get("Jockey 2nds", 0) + team.get("Jockey 3rds", 0)
-                rides_jockey = team.get("Jockey Rides", 1)
-                desempenho_jockey = podiums_jockey / max(rides_jockey, 1)
-                st.session_state["desempenho_jockey"] = desempenho_jockey
-            
-# Calcular desempenho do treinador
-                podiums_trainer = team.get("Treinador Placed", 0) + team.get("Treinador Wins", 0)
-                runs_trainer = team.get("Treinador Runs", 1)
-                desempenho_trainer = podiums_trainer / max(runs_trainer, 1)
-                st.session_state["desempenho_trainer"] = desempenho_trainer
-            
-# Ajustar o cálculo da média de desempenho para incluir variância
-                desempenhos = [desempenho_horse, desempenho_jockey, desempenho_trainer]
-                media_desempenho = sum(desempenhos) / len(desempenhos)
-                variancia_desempenho = np.var(desempenhos)
-                resultado_ajustado = media_desempenho - variancia_desempenho
-            
-# Média total de desempenho da equipe
-                media_desempenho = (desempenho_jockey + desempenho_trainer + desempenho_horse) / 3
-                df_desempenho.append({
-                    "Nome da Equipe": team["Nome da Equipe"],
-                    "Desempenho Médio Ajustado": round(resultado_ajustado, 2)
-                })
-            
-# Converter para DataFrame
-                df_desempenho = pd.DataFrame(df_desempenho)
-            
-# Ordenar DataFrame por Desempenho Médio em ordem decrescente
-                df_desempenho = df_desempenho.sort_values(by="Desempenho Médio Ajustado", ascending=False)
-            
-# Ajustar valores de aposta com base no desempenho médio
-                melhor_equipe = df_desempenho.iloc[0]
-                ajuste_percentual = melhor_equipe["Desempenho Médio Ajustado"] / 100
-                df_cavalos["Adjusted Bet"] = df_cavalos["Dutching Bet"] * (1 + ajuste_percentual)
+            podiums_horse = team.get("Wins", 0) + team.get("2nds", 0) + team.get("3rds", 0)
+            runs_horse = team.get("Runs", 1)
+            desempenho_horse = podiums_horse / max(runs_horse, 1)
+            st.session_state["desempenho_horse"] = desempenho_horse
+
+            podiums_jockey = team.get("Jockey Wins", 0) + team.get("Jockey 2nds", 0) + team.get("Jockey 3rds", 0)
+            rides_jockey = team.get("Jockey Rides", 1)
+            desempenho_jockey = podiums_jockey / max(rides_jockey, 1)
+            st.session_state["desempenho_jockey"] = desempenho_jockey
+
+            podiums_trainer = team.get("Treinador Placed", 0) + team.get("Treinador Wins", 0)
+            runs_trainer = team.get("Treinador Runs", 1)
+            desempenho_trainer = podiums_trainer / max(runs_trainer, 1)
+            st.session_state["desempenho_trainer"] = desempenho_trainer
+
+            desempenhos = [desempenho_horse, desempenho_jockey, desempenho_trainer]
+            media_desempenho = sum(desempenhos) / len(desempenhos)
+            variancia_desempenho = np.var(desempenhos)
+            resultado_ajustado = media_desempenho - variancia_desempenho
+
+            df_desempenho.append({
+                "Nome da Equipe": team["Nome da Equipe"],
+                "Desempenho Médio Ajustado": round(resultado_ajustado, 2)
+            })
+
+        df_desempenho = pd.DataFrame(df_desempenho)
+        df_desempenho = df_desempenho.sort_values(by="Desempenho Médio Ajustado", ascending=False)
+
+        melhor_equipe = df_desempenho.iloc[0]
+        ajuste_percentual = melhor_equipe["Desempenho Médio Ajustado"] / 100
+        df_cavalos["Adjusted Bet"] = df_cavalos["Dutching Bet"] * (1 + ajuste_percentual)
+
+        st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
+        st.dataframe(df_desempenho)
+        st.write("### Apostas Ajustadas")
+        st.dataframe(df_cavalos[["Nome", "Adjusted Bet"]])
             
 # Exibir tabela final ajustada
         st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
