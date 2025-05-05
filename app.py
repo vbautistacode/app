@@ -69,31 +69,33 @@ if not st.session_state.get("initialized", False):
     st.session_state["initialized"] = True
 if "Nome" not in st.session_state:
     st.session_state["Nome"] = "Cavalo_Default"  # Nome padrão ou escolha inicial
-# --- Funções de cálculo ---
+
+# Função para cálculo Dutching
 def calculate_dutching(odds, bankroll, historical_factor):
-#Distribui aposta usando Dutching com ponderação das odds e ajuste histórico.
     probabilities = np.array([1 / odd for odd in odds])
-    adjusted_probabilities = probabilities * historical_factor  # Ajusta conforme histórico dos cavalos
+    adjusted_probabilities = probabilities * historical_factor
     total_probability = adjusted_probabilities.sum()
-    if total_probability > 1:
-        adjusted_probabilities /= total_probability  # Normaliza
+    adjusted_probabilities /= total_probability if total_probability > 1 else 1
     apostas = np.round(bankroll * adjusted_probabilities, 2)
     return apostas
+
+# Função para rebalancear apostas
+def rebalance_bets(df_cavalos, bankroll):
+    if df_cavalos.empty or "Odds" not in df_cavalos.columns:
+        return df_cavalos  # Retorna sem ajustes se dados estiverem vazios
+    df_cavalos["Probability"] = 1 / df_cavalos["Odds"]
+    df_cavalos["Performance Score"] = (df_cavalos["Wins"] + df_cavalos["2nds"] + df_cavalos["3rds"]) / df_cavalos["Runs"]
+    df_cavalos_filtrado = df_cavalos[df_cavalos["Performance Score"] >= 0.15]
+    if df_cavalos_filtrado.empty:
+        return df_cavalos
+    df_cavalos_filtrado["Dutching Bet"] = calculate_dutching(df_cavalos_filtrado["Odds"], bankroll, np.ones(len(df_cavalos_filtrado)))
+    return df_cavalos_filtrado
+
 def assess_risk(odds, performance_score):
 #Ajusta aposta com base no risco: odds muito altas com baixo desempenho reduzem a alocação.
     risk_factor = np.where((odds > 5) & (performance_score < 0.2), 0.5, 1)  # Redução de 50% para alto risco
     return risk_factor
-def rebalance_bets(df_cavalos, bankroll):
-#Remove cavalos de baixo desempenho e distribui apostas com Dutching otimizado.
-    df_cavalos["Probability"] = 1 / df_cavalos["Odds"]
-    df_cavalos["Performance Score"] = (df_cavalos["Wins"] + df_cavalos["2nds"] + df_cavalos["3rds"]) / df_cavalos["Runs"]
-    df_cavalos["Risk Factor"] = assess_risk(df_cavalos["Odds"], df_cavalos["Performance Score"])
-    df_filtrado = df_cavalos[df_cavalos["Performance Score"] >= 0.15]  # Filtra cavalos fracos
-    if df_filtrado.empty:
-        st.warning("⚠️ Nenhum cavalo atende aos critérios de desempenho. Ajuste os parâmetros.")
-        return df_cavalos
-    df_filtrado["Dutching Bet"] = calculate_dutching(df_filtrado["Odds"], bankroll, df_filtrado["Risk Factor"])
-    return df_filtrado
+
 # --- Interface Streamlit ---
 st.title("Apostas | Estratégias Dutching")
 # Abas para organização
@@ -354,34 +356,31 @@ with tab3:
         st.warning("Ainda não há equipes cadastradas.")
 # --- Aba 4: Resultados ---
 with tab4:
-    st.subheader("Resultados das Apostas | Dutching e Performance de Equipes")
+    st.subheader("Resultados | Dutching e Performance de Equipes")
 
-    # Inicializar DataFrame dos cavalos
-    if "horse_data" in st.session_state and st.session_state["horse_data"]:
+     if "horse_data" in st.session_state and st.session_state["horse_data"]:
         df_cavalos = pd.DataFrame(st.session_state["horse_data"])
         bankroll = st.slider("Ajuste o valor do Bankroll", min_value=10.0, max_value=5000.0, step=10.0, value=100.0, key="bankroll_slider")
     else:
-        st.warning("⚠️ Nenhum dado de cavalos disponível. Verifique as entradas e tente novamente.")
-        df_cavalos = pd.DataFrame(columns=["Nome", "Odds", "Wins", "2nds", "3rds", "Runs"])  # Garante estrutura inicial
+        st.warning("⚠️ Nenhum dado de cavalos disponível.")
+        df_cavalos = pd.DataFrame(columns=["Nome", "Odds", "Wins", "2nds", "3rds", "Runs"])
 
-    # Garantir que Odds são numéricas e remover valores NaN
-    if "Odds" in df_cavalos.columns:
-        df_cavalos["Odds"] = pd.to_numeric(df_cavalos["Odds"], errors="coerce")
-        df_cavalos.dropna(subset=["Odds"], inplace=True)  # Remove linhas com Odds inválidas
-
-    # Verificar e calcular probabilidades e apostas Dutching
+    # Verificação de dados antes dos cálculos
     if not df_cavalos.empty and "Odds" in df_cavalos.columns:
-        odds_list = df_cavalos["Odds"].dropna().astype(float).tolist()
-        if odds_list and all(isinstance(odd, (int, float)) for odd in odds_list):
+        df_cavalos["Odds"] = pd.to_numeric(df_cavalos["Odds"], errors="coerce").dropna()
+        if not df_cavalos["Odds"].isnull().all():
             df_cavalos["Probability"] = (1 / df_cavalos["Odds"]).round(2)
-            df_cavalos["Dutching Bet"] = calculate_dutching(odds_list, bankroll)
+            df_cavalos["Dutching Bet"] = calculate_dutching(df_cavalos["Odds"], bankroll, np.ones(len(df_cavalos)))
             df_cavalos["Lucro Dutch"] = round(df_cavalos["Odds"] * df_cavalos["Dutching Bet"], 2)
             df_cavalos["ROI-Dutch($)"] = round((df_cavalos["Lucro Dutch"] - df_cavalos["Dutching Bet"]), 2)
             df_cavalos["ROI (%)"] = round((df_cavalos["Lucro Dutch"] / df_cavalos["Dutching Bet"]) * 100, 2)
         else:
-            st.warning("⚠️ Erro: A lista de odds contém valores inválidos!")
-    else:
-        st.warning("⚠️ Nenhuma odd válida encontrada. Verifique os dados de entrada.")
+            st.warning("⚠️ Lista de odds contém valores inválidos!")
+
+    df_cavalos_filtrado = rebalance_bets(df_cavalos, bankroll)
+
+    if not df_cavalos_filtrado.empty:
+        st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Probability", "Dutching Bet", "Lucro Dutch", "ROI-Dutch($)", "ROI (%)"]])
 
     # Aplicar rebalanceamento das apostas
         if "bankroll" in locals() and not df_cavalos.empty:
@@ -483,33 +482,25 @@ with tab4:
 # Exibir apostas ajustadas
         st.write("### Apostas Ajustadas")
         st.dataframe(df_cavalos[["Nome", "Adjusted Bet"]])
-# --- Simulação de Retornos Esperados ---
+# Simulação de Retornos
     def simulate_returns(df_cavalos, bankroll):
-#Simula os possíveis retornos com base nos valores apostados e nas odds.
         resultados = []
         for _, row in df_cavalos.iterrows():
-            cavalo = row["Nome"]
-            odd = row["Odds"]
-            dutching_bet = row["Dutching Bet"]
-            lucro_dutching = (odd * dutching_bet) - bankroll
+            lucro_dutching = (row["Odds"] * row["Dutching Bet"]) - bankroll
             resultados.append({
-                "Cavalo": cavalo,
-                "Odd": odd,
-                "Dutching Bet": dutching_bet,
+                "Cavalo": row["Nome"],
+                "Odd": row["Odds"],
+                "Dutching Bet": row["Dutching Bet"],
                 "Lucro Dutching ($)": round(lucro_dutching, 2),
                 "ROI Dutching (%)": round((lucro_dutching / bankroll) * 100, 2),
             })
         return pd.DataFrame(resultados)
-    st.write("### Simulação de Retornos Esperados")
-    if "horse_data" in st.session_state and st.session_state["horse_data"]:
-        df_cavalos = pd.DataFrame(st.session_state["horse_data"])    
-        bankroll = st.slider("Ajuste o valor do Bankroll", min_value=10.0, max_value=5000.0, step=10.0, value=100.0, key="bankroll_slider_simulacao")
-        if "Odds" in df_cavalos.columns and not df_cavalos["Odds"].isnull().all():
-            df_cavalos_filtrado = rebalance_bets(df_cavalos, bankroll)
-# Executa a simulação
-            df_simulacao = simulate_returns(df_cavalos_filtrado, bankroll)    
-# Exibir os resultados na interface
-            st.dataframe(df_simulacao)
+
+    if not df_cavalos_filtrado.empty:
+        df_simulacao = simulate_returns(df_cavalos_filtrado, bankroll)
+        st.dataframe(df_simulacao)
+
+
 # Função para gerar PDF
     def generate_pdf(locais_prova, df_cavalos, df_simulacao):
         pdf = FPDF()
