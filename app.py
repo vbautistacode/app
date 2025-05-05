@@ -365,18 +365,16 @@ with tab4:
         bankroll = st.slider("Ajuste o valor do Bankroll", min_value=10.0, max_value=5000.0, step=10.0, value=100.0, key="bankroll_slider")
     else:
         st.warning("⚠️ Nenhum dado de cavalos disponível. Verifique as entradas e tente novamente.")
-        df_cavalos = pd.DataFrame()# Definir colunas vazias
+        df_cavalos = pd.DataFrame(columns=["Nome", "Odds", "Wins", "2nds", "3rds", "Runs"])
+        df_cavalos["Odds"] = pd.to_numeric(df_cavalos["Odds"], errors="coerce")
+        df_cavalos = df_cavalos.dropna(subset=["Odds"])
     if "Odds" in df_cavalos.columns and not df_cavalos["Odds"].isnull().all():
         df_cavalos["Probability"] = (1 / df_cavalos["Odds"]).round(2)
-        df_cavalos["Dutching Bet"] = calculate_dutching(df_cavalos["Odds"], bankroll)
+        df_cavalos["Dutching Bet"] = calculate_dutching(df_cavalos["Odds"].tolist, bankroll)
         df_cavalos["Dutching Bet"] = df_cavalos["Dutching Bet"].round(2)
-        if bankroll > 0:
-            df_cavalos["Kelly Bet"] = df_cavalos.apply(
-                lambda row: kelly_criterion(row["Odds"], row["Probability"], bankroll), axis=1
-            )
-            df_cavalos["Lucro Dutch"] = round(df_cavalos["Odds"] * df_cavalos["Dutching Bet"], 2)
-            df_cavalos["ROI-Dutch($)"] = round((df_cavalos["Lucro Dutch"] - df_cavalos["Dutching Bet"]), 2)
-            df_cavalos["ROI (%)"] = round((df_cavalos["Lucro Dutch"] / df_cavalos["Dutching Bet"]) * 100, 2)
+        df_cavalos["Lucro Dutch"] = round(df_cavalos["Odds"] * df_cavalos["Dutching Bet"], 2)
+        df_cavalos["ROI-Dutch($)"] = round((df_cavalos["Lucro Dutch"] - df_cavalos["Dutching Bet"]), 2)
+        df_cavalos["ROI (%)"] = round((df_cavalos["Lucro Dutch"] / df_cavalos["Dutching Bet"]) * 100, 2)
 # Aplicar rebalanceamento das apostas
             df_cavalos_filtrado = rebalance_bets(df_cavalos, bankroll)
 # Exibir tabela formatada no Streamlit
