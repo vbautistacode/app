@@ -122,11 +122,6 @@ with tab1:
             st.success(f"Novo local '{novo_local}' adicionado com sucesso!")
         elif novo_local in locais_prova:
             st.warning("Este local já está registrado.")
-    # Lista de opções de "Going"
-    #tipo_pista = st.selectbox("Escolha o tipo de pista (Going):", st.session_state["going_conditions"], key="select_going_1")
-    # Salvar o tipo de pista selecionado no `session_state`
-    #st.session_state["tipo_pista_atual"] = tipo_pista
-    #st.session_state["distance"] = st.number_input("Distância da Pista", min_value=0.00, step=0.01)
 # --- Aba 2: Dados dos Cavalos ---
 with tab2:
     st.subheader("Dados Históricos | Cavalos")
@@ -498,28 +493,27 @@ with tab4:
 # Exibir os resultados na interface
             st.dataframe(df_simulacao)
 # Função para gerar PDF
-    def generate_pdf(df_cavalos, df_simulacao):
+    def generate_pdf(locais_prova, df_cavalos, df_simulacao):
         pdf = FPDF()
         pdf.set_auto_page_break(auto=True, margin=15)
         pdf.add_page()
         pdf.set_font("Arial", "B", 16)
         pdf.cell(200, 10, "Relatório de Apostas - Dutching", ln=True, align="C")
         pdf.set_font("Arial", "B", 12)
+        pdf.cell(200, 10, f"Local da Prova: {locais_prova}", ln=True)
         pdf.cell(200, 10, "Detalhes das Apostas", ln=True)
-        for index, row in df_cavalos.iterrows():
+        for _, row in df_cavalos.iterrows():
             pdf.set_font("Arial", "", 10)
             pdf.cell(200, 7, f"{row['Nome']} - Odds: {row['Odds']} - Bet: {row['Dutching Bet']}", ln=True)
-        pdf.set_font("Arial", "B", 12)
         pdf.cell(200, 10, "Simulação de Retornos", ln=True)
-        for index, row in df_simulacao.iterrows():
+        for _, row in df_simulacao.iterrows():
             pdf.set_font("Arial", "", 10)
             pdf.cell(200, 7, f"{row['Cavalo']} - ROI: {row['ROI Dutching (%)']}%", ln=True)
-# Salvar o PDF temporário e permitir o download
         pdf_filename = "relatorio_apostas.pdf"
         pdf.output(pdf_filename)
-        return pdf_filename    
-# Interface Streamlit para geração do PDF
+        return pdf_filename
+# Botão para baixar o relatório com local da prova
     if st.button("Baixar Relatório em PDF"):
-        pdf_file = generate_pdf(df_cavalos_filtrado, df_simulacao)
+        pdf_file = generate_pdf(df_cavalos_filtrado, df_simulacao, local_prova)
         with open(pdf_file, "rb") as f:
             st.download_button(label="Clique aqui para baixar o PDF", data=f, file_name=pdf_file, mime="application/pdf")
