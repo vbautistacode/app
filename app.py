@@ -440,14 +440,23 @@ with tab4:
         df_desempenho = pd.DataFrame(columns=["Nome da Equipe", "Desempenho Médio Ajustado"])
     
 # Teste se df_desempenho está correto antes de usar
-    if df_desempenho is None or df_desempenho.empty:
-        st.warning("⚠️ Nenhuma equipe cadastrada! Recarregando dados das abas anteriores.")
-
-# Recarregar dados das equipes
-    if "team_data" in st.session_state and not st.session_state["team_data"]:
-        st.session_state["team_data"] = []  # Inicializa uma lista vazia
+if df_desempenho is None or df_desempenho.empty:
+    st.warning("⚠️ Nenhuma equipe cadastrada! Recarregando dados das abas anteriores.")
+    
+# Recarregar dados das equipes apenas se necessário
+    if "team_data" in st.session_state:
+        if not st.session_state["team_data"]:
+            st.session_state["team_data"] = []  # Inicializa como lista vazia
+        
+# Garantir que df_desempenho seja atualizado corretamente
         df_desempenho = calcular_desempenho_equipes(st.session_state["team_data"])
-        df_cavalos_filtrado = rebalance_bets(df_cavalos, bankroll, df_desempenho)
+
+# **Somente agora** chamar rebalance_bets, após df_desempenho ser preenchido corretamente
+        if df_desempenho.empty:
+            st.warning("⚠️ Ainda sem dados de desempenho! Apostas permanecerão sem ajustes.")
+            df_cavalos_filtrado = df_cavalos  # Mantém os dados sem ajuste
+        else:
+            df_cavalos_filtrado = rebalance_bets(df_cavalos, bankroll, df_desempenho)
 
 # Cálculo de probabilidades e apostas Dutching
     if not df_cavalos.empty and "Odds" in df_cavalos.columns:
