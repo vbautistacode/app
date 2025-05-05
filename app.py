@@ -354,66 +354,86 @@ with tab3:
         st.warning("Ainda não há equipes cadastradas.")
 # --- Aba 4: Resultados ---
 with tab4:
-    st.subheader("Análise e Resultados")
-# 4.0. Dutching
+    st.subheader("Resultados das Apostas | Dutching e Performance de Equipes")
+
+    # Inicializar DataFrame dos cavalos
     if "horse_data" in st.session_state and st.session_state["horse_data"]:
         df_cavalos = pd.DataFrame(st.session_state["horse_data"])
-        bankroll = 100.0  # Define um valor padrão
+        bankroll = st.slider("Ajuste o valor do Bankroll", min_value=10.0, max_value=5000.0, step=10.0, value=100.0, key="bankroll_slider_simulacao")
     else:
         st.warning("⚠️ Nenhum dado de cavalos disponível. Verifique as entradas e tente novamente.")
         df_cavalos = pd.DataFrame(columns=["Nome", "Odds", "Wins", "2nds", "3rds", "Runs"])  # Garante estrutura inicial
-# Garantir que Odds são numéricas e remover valores NaN
+
+    # Garantir que Odds são numéricas e remover valores NaN
     if "Odds" in df_cavalos.columns:
         df_cavalos["Odds"] = pd.to_numeric(df_cavalos["Odds"], errors="coerce")
-        df_cavalos = df_cavalos.dropna(subset=["Odds"])  # Remove linhas inválidas
-# Verificar se há Odds válidas antes de aplicar cálculos
-    odds_list = df_cavalos["Odds"].dropna().astype(float).tolist() if "Odds" in df_cavalos.columns else []    
-    if not odds_list or any(pd.isna(odd) for odd in odds_list):
-        df_cavalos["Probability"] = (1 / df_cavalos["Odds"]).round(2)
-        df_cavalos["Dutching Bet"] = calculate_dutching(odds_list, bankroll)
-        df_cavalos["Dutching Bet"] = df_cavalos["Dutching Bet"].round(2)
-        df_cavalos["Lucro Dutch"] = round(df_cavalos["Odds"] * df_cavalos["Dutching Bet"], 2)
-        df_cavalos["ROI-Dutch($)"] = round((df_cavalos["Lucro Dutch"] - df_cavalos["Dutching Bet"]), 2)
-        df_cavalos["ROI (%)"] = round((df_cavalos["Lucro Dutch"] / df_cavalos["Dutching Bet"]) * 100, 2)
+        df_cavalos.dropna(subset=["Odds"], inplace=True)  # Remove linhas com Odds inválidas
+
+    # Verificar e calcular probabilidades e apostas Dutching
+    if not df_cavalos.empty and "Odds" in df_cavalos.columns:
+        odds_list = df_cavalos["Odds"].dropna().astype(float).tolist()
+        if odds_list and all(isinstance(odd, (int, float)) for odd in odds_list):
+            df_cavalos["Probability"] = (1 / df_cavalos["Odds"]).round(2)
+            df_cavalos["Dutching Bet"] = calculate_dutching(odds_list, bankroll)
+            df_cavalos["Lucro Dutch"] = round(df_cavalos["Odds"] * df_cavalos["Dutching Bet"], 2)
+            df_cavalos["ROI-Dutch($)"] = round((df_cavalos["Lucro Dutch"] - df_cavalos["Dutching Bet"]), 2)
+            df_cavalos["ROI (%)"] = round((df_cavalos["Lucro Dutch"] / df_cavalos["Dutching Bet"]) * 100, 2)
+        else:
+            st.warning("⚠️ Erro: A lista de odds contém valores inválidos!")
     else:
-        st.warning("⚠️ Erro: A lista de odds contém valores inválidos ou está vazia!")
-# Aplicar rebalanceamento das apostas
-    df_cavalos_filtrado = rebalance_bets(df_cavalos, bankroll)    
-# Exibir tabela formatada no Streamlit
-    st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Probability", "Dutching Bet", "Lucro Dutch", "ROI-Dutch($)", "ROI (%)"]])
-# Cálculo do somatório da coluna "Dutching Bet"
-    total_dutching = round(df_cavalos["Dutching Bet"].sum(), 2)
-# Ajuste das apostas baseado na performance das equipes
+        st.warning("⚠️ Nenhuma odd válida encontrada. Verifique os dados de entrada.")
+
+    # Aplicar rebalanceamento das apostas
+    df_cavalos_filtrado = rebalance_bets(df_cavalos, bankroll)
+
+    # Garantir que as colunas esperadas existem antes da exibição
+    colunas_esperadas = ["Nome", "Odds", "Probability", "Dutching Bet", "Lucro Dutch", "ROI-Dutch($)", "ROI (%)"]
+    colunas_disponiveis = df_cavalos_filtrado.columns.tolist()
+    colunas_validas = [col for col in colunas_esperadas if col in colunas_disponiveis]
+
+    if df_cavalos_filtrado.empty:
+        st.warning("⚠️ Nenhum cavalo atende aos critérios. Ajuste os parâmetros!")
+    else:
+        st.dataframe(df_cavalos_filtrado[colunas_validas])
+
+    # --- Análise de Performance das Equipes ---
     st.write("### Análise de Performance por Equipe")
+
     if "team_data" in st.session_state and st.session_state["team_data"]:
         equipe_selecionada = st.selectbox(
             "Selecione uma Equipe",
             [team["Nome da Equipe"] for team in st.session_state["team_data"]],
             key="selectbox_equipes"
         )
-        if equipe_selecionada:
-            df_desempenho = []
-            equipe_filtrada = [team for team in st.session_state["team_data"] if team["Nome da Equipe"] == equipe_selecionada]
-            for team in equipe_filtrada:
-                podiums_jockey = team.get("Jockey Wins", 0) + team.get("Jockey 2nds", 0) + team.get("Jockey 3rds", 0)
-                rides_jockey = team.get("Jockey Rides", 1)
-                performance_jockey = {
-                    "Tipo": "Jóquei",
-                    "Nome": team["Jockey"],
-                    "Razão Pódios/Corridas": "{:.2f}".format((podiums_jockey / max(rides_jockey, 1)) * 100)
-                }
-                df_desempenho.append(performance_jockey)
-                podiums_trainer = team.get("Treinador Placed", 0) + team.get("Treinador Wins", 1)
-                runs_trainer = team.get("Treinador Runs", 1)
-                performance_trainer = {
-                    "Tipo": "Treinador",
-                    "Nome": team["Treinador"],
-                    "Razão Pódios/Corridas": "{:.2f}".format((podiums_trainer / max(runs_trainer, 1)) * 100)
-                }
-                df_desempenho.append(performance_trainer)
+
+        # Filtrar e calcular desempenho de equipe
+        df_desempenho = []
+        equipe_filtrada = [team for team in st.session_state["team_data"] if team["Nome da Equipe"] == equipe_selecionada]
+        for team in equipe_filtrada:
+            podiums_jockey = team.get("Jockey Wins", 0) + team.get("Jockey 2nds", 0) + team.get("Jockey 3rds", 0)
+            rides_jockey = team.get("Jockey Rides", 1)
+            performance_jockey = {
+                "Tipo": "Jóquei",
+                "Nome": team["Jockey"],
+                "Razão Pódios/Corridas": "{:.2f}%".format((podiums_jockey / max(rides_jockey, 1)) * 100)
+            }
+            df_desempenho.append(performance_jockey)
+
+            podiums_trainer = team.get("Treinador Placed", 0) + team.get("Treinador Wins", 1)
+            runs_trainer = team.get("Treinador Runs", 1)
+            performance_trainer = {
+                "Tipo": "Treinador",
+                "Nome": team["Treinador"],
+                "Razão Pódios/Corridas": "{:.2f}%".format((podiums_trainer / max(runs_trainer, 1)) * 100)
+            }
+            df_desempenho.append(performance_trainer)
+
+        if df_desempenho:
             st.dataframe(pd.DataFrame(df_desempenho))
         else:
             st.warning(f"Nenhum dado encontrado para a equipe '{equipe_selecionada}'.")
+
+
 # Melhor equipe baseada na performance
     if "team_data" in st.session_state and st.session_state["team_data"]:
         df_desempenho = []
