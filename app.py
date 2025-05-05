@@ -392,7 +392,6 @@ with tab3:
 # --- Aba 4: Resultados ---
 with tab4:
     st.subheader("Resultados das Apostas | Dutching e Performance de Equipes")
-
     if "horse_data" in st.session_state and st.session_state["horse_data"]:
         df_cavalos = pd.DataFrame(st.session_state["horse_data"])
         bankroll = st.slider("Ajuste o valor do Bankroll", min_value=10.0, max_value=5000.0, step=10.0, value=100.0, key="bankroll_slider")
@@ -409,9 +408,7 @@ with tab4:
             df_cavalos["Lucro Dutch"] = round(df_cavalos["Odds"] * df_cavalos["Dutching Bet"], 2)
             df_cavalos["ROI-Dutch($)"] = round((df_cavalos["Lucro Dutch"] - df_cavalos["Dutching Bet"]), 2)
             df_cavalos["ROI (%)"] = round((df_cavalos["Lucro Dutch"] / df_cavalos["Dutching Bet"]) * 100, 2)
-        else:
-            st.warning("⚠️ Lista de odds contém valores inválidos!")
-    df_cavalos_filtrado = rebalance_bets(df_cavalos, bankroll)
+    
     if not df_cavalos_filtrado.empty:
         st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Probability", "Dutching Bet", "Lucro Dutch", "ROI-Dutch($)", "ROI (%)"]])
 
