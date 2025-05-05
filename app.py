@@ -408,8 +408,14 @@ with tab3:
 # --- Aba 4: Resultados ---
 with tab4:
     st.subheader("🏇 Resultados | Dutching e Performance de Equipes")
-    df_desempenho = calcular_desempenho_equipes(st.session_state["team_data"])
+    
+    # Garantir que há dados antes de calcular o desempenho
+    if "team_data" in st.session_state and st.session_state["team_data"]:
+        df_desempenho = calcular_desempenho_equipes(st.session_state["team_data"])
+    else:
+        df_desempenho = pd.DataFrame(columns=["Nome da Equipe", "Desempenho Médio Ajustado"])
 
+    # Garantir que há dados antes de calcular apostas
     if "horse_data" in st.session_state and st.session_state["horse_data"]:
         df_cavalos = pd.DataFrame(st.session_state["horse_data"])
         bankroll = st.number_input("Digite o valor do Bankroll:", min_value=10.0, max_value=5000.0, step=10.0, value=100.0, key="bankroll_input")
@@ -417,41 +423,34 @@ with tab4:
         st.warning("⚠️ Nenhum dado de cavalos disponível.")
         df_cavalos = pd.DataFrame(columns=["Nome", "Odds", "Wins", "2nds", "3rds", "Runs"])
 
+    # Rebalancear apostas com base no desempenho das equipes
     df_cavalos_filtrado = rebalance_bets(df_cavalos, bankroll, df_desempenho)
-    
-        st.write("#### Resultados das Apostas")
-        st.dataframe(df_cavalos_filtrado)
-        st.write("#### Desempenho das Equipes")
-        st.dataframe(df_desempenho)
+
+    # Exibir resultados
+    st.write("#### Resultados das Apostas")
+    st.dataframe(df_cavalos_filtrado)
+
+    st.write("#### Desempenho das Equipes")
+    st.dataframe(df_desempenho)
 
     # Cálculo de probabilidades e apostas Dutching
+    if not df_cavalos.empty and "Odds" in df_cavalos.columns:
         df_cavalos["Dutching Bet"] = calculate_dutching(df_cavalos["Odds"], bankroll, np.ones(len(df_cavalos)))
         df_cavalos["Lucro Dutch"] = round(df_cavalos["Odds"] * df_cavalos["Dutching Bet"], 2)
         df_cavalos["ROI-Dutch($)"] = round((df_cavalos["Lucro Dutch"] - df_cavalos["Dutching Bet"]), 2)
         df_cavalos["ROI (%)"] = round((df_cavalos["Lucro Dutch"] / df_cavalos["Dutching Bet"]) * 100, 2)
-        
+
+    # Evitar erro ao acessar `melhor_equipe`
+    if not df_desempenho.empty:
         melhor_equipe = df_desempenho.iloc[0]
         ajuste_percentual = melhor_equipe["Desempenho Médio Ajustado"] / 100
         df_cavalos["Adjusted Bet"] = df_cavalos["Dutching Bet"] * (1 + ajuste_percentual)
     
-    if st.session_state["horse_data"]:
-            df_cavalos = pd.DataFrame(st.session_state["horse_data"])
-            bankroll = st.number_input("Digite o valor do Bankroll", min_value=1.00, step=1.0)
-            if "Odds" in df_cavalos.columns and not df_cavalos["Odds"].isnull().all():
-                df_cavalos["Probability"] = (1 / df_cavalos["Odds"]).round(2)
-                df_cavalos["Dutching Bet"] = calculate_dutching(df_cavalos["Odds"], bankroll, np.ones(len(df_cavalos)))
-                df_cavalos["Lucro Dutch"] = round(df_cavalos["Odds"] * df_cavalos["Dutching Bet"], 2)
-                df_cavalos["ROI-Dutch($)"] = round((df_cavalos["Lucro Dutch"] - df_cavalos["Dutching Bet"]), 2)
-                df_cavalos["ROI (%)"] = round((df_cavalos["Lucro Dutch"] / df_cavalos["Dutching Bet"]) * 100, 2)
-    # Exibir a tabela no Streamlit com os dados formatados
-                st.dataframe(df_cavalos[["Nome", "Odds", "Probability", "Kelly Bet", "Dutching Bet", "Lucro KB", "Lucro DB", "ROI-kb($)", "ROI-db($)", "ROI (%)"]])
-    # Cálculo do somatório da coluna "Dutching Bet"
-                total_dutching = round(df_cavalos["Dutching Bet"].sum(), 2)
-                        
-                st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
-                st.dataframe(df_desempenho)
-
-# Função para gerar PDF
+        # Exibir melhor equipe
+        st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
+        st.dataframe(df_desempenho)
+    
+    # Função para gerar PDF
     def generate_pdf(locais_prova, df_cavalos, df_simulacao):
         pdf = FPDF()
         pdf.set_auto_page_break(auto=True, margin=15)
@@ -461,18 +460,21 @@ with tab4:
         pdf.set_font("Arial", "B", 12)
         pdf.cell(200, 10, f"Local da Prova: {locais_prova}", ln=True)
         pdf.cell(200, 10, "Detalhes das Apostas", ln=True)
+
         for _, row in df_cavalos.iterrows():
             pdf.set_font("Arial", "", 10)
             pdf.cell(200, 7, f"{row['Nome']} - Odds: {row['Odds']} - Bet: {row['Dutching Bet']}", ln=True)
+
         pdf.cell(200, 10, "Simulação de Retornos", ln=True)
         for _, row in df_simulacao.iterrows():
             pdf.set_font("Arial", "", 10)
             pdf.cell(200, 7, f"{row['Cavalo']} - ROI: {row['ROI Dutching (%)']}%", ln=True)
+
         pdf_filename = "relatorio_apostas.pdf"
         pdf.output(pdf_filename)
         return pdf_filename
-        
-# Botão para baixar o relatório com local da prova
+
+    # Botão para baixar o relatório em PDF
     if st.button("Baixar Relatório em PDF"):
         pdf_file = generate_pdf(df_cavalos_filtrado, df_simulacao, locais_prova)
         with open(pdf_file, "rb") as f:
