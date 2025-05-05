@@ -391,9 +391,9 @@ with tab4:
     # Garantir que as colunas esperadas existem antes da exibição
     colunas_esperadas = ["Nome", "Odds", "Probability", "Dutching Bet", "Lucro Dutch", "ROI-Dutch($)", "ROI (%)"]
         if not df_cavalos_filtrado.empty:
-    colunas_disponiveis = df_cavalos_filtrado.columns.tolist()
-    else:
-        st.warning("⚠️ O DataFrame `df_cavalos_filtrado` está vazio ou não foi criado corretamente!")
+            colunas_disponiveis = df_cavalos_filtrado.columns.tolist()
+        else:
+            st.warning("⚠️ O DataFrame `df_cavalos_filtrado` está vazio ou não foi criado corretamente!")
     colunas_validas = [col for col in colunas_esperadas if col in colunas_disponiveis]
 
     if df_cavalos_filtrado.empty:
