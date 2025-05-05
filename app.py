@@ -368,7 +368,7 @@ with tab4:
         df_cavalos = pd.DataFrame()# Definir colunas vazias
     if "Odds" in df_cavalos.columns and not df_cavalos["Odds"].isnull().all():
         df_cavalos["Probability"] = (1 / df_cavalos["Odds"]).round(2)
-        df_cavalos["Dutching Bet"] = calculate_dutching(df_cavalos["Odds"].tolist, bankroll)
+        df_cavalos["Dutching Bet"] = calculate_dutching(df_cavalos["Odds"], bankroll)
         df_cavalos["Dutching Bet"] = df_cavalos["Dutching Bet"].round(2)
         if bankroll > 0:
             df_cavalos["Kelly Bet"] = df_cavalos.apply(
