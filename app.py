@@ -440,13 +440,13 @@ with tab4:
         df_desempenho = pd.DataFrame(columns=["Nome da Equipe", "Desempenho Médio Ajustado"])
     
 # Teste se df_desempenho está correto antes de usar
-if df_desempenho is None or df_desempenho.empty:
-    st.warning("⚠️ Nenhuma equipe cadastrada! Recarregando dados das abas anteriores.")
-    
+    if df_desempenho is None or df_desempenho.empty:
+        st.warning("⚠️ Nenhuma equipe cadastrada! Recarregando dados das abas anteriores.")
+        
 # Recarregar dados das equipes apenas se necessário
-    if "team_data" in st.session_state:
-        if not st.session_state["team_data"]:
-            st.session_state["team_data"] = []  # Inicializa como lista vazia
+        if "team_data" in st.session_state:
+            if not st.session_state["team_data"]:
+                st.session_state["team_data"] = []  # Inicializa como lista vazia
         
 # Garantir que df_desempenho seja atualizado corretamente
         df_desempenho = calcular_desempenho_equipes(st.session_state["team_data"])
