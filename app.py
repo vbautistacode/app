@@ -430,11 +430,11 @@ with tab4:
     st.write("##### Resultados | Dutching e Performance de Equipes")
     
 # Garantir que há dados antes de calcular o desempenho
-        if "team_data" in st.session_state and st.session_state["team_data"]:
-            df_desempenho = calcular_desempenho_equipes(st.session_state["team_data"])
-        else:
-            st.warning("⚠️ Nenhuma equipe cadastrada! Criando DataFrame vazio.")
-            df_desempenho = pd.DataFrame(columns=["Nome da Equipe", "Desempenho Médio Ajustado"])
+    if "team_data" in st.session_state and st.session_state["team_data"]:
+        df_desempenho = calcular_desempenho_equipes(st.session_state["team_data"])
+    else:
+        st.warning("⚠️ Nenhuma equipe cadastrada! Criando DataFrame vazio.")
+        df_desempenho = pd.DataFrame(columns=["Nome da Equipe", "Desempenho Médio Ajustado"])
 
 # Garantir que há dados antes de calcular apostas
     if "horse_data" in st.session_state and st.session_state["horse_data"]:
