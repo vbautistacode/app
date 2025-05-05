@@ -359,7 +359,7 @@ with tab4:
     # Inicializar DataFrame dos cavalos
     if "horse_data" in st.session_state and st.session_state["horse_data"]:
         df_cavalos = pd.DataFrame(st.session_state["horse_data"])
-        bankroll = st.slider("Ajuste o valor do Bankroll", min_value=10.0, max_value=5000.0, step=10.0, value=100.0, key="bankroll_slider_simulacao")
+        bankroll = st.slider("Ajuste o valor do Bankroll", min_value=10.0, max_value=5000.0, step=10.0, value=100.0, key="bankroll_slider")
     else:
         st.warning("⚠️ Nenhum dado de cavalos disponível. Verifique as entradas e tente novamente.")
         df_cavalos = pd.DataFrame(columns=["Nome", "Odds", "Wins", "2nds", "3rds", "Runs"])  # Garante estrutura inicial
@@ -384,8 +384,10 @@ with tab4:
         st.warning("⚠️ Nenhuma odd válida encontrada. Verifique os dados de entrada.")
 
     # Aplicar rebalanceamento das apostas
-    df_cavalos_filtrado = rebalance_bets(df_cavalos, bankroll)
-
+        if "bankroll" in locals():
+            df_cavalos_filtrado = rebalance_bets(df_cavalos, bankroll)
+        else:
+            st.error("⚠️ Erro: `bankroll` não está definido corretamente!")
     # Garantir que as colunas esperadas existem antes da exibição
     colunas_esperadas = ["Nome", "Odds", "Probability", "Dutching Bet", "Lucro Dutch", "ROI-Dutch($)", "ROI (%)"]
     colunas_disponiveis = df_cavalos_filtrado.columns.tolist()
