@@ -376,7 +376,7 @@ with tab4:
         df_cavalos["ROI-Dutch($)"] = round((df_cavalos["Lucro Dutch"] - df_cavalos["Dutching Bet"]), 2)
         df_cavalos["ROI (%)"] = round((df_cavalos["Lucro Dutch"] / df_cavalos["Dutching Bet"]) * 100, 2)
 # Aplicar rebalanceamento das apostas
-            df_cavalos_filtrado = rebalance_bets(df_cavalos, bankroll)
+        df_cavalos_filtrado = rebalance_bets(df_cavalos, bankroll)
 # Exibir tabela formatada no Streamlit
         st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Probability", "Dutching Bet", "Lucro Dutch", "ROI-Dutch($)", "ROI (%)"]])
 # Cálculo do somatório da coluna "Dutching Bet"
