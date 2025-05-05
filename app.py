@@ -408,8 +408,7 @@ with tab3:
 # --- Aba 4: Resultados ---
 with tab4:
     st.subheader("🏇 Resultados | Dutching e Performance de Equipes")
-
-    df_desempenho = calcular_desempenho_equipes(st.session_state["team_data"])
+        df_desempenho = calcular_desempenho_equipes(st.session_state["team_data"])
 
     if "horse_data" in st.session_state and st.session_state["horse_data"]:
         df_cavalos = pd.DataFrame(st.session_state["horse_data"])
