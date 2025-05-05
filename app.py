@@ -370,6 +370,10 @@ with tab4:
         df_cavalos["Probability"] = (1 / df_cavalos["Odds"]).round(2)
 # Garantir que estamos passando uma lista de valores numéricos
         odds_list = df_cavalos["Odds"].astype(float).tolist()
+    if odds_list and all(isinstance(odd, (int, float)) for odd in odds_list):
+        df_cavalos["Dutching Bet"] = calculate_dutching(odds_list, bankroll)
+    else:
+        st.warning("⚠️ Erro: A lista de odds contém valores inválidos!")
         df_cavalos["Dutching Bet"] = calculate_dutching(odds_list, bankroll)
         df_cavalos["Dutching Bet"] = df_cavalos["Dutching Bet"].round(2)
         df_cavalos["Lucro Dutch"] = round(df_cavalos["Odds"] * df_cavalos["Dutching Bet"], 2)
