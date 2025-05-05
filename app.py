@@ -408,10 +408,11 @@ with tab4:
             df_cavalos["Lucro Dutch"] = round(df_cavalos["Odds"] * df_cavalos["Dutching Bet"], 2)
             df_cavalos["ROI-Dutch($)"] = round((df_cavalos["Lucro Dutch"] - df_cavalos["Dutching Bet"]), 2)
             df_cavalos["ROI (%)"] = round((df_cavalos["Lucro Dutch"] / df_cavalos["Dutching Bet"]) * 100, 2)
-    
-    if not df_cavalos_filtrado.empty:
-        st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Probability", "Dutching Bet", "Lucro Dutch", "ROI-Dutch($)", "ROI (%)"]])
-
+            df_cavalos_filtrado = rebalance_bets(df_cavalos, bankroll) if "bankroll" in locals() else pd.DataFrame()
+        if not df_cavalos_filtrado.empty:
+            st.dataframe(df_cavalos_filtrado)
+        else:
+            st.warning("⚠️ Nenhum dado disponível após rebalanceamento.")
     # Aplicar rebalanceamento das apostas
         if "bankroll" not in st.session_state:
             st.session_state["bankroll"] = 100.0  # Valor padrão
