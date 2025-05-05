@@ -480,3 +480,37 @@ with tab4:
     if not df_cavalos_filtrado.empty:
         st.write("### Apostas Rebalanceadas")
         st.dataframe(df_cavalos_filtrado)
+
+#Função PDF    
+    def generate_pdf(df_cavalos_filtrado, df_desempenho, locais_prova):
+    pdf = FPDF()
+    pdf.set_auto_page_break(auto=True, margin=15)
+    pdf.add_page()
+    pdf.set_font("Arial", "B", 16)
+    pdf.cell(200, 10, "Relatório de Apostas - Dutching", ln=True, align="C")
+# 🔹 Exibir locais de prova
+    pdf.set_font("Arial", "B", 12)
+    pdf.cell(200, 10, f"Local da Prova: {locais_prova}", ln=True)
+# 🔹 Dados das equipes
+    pdf.cell(200, 10, "Desempenho das Equipes", ln=True)
+    for _, row in df_desempenho.iterrows():
+        pdf.set_font("Arial", "", 10)
+        pdf.cell(200, 7, f"Equipe: {row['Nome da Equipe']} - Desempenho: {row['Desempenho Médio Ajustado']:.2f}", ln=True)
+# 🔹 Dados das apostas
+    pdf.cell(200, 10, "Detalhes das Apostas", ln=True)
+    for _, row in df_cavalos_filtrado.iterrows():
+        pdf.set_font("Arial", "", 10)
+        pdf.cell(200, 7, f"{row['Nome']} - Odds: {row['Odds']} - Bet: {row['Dutching Bet']} - ROI: {row['ROI (%)']}%", ln=True)
+# 🔹 Salvar arquivo PDF
+    pdf_filename = "relatorio_apostas.pdf"
+    pdf.output(pdf_filename)
+    return pdf_filename
+# 🔹 Criar botão de download no Streamlit, garantindo que o relatório inclua locais de prova
+if not df_cavalos_filtrado.empty:
+    locais_prova = st.text_input("Digite o local da prova:", key="local_prova_input")  # Entrada do usuário
+    if locais_prova:  # Garante que o local foi preenchido
+        pdf_file = generate_pdf(df_cavalos_filtrado, df_desempenho, locais_prova)
+        with open(pdf_file, "rb") as f:
+            st.download_button(label="📄 Baixar Relatório em PDF", data=f, file_name=pdf_file, mime="application/pdf")
+    else:
+        st.warning("⚠️ Preencha o local da prova antes de gerar o relatório.")
