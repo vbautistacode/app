@@ -1,3 +1,4 @@
+#Importações
 from datetime import datetime, timedelta
 import streamlit as st
 from fpdf import FPDF
@@ -9,15 +10,19 @@ import joblib
 import base64
 import json
 import os
+
 # Configurar Pandas para aceitar futuras mudanças no tratamento de objetos
 pd.set_option('future.no_silent_downcasting', True)
+
 # Configuração do GitHub
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 REPO_OWNER = "vbautistacode"
 REPO_NAME = "app"
 BRANCH = "main"
+
 # Diretório do repositório no GitHub
 diretorio_base = f"https://raw.githubusercontent.com/{REPO_OWNER}/{REPO_NAME}/{BRANCH}/"
+
 # Função para carregar dados direto do GitHub
 def load_data():
     arquivos = ["horse_data.json", "team_data.json", "bet_data.json"]
@@ -29,6 +34,7 @@ def load_data():
             st.session_state[arquivo.replace(".json", "")] = response.json()
         except requests.exceptions.RequestException:
             st.session_state[arquivo.replace(".json", "")] = []  # Retorna lista vazia em caso de erro
+
 # Função para salvar dados no GitHub
 def salvar_csv_no_github(dataframe, nome_arquivo):
     try:
@@ -55,10 +61,12 @@ def salvar_csv_no_github(dataframe, nome_arquivo):
             st.error(f"❌ Erro ao salvar {nome_arquivo}: {response.json()}")
     except Exception as e:
         st.error(f"❌ Erro inesperado: {e}")
+
 # Inicialização dos dados no session_state
 if "initialized" not in st.session_state:
     load_data()
     st.session_state["initialized"] = True
+
 # Inicializa os dados no session_state
 if "horse_data" not in st.session_state:
     st.session_state["horse_data"] = []
@@ -91,15 +99,17 @@ def rebalance_bets(df_cavalos, bankroll):
     df_cavalos_filtrado["Dutching Bet"] = calculate_dutching(df_cavalos_filtrado["Odds"], bankroll, np.ones(len(df_cavalos_filtrado)))
     return df_cavalos_filtrado
 
-def assess_risk(odds, performance_score):
 #Ajusta aposta com base no risco: odds muito altas com baixo desempenho reduzem a alocação.
+def assess_risk(odds, performance_score):
     risk_factor = np.where((odds > 5) & (performance_score < 0.2), 0.5, 1)  # Redução de 50% para alto risco
     return risk_factor
 
 # --- Interface Streamlit ---
 st.title("Apostas | Estratégias Dutching")
+
 # Abas para organização
 tab1, tab2, tab3, tab4, = st.tabs(["Locais", "Dados dos Cavalos", "Dados das Equipes", "Análises"])
+
 # --- Aba 1: Escolha ou Registro do Local de Prova ---   
 with tab1:
     def carregar_locais():
@@ -112,10 +122,12 @@ with tab1:
         except requests.exceptions.RequestException:
             return []
     locais_prova = carregar_locais()
-    # Dropdown para selecionar um local existente
+# Dropdown para selecionar um local existente
+    
     local_selecionado = st.selectbox("Selecione um local de prova:", locais_prova, key="select_local")
     st.session_state["local_atual"] = local_selecionado
-    # Registrar um novo local
+# Registrar um novo local
+    
     novo_local = st.text_input("Ou registre um novo local de prova:")
     if st.button("Salvar Novo Local"):
         if novo_local and novo_local not in locais_prova:
@@ -124,20 +136,24 @@ with tab1:
             st.success(f"Novo local '{novo_local}' adicionado com sucesso!")
         elif novo_local in locais_prova:
             st.warning("Este local já está registrado.")
+            
 # --- Aba 2: Dados dos Cavalos ---
 with tab2:
     st.subheader("Dados Históricos | Cavalos")
+    
 # ✅ Verifica se 'horse_data' já foi inicializado
     if "horse_data" not in st.session_state:
         st.session_state["horse_data"] = []
     if "local_atual" in st.session_state and st.session_state["local_atual"]:
         st.write(f"Registrando para o local: **{st.session_state['local_atual']}**")
+        
 # ✅ Inicializa a variável de controle de registro
     if "horse_data_started" not in st.session_state:
         st.session_state["horse_data_started"] = False
     if st.button("Cadastro de Dados dos Cavalos"):
         st.session_state["horse_data_started"] = True
     if st.session_state["horse_data_started"]:
+        
 # ✅ Ajusta a seleção de cavalos existentes
         cavalo_selecionado = st.selectbox(
             "Selecione o Cavalo para Editar ou Adicionar Novo",
@@ -148,6 +164,7 @@ with tab2:
             (horse for horse in st.session_state["horse_data"] if horse["Nome"] == cavalo_selecionado),
             None
         ) if cavalo_selecionado != "Adicionar Novo" else None
+        
 # ✅ Divisão em colunas para melhor organização
         col1, col2 = st.columns(2)
         with col1:
@@ -160,6 +177,7 @@ with tab2:
             wins = st.number_input("Wins (Vitórias)", min_value=0, step=1, value=cavalo_dados["Wins"] if cavalo_dados else 0)
             seconds = st.number_input("2nds (Segundos Lugares)", min_value=0, step=1, value=cavalo_dados["2nds"] if cavalo_dados else 0)
             thirds = st.number_input("3rds (Terceiros Lugares)", min_value=0, step=1, value=cavalo_dados["3rds"] if cavalo_dados else 0)
+            
 # ✅ Botão para salvar dados do cavalo
         if st.button("Salvar Dados do Cavalo"):
             novo_cavalo = {
@@ -179,12 +197,14 @@ with tab2:
                     if horse["Nome"] == cavalo_selecionado:
                         horse.update(novo_cavalo)
                         st.success(f"Alterações no cavalo '{Nome}' salvas com sucesso!")
+                        
 # ✅ Exibição de cavalos cadastrados
     if st.session_state["horse_data"]:
         st.write("### Cavalos Registrados")
         df_horses = pd.DataFrame(st.session_state["horse_data"])
         st.dataframe(df_horses)       
 # ✅ Correção da função de salvamento no GitHub
+
 def salvar_csv_no_github(dataframe):
     GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
     REPO_OWNER = "vbautistacode"
@@ -216,19 +236,23 @@ def salvar_csv_no_github(dataframe):
     except Exception as e:
         st.error(f"❌ Erro inesperado: {e}")
 with tab2:
+    
 # ✅ Botão para salvar no GitHub
     if st.button("Salvar em CSV", key="unique_key_1"):
         salvar_csv_no_github(df_horses)
     else:
         st.warning("Ainda não há cavalos registrados.")
+        
 # --- Aba 3: Dados das Equipes ---
 with tab3:
     st.subheader("Dados Históricos | Equipes")
+    
 # Inicializa o estado das equipes
     if "team_data" not in st.session_state:
         st.session_state["team_data"] = []
     if "reset_team_fields" not in st.session_state:
         st.session_state["reset_team_fields"] = False  # Indica se os campos devem ser limpos
+        
 # Botão para iniciar o cadastro
     if st.button("Cadastro de Dados das Equipes"):
         st.session_state["team_data_started"] = True
@@ -252,10 +276,13 @@ with tab3:
                 st.warning("Ainda não há equipes cadastradas. Preencha os dados para adicionar uma nova equipe.")
                 equipe_selecionada = "Adicionar Nova"
                 equipe_dados = None
+                
 # Divisão em duas colunas
         col1, col2 = st.columns(2)
+        
 # Campos na primeira coluna
         with col1:
+            
 # Extrair os nomes dos cavalos para usar como opções no selectbox
             nomes_cavalos = [horse["Nome"] for horse in st.session_state["horse_data"]] if "horse_data" in st.session_state else []
             nome_equipe = st.selectbox("Nome do Cavalo Associado", nomes_cavalos, key="select_horse_team")  # Vincula Nome do Cavalo
@@ -269,14 +296,17 @@ with tab3:
             jockey_rides = st.number_input("Jockey Rides", min_value=0, step=1, value=equipe_dados["Jockey Rides"] if equipe_dados else 0)
             jockey_seconds = st.number_input("Jockey 2nds", min_value=0, step=1, value=equipe_dados["Jockey 2nds"] if equipe_dados else 0)
             jockey_thirds = st.number_input("Jockey 3rds", min_value=0, step=1, value=equipe_dados["Jockey 3rds"] if equipe_dados else 0)
+            
 #Botão para salvar dados
             if st.button("Salvar Dados da Equipe"):
+                
 # Verificar se já existe uma equipe com o mesmo nome
                 nomes_equipes_existentes = [team["Nome da Equipe"] for team in st.session_state["team_data"]]
                 if equipe_selecionada == "Adicionar Nova":
                     if nome_equipe in nomes_equipes_existentes:
                         st.error(f"A equipe '{nome_equipe}' já foi registrada. Insira um nome único!")
                     else:
+                        
 # Adiciona nova equipe
                             nova_equipe = {
                         "Nome da Equipe": nome_equipe,
@@ -293,6 +323,7 @@ with tab3:
                     st.session_state["team_data"].append(nova_equipe)  # Salva no session_state
                     st.success(f"Nova equipe '{nome_equipe}' adicionada com sucesso!")
                 else:
+                    
 #Atualiza equipe existente
                     for team in st.session_state["team_data"]:
                         if team["Nome da Equipe"] == equipe_selecionada:
@@ -309,6 +340,7 @@ with tab3:
                                 "Jockey 3rds": jockey_thirds,
                             })
                             st.success(f"Alterações na equipe '{nome_equipe}' salvas com sucesso!")
+                            
 # 🔹 Configuração do GitHub
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")  # Pegando o token do ambiente
 REPO_OWNER = "vbautistacode"
@@ -316,6 +348,7 @@ REPO_NAME = "app"
 BRANCH = "main"
 FILE_PATH = "dados_equipe.csv"
 GITHUB_API_URL = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/contents/{FILE_PATH}"
+
 # ✅ Função para salvar CSV no GitHub
 def salvar_csv_no_github(dataframe):
     try:
@@ -342,6 +375,7 @@ def salvar_csv_no_github(dataframe):
     except Exception as e:
         st.error(f"❌ Erro inesperado: {e}")
 with tab3:
+    
 # 🔹 Exibir equipes já cadastradas
     if "team_data" not in st.session_state:
         st.session_state["team_data"] = []
@@ -354,12 +388,14 @@ with tab3:
             salvar_csv_no_github(df_teams)
     else:
         st.warning("Ainda não há equipes cadastradas.")
+        
 # --- Aba 4: Resultados ---
 with tab4:
     st.subheader("Resultados das Apostas | Dutching e Performance de Equipes")
 
     if "horse_data" in st.session_state and st.session_state["horse_data"]:
         df_cavalos = pd.DataFrame(st.session_state["horse_data"])
+        bankroll = st.session_state.get("bankroll", 100.0)  # Define um valor padrão caso não esteja armazenado
         bankroll = st.slider("Ajuste o valor do Bankroll", min_value=10.0, max_value=5000.0, step=10.0, value=100.0, key="bankroll_slider")
     else:
         st.warning("⚠️ Nenhum dado de cavalos disponível.")
@@ -376,9 +412,7 @@ with tab4:
             df_cavalos["ROI (%)"] = round((df_cavalos["Lucro Dutch"] / df_cavalos["Dutching Bet"]) * 100, 2)
         else:
             st.warning("⚠️ Lista de odds contém valores inválidos!")
-
     df_cavalos_filtrado = rebalance_bets(df_cavalos, bankroll)
-
     if not df_cavalos_filtrado.empty:
         st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Probability", "Dutching Bet", "Lucro Dutch", "ROI-Dutch($)", "ROI (%)"]])
 
@@ -387,11 +421,11 @@ with tab4:
             df_cavalos_filtrado = rebalance_bets(df_cavalos, bankroll)
         else:
             st.error("⚠️ Erro: `bankroll` não está definido corretamente!")
+            
     # Garantir que as colunas esperadas existem antes da exibição
     colunas_esperadas = ["Nome", "Odds", "Probability", "Dutching Bet", "Lucro Dutch", "ROI-Dutch($)", "ROI (%)"]
     colunas_disponiveis = df_cavalos_filtrado.columns.tolist()
     colunas_validas = [col for col in colunas_esperadas if col in colunas_disponiveis]
-    
     if df_cavalos_filtrado.empty:
         st.warning("⚠️ Nenhum cavalo atende aos critérios. Ajuste os parâmetros!")
     else:
@@ -399,15 +433,14 @@ with tab4:
 
     # --- Análise de Performance das Equipes ---
     st.write("### Análise de Performance por Equipe")
-
     if "team_data" in st.session_state and st.session_state["team_data"]:
         equipe_selecionada = st.selectbox(
             "Selecione uma Equipe",
             [team["Nome da Equipe"] for team in st.session_state["team_data"]],
             key="selectbox_equipes"
         )
-
-        # Filtrar e calcular desempenho de equipe
+        
+# Filtrar e calcular desempenho de equipe
         df_desempenho = []
         equipe_filtrada = [team for team in st.session_state["team_data"] if team["Nome da Equipe"] == equipe_selecionada]
         for team in equipe_filtrada:
@@ -434,51 +467,61 @@ with tab4:
         else:
             st.warning(f"Nenhum dado encontrado para a equipe '{equipe_selecionada}'.")
 
-
 # Melhor equipe baseada na performance
     if "team_data" in st.session_state and st.session_state["team_data"]:
         df_desempenho = []
         for team in st.session_state["team_data"]:
+            
 # Calcular desempenho do cavalo
                 podiums_horse = team.get("Wins", 0) + team.get("2nds", 0) + team.get("3rds", 0)
                 runs_horse = team.get("Runs", 1)
                 desempenho_horse = podiums_horse / max(runs_horse, 1)
                 st.session_state["desempenho_horse"] = desempenho_horse
+            
 # Calcular desempenho do jóquei
                 podiums_jockey = team.get("Jockey Wins", 0) + team.get("Jockey 2nds", 0) + team.get("Jockey 3rds", 0)
                 rides_jockey = team.get("Jockey Rides", 1)
                 desempenho_jockey = podiums_jockey / max(rides_jockey, 1)
                 st.session_state["desempenho_jockey"] = desempenho_jockey
+            
 # Calcular desempenho do treinador
                 podiums_trainer = team.get("Treinador Placed", 0) + team.get("Treinador Wins", 0)
                 runs_trainer = team.get("Treinador Runs", 1)
                 desempenho_trainer = podiums_trainer / max(runs_trainer, 1)
                 st.session_state["desempenho_trainer"] = desempenho_trainer
+            
 # Ajustar o cálculo da média de desempenho para incluir variância
                 desempenhos = [desempenho_horse, desempenho_jockey, desempenho_trainer]
                 media_desempenho = sum(desempenhos) / len(desempenhos)
                 variancia_desempenho = np.var(desempenhos)
                 resultado_ajustado = media_desempenho - variancia_desempenho
+            
 # Média total de desempenho da equipe
                 media_desempenho = (desempenho_jockey + desempenho_trainer + desempenho_horse) / 3
                 df_desempenho.append({
                     "Nome da Equipe": team["Nome da Equipe"],
                     "Desempenho Médio Ajustado": round(resultado_ajustado, 2)
                 })
+            
 # Converter para DataFrame
                 df_desempenho = pd.DataFrame(df_desempenho)
+            
 # Ordenar DataFrame por Desempenho Médio em ordem decrescente
                 df_desempenho = df_desempenho.sort_values(by="Desempenho Médio Ajustado", ascending=False)
+            
 # Ajustar valores de aposta com base no desempenho médio
                 melhor_equipe = df_desempenho.iloc[0]
                 ajuste_percentual = melhor_equipe["Desempenho Médio Ajustado"] / 100
-                df_cavalos["Adjusted Bet"] = df_cavalos["Dutching Bet"] * (1 + ajuste_percentual)    
+                df_cavalos["Adjusted Bet"] = df_cavalos["Dutching Bet"] * (1 + ajuste_percentual)
+            
 # Exibir tabela final ajustada
         st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
         st.dataframe(df_desempenho)    
+        
 # Exibir apostas ajustadas
         st.write("### Apostas Ajustadas")
         st.dataframe(df_cavalos[["Nome", "Adjusted Bet"]])
+        
 # Simulação de Retornos
     def simulate_returns(df_cavalos, bankroll):
         resultados = []
@@ -492,11 +535,9 @@ with tab4:
                 "ROI Dutching (%)": round((lucro_dutching / bankroll) * 100, 2),
             })
         return pd.DataFrame(resultados)
-
     if not df_cavalos_filtrado.empty:
         df_simulacao = simulate_returns(df_cavalos_filtrado, bankroll)
         st.dataframe(df_simulacao)
-
 
 # Função para gerar PDF
     def generate_pdf(locais_prova, df_cavalos, df_simulacao):
@@ -518,6 +559,7 @@ with tab4:
         pdf_filename = "relatorio_apostas.pdf"
         pdf.output(pdf_filename)
         return pdf_filename
+        
 # Botão para baixar o relatório com local da prova
     if st.button("Baixar Relatório em PDF"):
         pdf_file = generate_pdf(df_cavalos_filtrado, df_simulacao, local_prova)
