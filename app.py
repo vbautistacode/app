@@ -426,8 +426,19 @@ with tab4:
         st.warning("⚠️ Nenhum dado de cavalos disponível.")
         df_cavalos = pd.DataFrame(columns=["Nome", "Odds", "Wins", "2nds", "3rds", "Runs"])
 
-    # Rebalancear apostas com base no desempenho das equipes
-    df_cavalos_filtrado = rebalance_bets(df_cavalos, bankroll, df_desempenho)
+# Rebalancear apostas com base no desempenho das equipes
+       # Garantir que df_desempenho seja criado corretamente
+    if "team_data" in st.session_state and st.session_state["team_data"]:
+        df_desempenho = calcular_desempenho_equipes(st.session_state["team_data"])
+    else:
+        st.warning("⚠️ Nenhuma equipe cadastrada! Criando DataFrame vazio.")
+        df_desempenho = pd.DataFrame(columns=["Nome da Equipe", "Desempenho Médio Ajustado"])
+    
+    # Teste se df_desempenho está correto antes de usar
+    if df_desempenho is None or df_desempenho.empty:
+        st.error("❌ Erro: df_desempenho não foi gerado corretamente.")
+    else:
+        df_cavalos_filtrado = rebalance_bets(df_cavalos, bankroll, df_desempenho)
 
     # Exibir resultados
     st.write("#### Resultados das Apostas")
