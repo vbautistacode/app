@@ -391,6 +391,36 @@ with tab3:
         
 # --- Aba 4: Resultados ---
 with tab4:
+
+    if "horse_data" in st.session_state and st.session_state["horse_data"]:
+        df_cavalos = pd.DataFrame(st.session_state["horse_data"])
+        bankroll = st.number_input("Digite o valor do Bankroll:", step=10.0, value=100.0, key="bankroll_input")
+    else:
+        st.warning("⚠️ Nenhum dado de cavalos disponível.")
+        df_cavalos = pd.DataFrame(columns=["Nome", "Odds", "Wins", "2nds", "3rds", "Runs"])
+
+    # Verificação de dados antes dos cálculos
+    if not df_cavalos.empty and "Odds" in df_cavalos.columns:
+        df_cavalos["Odds"] = pd.to_numeric(df_cavalos["Odds"], errors="coerce").dropna()
+        if not df_cavalos["Odds"].isnull().all():
+            df_cavalos["Probability"] = (1 / df_cavalos["Odds"]).round(2)
+            df_cavalos["Dutching Bet"] = calculate_dutching(df_cavalos["Odds"], bankroll, np.ones(len(df_cavalos)))
+            df_cavalos["Lucro Dutch"] = round(df_cavalos["Odds"] * df_cavalos["Dutching Bet"], 2)
+            df_cavalos["ROI-Dutch($)"] = round((df_cavalos["Lucro Dutch"] - df_cavalos["Dutching Bet"]), 2)
+            df_cavalos["ROI (%)"] = round((df_cavalos["Lucro Dutch"] / df_cavalos["Dutching Bet"]) * 100, 2)
+            df_cavalos_filtrado = rebalance_bets(df_cavalos, bankroll) if "bankroll" in locals() else pd.DataFrame()
+        if not df_cavalos_filtrado.empty:
+            st.dataframe(df_cavalos_filtrado)
+        else:
+            st.warning("⚠️ Nenhum dado disponível após rebalanceamento.")
+    # Aplicar rebalanceamento das apostas
+        if "bankroll" not in st.session_state:
+            st.session_state["bankroll"] = 100.0  # Valor padrão
+            bankroll = st.session_state["bankroll"]
+            df_cavalos_filtrado = rebalance_bets(df_cavalos, bankroll)
+        else:
+            st.error("⚠️ Erro: `bankroll` não está definido corretamente!")
+    
     # --- Análise de Performance das Equipes ---
     st.write("### Análise de Performance por Equipe")
     if "team_data" in st.session_state and st.session_state["team_data"]:
@@ -481,35 +511,6 @@ with tab4:
 # Exibir apostas ajustadas
         st.write("### Apostas Ajustadas")
         st.dataframe(df_cavalos[["Nome", "Adjusted Bet"]])
-
-    if "horse_data" in st.session_state and st.session_state["horse_data"]:
-        df_cavalos = pd.DataFrame(st.session_state["horse_data"])
-        bankroll = st.number_input("Digite o valor do Bankroll:", step=10.0, value=100.0, key="bankroll_input")
-    else:
-        st.warning("⚠️ Nenhum dado de cavalos disponível.")
-        df_cavalos = pd.DataFrame(columns=["Nome", "Odds", "Wins", "2nds", "3rds", "Runs"])
-
-    # Verificação de dados antes dos cálculos
-    if not df_cavalos.empty and "Odds" in df_cavalos.columns:
-        df_cavalos["Odds"] = pd.to_numeric(df_cavalos["Odds"], errors="coerce").dropna()
-        if not df_cavalos["Odds"].isnull().all():
-            df_cavalos["Probability"] = (1 / df_cavalos["Odds"]).round(2)
-            df_cavalos["Dutching Bet"] = calculate_dutching(df_cavalos["Odds"], bankroll, np.ones(len(df_cavalos)))
-            df_cavalos["Lucro Dutch"] = round(df_cavalos["Odds"] * df_cavalos["Dutching Bet"], 2)
-            df_cavalos["ROI-Dutch($)"] = round((df_cavalos["Lucro Dutch"] - df_cavalos["Dutching Bet"]), 2)
-            df_cavalos["ROI (%)"] = round((df_cavalos["Lucro Dutch"] / df_cavalos["Dutching Bet"]) * 100, 2)
-            df_cavalos_filtrado = rebalance_bets(df_cavalos, bankroll) if "bankroll" in locals() else pd.DataFrame()
-        if not df_cavalos_filtrado.empty:
-            st.dataframe(df_cavalos_filtrado)
-        else:
-            st.warning("⚠️ Nenhum dado disponível após rebalanceamento.")
-    # Aplicar rebalanceamento das apostas
-        if "bankroll" not in st.session_state:
-            st.session_state["bankroll"] = 100.0  # Valor padrão
-            bankroll = st.session_state["bankroll"]
-            df_cavalos_filtrado = rebalance_bets(df_cavalos, bankroll)
-        else:
-            st.error("⚠️ Erro: `bankroll` não está definido corretamente!")
 
 # Função para gerar PDF
     def generate_pdf(locais_prova, df_cavalos, df_simulacao):
