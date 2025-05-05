@@ -423,7 +423,15 @@ with tab4:
         else:
             st.warning("⚠️ Nenhuma equipe cadastrada! Criando DataFrame vazio.")
             df_desempenho = pd.DataFrame(columns=["Nome da Equipe", "Desempenho Médio Ajustado"])
-            
+
+# Garantir que há dados antes de calcular apostas
+    if "horse_data" in st.session_state and st.session_state["horse_data"]:
+        df_cavalos = pd.DataFrame(st.session_state["horse_data"])
+        bankroll = st.number_input("Digite o valor do Bankroll:", min_value=10.0, max_value=5000.0, step=10.0, value=100.0, key="bankroll_input")
+    else:
+        st.warning("⚠️ Nenhum dado de cavalos disponível.")
+        df_cavalos = pd.DataFrame(columns=["Nome", "Odds", "Dutching Bet", "Lucro Dutch"])
+    
 # Cálculo de probabilidades e apostas Dutching
     if not df_cavalos.empty and "Odds" in df_cavalos.columns:
         df_cavalos["Dutching Bet"] = calculate_dutching(df_cavalos["Odds"], bankroll, np.ones(len(df_cavalos)))
@@ -440,14 +448,6 @@ with tab4:
 # Exibir melhor equipe
         st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
         st.dataframe(df_desempenho)
-
-# Garantir que há dados antes de calcular apostas
-    if "horse_data" in st.session_state and st.session_state["horse_data"]:
-        df_cavalos = pd.DataFrame(st.session_state["horse_data"])
-        bankroll = st.number_input("Digite o valor do Bankroll:", min_value=10.0, max_value=5000.0, step=10.0, value=100.0, key="bankroll_input")
-    else:
-        st.warning("⚠️ Nenhum dado de cavalos disponível.")
-        df_cavalos = pd.DataFrame(columns=["Nome", "Odds", "Wins", "2nds", "3rds", "Runs"])
 
 # Rebalancear apostas com base no desempenho das equipes
     if "team_data" in st.session_state and st.session_state["team_data"]:
