@@ -482,31 +482,6 @@ with tab4:
     if df_cavalos_filtrado is None:
         st.error("❌ Erro: rebalance_bets() não retornou um DataFrame!")
     
-# Rebalancear apostas com base no desempenho das equipes    
-# 🔹 Garantir que há dados antes de calcular desempenho
-    if "team_data" in st.session_state and st.session_state["team_data"]:
-        df_desempenho = calcular_desempenho_equipes(st.session_state["team_data"])
-    else:
-        st.warning("⚠️ Nenhuma equipe cadastrada! Criando DataFrame vazio.")
-        df_desempenho = pd.DataFrame(columns=["Nome da Equipe", "Desempenho Médio Ajustado"])
-    
-# 🔹 Garantir que há dados antes de calcular apostas
-    if "horse_data" in st.session_state and st.session_state["horse_data"]:
-        df_cavalos = pd.DataFrame(st.session_state["horse_data"])
-    else:
-        st.warning("⚠️ Nenhum dado de cavalos disponível.")
-        df_cavalos = pd.DataFrame(columns=["Nome", "Odds", "Dutching Bet"])
-    
-# 🔹 Chamar a função de rebalanceamento usando normalização
-    df_cavalos_filtrado = rebalance_bets(df_cavalos, df_desempenho)
-    
-# 🔹 Exibir resultados apenas se houver dados filtrados
-    if not df_cavalos_filtrado.empty:
-        st.write("### Apostas Rebalanceadas (Com Normalização)")
-        st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Dutching Bet", "Desempenho Normalizado", "Dutching Bet Ajustado"]])
-    else:
-        st.warning("⚠️ Ainda sem dados de desempenho! Apostas permanecerão sem ajustes.")
-    
 #Função PDF    
 def generate_pdf(df_cavalos_filtrado, df_desempenho, locais_prova):
     pdf = FPDF()
