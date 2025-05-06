@@ -479,7 +479,7 @@ with tab4:
     
 # 🔹 Exibir resultados apenas com Nome, Odds e Dutching Bet Ajustado
 if not df_cavalos_filtrado.empty and "Dutching Bet Ajustado" in df_cavalos_filtrado.columns:
-    st.write("### Apostas Rebalanceadas (Ajuste Aplicado)")
+    st.write("#### Apostas Rebalanceadas (Ajuste Aplicado)")
     
     # 🔹 Exibe tabela formatada apenas com dados essenciais
     st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Dutching Bet Ajustado"]])
