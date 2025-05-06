@@ -477,7 +477,7 @@ with tab4:
         st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
         st.dataframe(df_desempenho)
 
-# 🔹 Carregar dados preenchidos da sessão
+# 🔹 Carregar dados de desempenho da sessão
     df_desempenho = st.session_state.get("team_data", [])
     
     if isinstance(df_desempenho, list) and len(df_desempenho) > 0:
@@ -488,33 +488,15 @@ with tab4:
     else:
         st.warning("⚠️ Nenhum dado válido de desempenho foi encontrado.")
         df_desempenho = pd.DataFrame(columns=["Nome da Equipe", "Desempenho Médio Ajustado"])
-
-# Rebalanceamento 🔹 Carregar dados preenchidos da sessão
-    df_cavalos = st.session_state.get("horse_data", [])
     
-    # 🔹 Criar DataFrames somente se houver dados válidos
-    if isinstance(df_desempenho, list) and len(df_desempenho) > 0:
-        df_desempenho = pd.DataFrame(df_desempenho)
-    else:
-        st.warning("⚠️ Nenhum dado válido de desempenho foi encontrado!")
-        df_desempenho = pd.DataFrame(columns=["Nome da Equipe", "Desempenho Médio Ajustado"])
+    # 🔹 Carregar dados de apostas da sessão
+    df_cavalos = st.session_state.get("horse_data", [])
     
     if isinstance(df_cavalos, list) and len(df_cavalos) > 0:
         df_cavalos = pd.DataFrame(df_cavalos)
+    
+        if "Nome" not in df_cavalos.columns or "Dutching Bet" not in df_cavalos.columns:
+            st.error("❌ Erro: Dados de apostas estão incompletos! Verifique se foram carregados corretamente.")
     else:
-        st.warning("⚠️ Nenhum dado válido de apostas foi encontrado!")
+        st.warning("⚠️ Nenhum dado válido de apostas foi encontrado.")
         df_cavalos = pd.DataFrame(columns=["Nome", "Odds", "Dutching Bet"])
-    
-    # 🔹 Aplicar rebalanceamento apenas se houver dados suficientes
-    if not df_desempenho.empty and not df_cavalos.empty:
-        df_cavalos_filtrado = rebalance_bets(df_cavalos, df_desempenho)
-    else:
-        st.warning("⚠️ Dados insuficientes para rebalanceamento! Criando DataFrame vazio.")
-        df_cavalos_filtrado = pd.DataFrame(columns=["Nome", "Odds", "Dutching Bet", "Desempenho Normalizado", "Dutching Bet Ajustado"])
-    
-    # 🔹 Exibir resultados
-    if not df_cavalos_filtrado.empty and "Dutching Bet Ajustado" in df_cavalos_filtrado.columns:
-        st.write("### Apostas Rebalanceadas (Normalização)")
-        st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Dutching Bet", "Desempenho Normalizado", "Dutching Bet Ajustado"]])
-    else:
-        st.warning("⚠️ Ainda sem dados de desempenho! Apostas permanecerão sem ajustes.")
