@@ -113,11 +113,13 @@ def calcular_desempenho_equipes(team_data):
 
     return pd.DataFrame(df_desempenho_lista).sort_values(by="Desempenho Médio Ajustado", ascending=False)
 
+def rebalance_bets(df_cavalos, df_desempenho):
+#Reajusta as apostas Dutching com base no desempenho das equipes.
 import pandas as pd
 import streamlit as st
 
 def rebalance_bets(df_cavalos, df_desempenho):
-#Reajusta as apostas Dutching com base no desempenho das equipes.
+#Reajusta as apostas Dutching com base no peso relativo ao desempenho das equipes.
 # 🔹 Verificar se df_desempenho contém a coluna necessária
     if df_desempenho.empty or "Nome da Equipe" not in df_desempenho.columns:
         st.warning("⚠️ Nenhum dado de desempenho disponível. Retornando valores sem ajuste.")
@@ -131,17 +133,17 @@ def rebalance_bets(df_cavalos, df_desempenho):
 # 🔹 Garantir que não há valores nulos na coluna 'Nome'
     df_cavalos["Nome"] = df_cavalos["Nome"].fillna("Desconhecido")
     df_desempenho["Nome"] = df_desempenho["Nome"].fillna("Desconhecido")
+# 🔹 Calcular o peso relativo de cada equipe baseado no desempenho
+    df_desempenho["Peso Relativo"] = df_desempenho["Desempenho Médio Ajustado"] / df_desempenho["Desempenho Médio Ajustado"].sum()
 # 🔹 Realizar o merge para incorporar o desempenho das equipes
     df_cavalos_filtrado = df_cavalos.merge(df_desempenho, on="Nome", how="left")
-# 🔹 Certificar que 'Desempenho Médio Ajustado' está preenchido corretamente
-    if "Desempenho Médio Ajustado" in df_cavalos_filtrado.columns:
-        df_cavalos_filtrado["Desempenho Médio Ajustado"] = df_cavalos_filtrado["Desempenho Médio Ajustado"].fillna(0)
-# 🔹 Calcular ajuste percentual baseado no desempenho
-        ajuste_percentual = (1 + df_cavalos_filtrado["Desempenho Médio Ajustado"] / 100)
+# 🔹 Certificar que 'Peso Relativo' está preenchido corretamente
+    if "Peso Relativo" in df_cavalos_filtrado.columns:
+        df_cavalos_filtrado["Peso Relativo"] = df_cavalos_filtrado["Peso Relativo"].fillna(0)
 # 🔹 Aplicar ajuste proporcional às apostas Dutching
-        df_cavalos_filtrado["Dutching Bet Ajustado"] = df_cavalos_filtrado["Dutching Bet"] * ajuste_percentual
+        df_cavalos_filtrado["Dutching Bet Ajustado"] = df_cavalos_filtrado["Dutching Bet"] * (1 + df_cavalos_filtrado["Peso Relativo"])
     else:
-        st.warning("⚠️ A coluna 'Desempenho Médio Ajustado' não foi encontrada! O ajuste não será aplicado.")
+        st.warning("⚠️ A coluna 'Peso Relativo' não foi encontrada! O ajuste não será aplicado.")
         df_cavalos_filtrado["Dutching Bet Ajustado"] = df_cavalos_filtrado["Dutching Bet"]  # Mantém valores originais
     return df_cavalos_filtrado
 
@@ -470,25 +472,29 @@ with tab4:
         st.dataframe(df_desempenho)
 
 # Rebalancear apostas com base no desempenho das equipes    
+# 🔹 Garantir que há dados antes de calcular desempenho
     if "team_data" in st.session_state and st.session_state["team_data"]:
         df_desempenho = calcular_desempenho_equipes(st.session_state["team_data"])
     else:
         st.warning("⚠️ Nenhuma equipe cadastrada! Criando DataFrame vazio.")
         df_desempenho = pd.DataFrame(columns=["Nome da Equipe", "Desempenho Médio Ajustado"])
+    
 # 🔹 Garantir que há dados antes de calcular apostas
     if "horse_data" in st.session_state and st.session_state["horse_data"]:
         df_cavalos = pd.DataFrame(st.session_state["horse_data"])
     else:
         st.warning("⚠️ Nenhum dado de cavalos disponível.")
-        df_cavalos = pd.DataFrame(columns=["Nome", "Odds", "Dutching Bet"])    
+        df_cavalos = pd.DataFrame(columns=["Nome", "Odds", "Dutching Bet"])
+
 # 🔹 Chamar a função de rebalanceamento
-    df_cavalos_filtrado = rebalance_bets(df_cavalos, df_desempenho)    
+df_cavalos_filtrado = rebalance_bets(df_cavalos, df_desempenho)
+
 # 🔹 Exibir resultados apenas se houver dados filtrados
-    if not df_cavalos_filtrado.empty:
-        st.write("### Apostas Rebalanceadas")
-        st.dataframe(df_cavalos_filtrado)
-    else:
-        st.warning("⚠️ Ainda sem dados de desempenho! Apostas permanecerão sem ajustes.")
+if not df_cavalos_filtrado.empty:
+    st.write("### Apostas Rebalanceadas")
+    st.dataframe(df_cavalos_filtrado)
+else:
+    st.warning("⚠️ Ainda sem dados de desempenho! Apostas permanecerão sem ajustes.")
     
 #Função PDF    
 def generate_pdf(df_cavalos_filtrado, df_desempenho, locais_prova):
