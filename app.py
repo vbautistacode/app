@@ -477,6 +477,8 @@ with tab4:
         st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
         st.dataframe(df_desempenho)
 
+        st.write("🔎 Colunas disponíveis no df_cavalos_filtrado:", df_cavalos_filtrado.columns)
+    
 # Rebalancear apostas com base no desempenho das equipes    
 # 🔹 Garantir que há dados antes de calcular desempenho
     if "team_data" in st.session_state and st.session_state["team_data"]:
