@@ -481,7 +481,7 @@ with tab4:
 # 🔹 Aplicar rebalanceamento pós-filtragem
             df_cavalos_filtrado["Dutching Bet Ajustado"] = df_cavalos_filtrado["Adjusted Bet"]
             total_apostado = df_cavalos_filtrado["Dutching Bet Ajustado"].sum()
-            retorno_esperado = ((df_cavalos_filtrado["Dutching Bet Ajustado"] * df_cavalos_filtrado["Odds"]).sum() - df_cavalos_filtrado["Dutching Bet Ajustado"])
+            retorno_esperado = (df_cavalos_filtrado["Dutching Bet Ajustado"] * df_cavalos_filtrado["Odds"]).sum() - df_cavalos_filtrado["Dutching Bet Ajustado"]
             st.write("")
             st.write("")
             st.write("")
