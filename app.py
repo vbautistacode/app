@@ -442,7 +442,7 @@ with tab4:
 
 #🔹Slide
         desempenho_ajustado = melhor_equipe.get("Desempenho Médio Ajustado", 1.0)  # Valor padrão seguro
-        ajuste_percentual = st.slider("Defina o ajuste percentual baseado no desempenho (%)", 0.1, 1.0, 1.0, 0.05) / max(desempenho_ajustado, 0.01)
+        ajuste_percentual = st.slider("Defina o ajuste percentual baseado no desempenho (%)", 0.1, 1.0, 2.0, 0.05) / max(desempenho_ajustado, 0.01)
         df_cavalos["Adjusted Bet"] = df_cavalos["Dutching Bet"] * ajuste_percentual
         df_cavalos["Lucro Adjusted"] = round(df_cavalos["Adjusted Bet"] * df_cavalos["Odds"], 2)
         total_adjusted = df_cavalos["Adjusted Bet"].sum()
@@ -455,13 +455,12 @@ with tab4:
         st.write(f"💰 **Total de Bet Ajustado:** {total_adjusted:.2f}")
         st.write(f"💸 **Lucro:** {lucro_adjusted:.2f}")
         st.write("")
-    
+        st.write("##### | Apostas Rebalanceadas (Filtro por Desvio Padrão)")
 # 🔹 Criar layout com duas colunas
     col1, col2 = st.columns(2)
     
 # 🔹 Coluna 1: Slider para ajuste do fator de exclusão
     with col1:
-        st.markdown("<h5 style='text-align: center;'>| Apostas Rebalanceadas (Filtro por Desvio Padrão)</h5>", unsafe_allow_html=True)
         fator_exclusao = st.radio("Ajuste o fator de exclusão (Desvio Padrão)", [0.0, 0.25, 0.50, 0.75, 1.0, 1.25, 1.50, 1.75, 2.0])
         
 # 🔹 Coluna 2: Aplicação do filtro e exibição das apostas ajustadas
