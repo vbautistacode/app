@@ -473,9 +473,7 @@ with tab4:
         st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
         st.dataframe(df_desempenho)
         
-        df_cavalos_filtrado = df_cavalos.merge(df_desempenho.rename(columns={"Nome da Equipe": "Nome"}), on="Nome", how="left")
-        st.write("🔎 Dados de df_cavalos_filtrado após merge:")
-        st.dataframe(df_cavalos_filtrado)
+        st.write("🔎 Colunas disponíveis em df_desempenho:", df_desempenho.columns)
         
 # Rebalanceamento 🔹 Carregar dados preenchidos da sessão
     if "team_data" in st.session_state and st.session_state["team_data"]:
