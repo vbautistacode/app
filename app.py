@@ -400,7 +400,7 @@ with tab3:
         
 # --- Aba 4: Resultados ---
 with tab4:
-    st.write("##### Resultados | Dutching e Performance de Equipes")
+    st.write("##### | Dutching e Performance de Equipes")
     
 # Garantir que há dados antes de calcular o desempenho
     if "team_data" in st.session_state and st.session_state["team_data"]:
@@ -425,7 +425,7 @@ with tab4:
         df_cavalos["ROI-Dutch($)"] = round((df_cavalos["Lucro Dutch"] - df_cavalos["Dutching Bet"]), 2)
         df_cavalos["ROI (%)"] = round((df_cavalos["Lucro Dutch"] / df_cavalos["Dutching Bet"]) * 100, 2)
         total_dutching = df_cavalos["Dutching Bet"].sum()
-        st.write("##### Resultados | Dutching")
+        st.write("##### | Resultados")
         st.dataframe(df_cavalos[["Nome", "Odds", "Probabilidade", "Dutching Bet", "Lucro Dutch", "ROI-Dutch($)", "ROI (%)"]])
         st.write(f"💰 **Total de Dutching Bet:** {total_dutching:.2f}")
         st.write("")
@@ -446,7 +446,7 @@ with tab4:
         st.write("")
 
 # Exibir rebalanceamento
-        st.write("##### Apostas Rebalanceadas com Desempenho")
+        st.write("##### | Apostas Rebalanceadas com Desempenho")
         st.dataframe(df_cavalos[["Nome", "Odds", "Dutching Bet", "Adjusted Bet", "Lucro Adjusted"]])
         st.write(f"💰 **Total de Bet Ajustado:** {total_adjusted:.2f}")
         st.write("")
@@ -462,5 +462,5 @@ with tab4:
             
 # Aplicar rebalanceamento pós-filtrage
         df_cavalos_filtrado["Dutching Bet Ajustado"] = df_cavalos_filtrado["Adjusted Bet"]
-        st.write("##### Apostas Rebalanceadas (Filtro por Desvio Padrão)")
+        st.write("##### | Apostas Rebalanceadas (Filtro por Desvio Padrão)")
         st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Dutching Bet Ajustado"]])
