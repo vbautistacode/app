@@ -489,7 +489,7 @@ with tab4:
 fator_exclusao = st.slider("Ajuste o fator de exclusão (Desvio padrão)", 0.0, 2.0, 1.0, 0.1)
 
 # 🔹 Aplicar filtragem com base no fator ajustado manualmente
-    df_cavalos_filtrado = filtrar_cavalos(df_cavalos, df_desempenho, fator_exclusao)
+        df_cavalos_filtrado = filtrar_cavalos(df_cavalos, df_desempenho, fator_exclusao)
 
 # 🔹 Continuar com o rebalanceamento após a filtragem
     if not df_cavalos_filtrado.empty:
