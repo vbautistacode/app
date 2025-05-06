@@ -426,19 +426,19 @@ with tab4:
         df_cavalos["ROI (%)"] = round((df_cavalos["Lucro Dutch"] / df_cavalos["Dutching Bet"]) * 100, 2)
         st.write("##### Resultados | Dutching")
         st.dataframe(df_cavalos[["Nome", "Odds", "Probabilidade", "Dutching Bet", "Lucro Dutch", "ROI-Dutch($)", "ROI (%)"]])
-    
-# Evitar erro ao acessar `melhor_equipe`
-    if not df_desempenho.empty:
-        melhor_equipe = df_desempenho.iloc[0]
-        ajuste_percentual = melhor_equipe["Desempenho Médio Ajustado"] / 100
-        df_cavalos["Adjusted Bet"] = df_cavalos["Dutching Bet"] * (1 + ajuste_percentual)
-    
+
 # Exibir melhor equipe
         st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
         st.dataframe(df_desempenho)
+
+# Ajustar aposta por `melhor_equipe`
+    if not df_desempenho.empty:
+        melhor_equipe = df_desempenho.iloc[0]
+        ajuste_percentual = st.slider("Defina o ajuste percentual baseado no desempenho (%)", 90, 110, 100, 1) / 100
+        df_cavalos["Adjusted Bet"] = df_cavalos["Dutching Bet"] * ajuste_percentual
         
 # Exibir rebalanceamento
-        st.write("#### Apostas Rebalanceadas com Desempenho")
+        st.write("##### Apostas Rebalanceadas com Desempenho")
         st.dataframe(df_cavalos[["Nome", "Odds", "Dutching Bet", "Adjusted Bet"]])
 
 # 🔹 Adicionar um slider para ajustar o fator de exclusão baseado no desvio padrão
@@ -455,7 +455,7 @@ with tab4:
 # 🔹 Aplicar rebalanceamento pós-filtragem
         df_cavalos_filtrado["Dutching Bet Ajustado"] = df_cavalos_filtrado["Adjusted Bet"]
         
-        st.write("#### Apostas Rebalanceadas (Filtro por Desvio Padrão)")
+        st.write("##### Apostas Rebalanceadas (Filtro por Desvio Padrão)")
         st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Dutching Bet Ajustado"]])
     else:
         st.warning("⚠️ Nenhum ajuste foi aplicado às apostas devido à ausência de dados válidos.")
