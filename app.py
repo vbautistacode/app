@@ -465,11 +465,18 @@ with tab4:
         st.dataframe(df_desempenho)
 
 # Rebalancear apostas com base no desempenho das equipes
-    if not df_desempenho.empty:
-        if "Nome" in df_cavalos.columns and "Nome" in df_desempenho.columns:
-            df_cavalos_filtrado = df_cavalos.merge(df_desempenho, on="Nome", how="left")
-            df_cavalos_filtrado["Desempenho Médio Ajustado"] = df_cavalos_filtrado["Desempenho Médio Ajustado"].fillna(0)
-            df_cavalos_filtrado["Dutching Bet"] *= (1 + df_cavalos_filtrado["Desempenho Médio Ajustado"] / 100)
+    if "Nome" not in df_cavalos.columns or "Nome" not in df_desempenho.columns:
+        st.error("❌ Erro: A coluna 'Nome' não está presente em um dos DataFrames!")
+        st.write("Colunas em df_cavalos:", df_cavalos.columns)
+        st.write("Colunas em df_desempenho:", df_desempenho.columns)
+    else:
+        df_desempenho.rename(columns={"Nome da Equipe": "Nome"}, inplace=True)
+        # 🔹 Garantir que não há valores nulos na coluna 'Nome'
+        df_cavalos["Nome"] = df_cavalos["Nome"].fillna("Desconhecido")
+        df_desempenho["Nome"] = df_desempenho["Nome"].fillna("Desconhecido")
+        df_cavalos_filtrado = df_cavalos.merge(df_desempenho, on="Nome", how="left")
+        df_cavalos_filtrado["Desempenho Médio Ajustado"] = df_cavalos_filtrado["Desempenho Médio Ajustado"].fillna(0)
+        df_cavalos_filtrado["Dutching Bet"] *= (1 + df_cavalos_filtrado["Desempenho Médio Ajustado"] / 100)
         else:
             st.warning("⚠️ A coluna 'Nome' não foi encontrada! O merge não será realizado.")
             df_cavalos_filtrado = df_cavalos
@@ -478,7 +485,7 @@ with tab4:
         df_cavalos_filtrado = df_cavalos
 
     if not df_cavalos_filtrado.empty:
-        st.write("### Apostas Rebalanceadas")
+        st.write("##### Apostas Rebalanceadas")
         st.dataframe(df_cavalos_filtrado)
 
 #Função PDF    
