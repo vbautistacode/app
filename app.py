@@ -475,6 +475,9 @@ with tab4:
             st.write("")
             st.write("")
             st.write("")
+            st.write("")
+            st.write("")
+            st.write("")
             st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Dutching Bet Ajustado"]])
         else:
             st.warning("⚠️ Nenhum ajuste foi aplicado às apostas devido à ausência de dados válidos.")
