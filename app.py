@@ -117,6 +117,7 @@ def rebalance_bets(df_cavalos, df_desempenho):
 #Reajusta as apostas Dutching com base no peso relativo ao desempenho das equipes.
 # 🔹 Verificar se df_desempenho contém a coluna necessária
     if df_desempenho.empty or "Nome da Equipe" not in df_desempenho.columns:
+        st.warning("⚠️ Nenhum dado de desempenho disponível.")
         return df_cavalos.copy()
 # 🔹 Renomear coluna para compatibilidade no merge
     df_desempenho.rename(columns={"Nome da Equipe": "Nome"}, inplace=True)
