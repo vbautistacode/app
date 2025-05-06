@@ -440,12 +440,13 @@ with tab4:
         st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
         st.dataframe(df_desempenho)
 
-#🔹Slider
-        ajuste_percentual = st.slider("Defina o ajuste percentual baseado no desempenho (%)",  min_value=0.1, max_value=5.0, value=1.0, step=0.1) / melhor_equipe["Desempenho Médio Ajustado"] 
+#🔹Slide
+        desempenho_ajustado = melhor_equipe.get("Desempenho Médio Ajustado", 1.0)  # Valor padrão seguro
+        ajuste_percentual = st.slider("Defina o ajuste percentual baseado no desempenho (%)", 0.1, 5.0, 1.0, 0.1) / max(desempenho_ajustado, 0.01)
         df_cavalos["Adjusted Bet"] = df_cavalos["Dutching Bet"] * ajuste_percentual
         df_cavalos["Lucro Adjusted"] = round(df_cavalos["Adjusted Bet"] * df_cavalos["Odds"], 2)
         total_adjusted = df_cavalos["Adjusted Bet"].sum()
-        lucro_adjusted = df_cavalos["Lucro Adjusted"] - df_cavalos["Adjusted Bet"]
+        lucro_adjusted = df_cavalos["Lucro Adjusted"].sum() - df_cavalos["Adjusted Bet"].sum()
         st.write("")
     
 # Exibir rebalanceamento
