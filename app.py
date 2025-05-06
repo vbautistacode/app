@@ -428,8 +428,8 @@ with tab4:
         st.dataframe(df_cavalos[["Nome", "Odds", "Probabilidade", "Dutching Bet", "Lucro Dutch", "ROI-Dutch($)", "ROI (%)"]])
 
 # Exibir melhor equipe
-        st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
-        st.dataframe(df_desempenho)
+    st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
+    st.dataframe(df_desempenho)
 
 # Ajustar aposta por `melhor_equipe`
     if not df_desempenho.empty:
