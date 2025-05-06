@@ -436,8 +436,9 @@ with tab4:
 # Exibir melhor equipe
         st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
         st.dataframe(df_desempenho)
+        
 # Exibir rebalanceamento
-        st.write("### Apostas Ajustadas com Desempenho")
+        st.write("### Apostas Rebalanceadas com Desempenho")
         st.dataframe(df_cavalos[["Nome", "Odds", "Dutching Bet", "Adjusted Bet"]])
 # 🔹 Aplicar rebalanceamento diretamente sobre Adjusted_Bet
     if not df_cavalos.empty and "Adjusted Bet" in df_cavalos.columns:
