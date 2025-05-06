@@ -113,28 +113,28 @@ def calcular_desempenho_equipes(team_data):
 
     return pd.DataFrame(df_desempenho_lista).sort_values(by="Desempenho Médio Ajustado", ascending=False)
 
-def filtrar_cavalos(df_cavalos, df_desempenho, fator_exclusao=1.0):
-#Remove cavalos com desempenho abaixo da média estatística.
+# def filtrar_cavalos(df_cavalos, df_desempenho, fator_exclusao=1.0):
+# #Remove cavalos com desempenho abaixo da média estatística.
 
-    # 🔹 Renomeia a coluna para permitir o merge
-    df_desempenho.rename(columns={"Nome da Equipe": "Nome"}, inplace=True)
+#     # 🔹 Renomeia a coluna para permitir o merge
+#     df_desempenho.rename(columns={"Nome da Equipe": "Nome"}, inplace=True)
 
-    # 🔹 Realiza o merge dos dados
-    df_cavalos_filtrado = df_cavalos.merge(df_desempenho, on="Nome", how="left")
+#     # 🔹 Realiza o merge dos dados
+#     df_cavalos_filtrado = df_cavalos.merge(df_desempenho, on="Nome", how="left")
 
-    if "Desempenho Médio Ajustado" in df_cavalos_filtrado.columns:
-        # 🔹 Calcula média e desvio padrão
-        media_desemp = df_cavalos_filtrado["Desempenho Médio Ajustado"].mean()
-        desvio_desemp = df_cavalos_filtrado["Desempenho Médio Ajustado"].std()
+#     if "Desempenho Médio Ajustado" in df_cavalos_filtrado.columns:
+#         # 🔹 Calcula média e desvio padrão
+#         media_desemp = df_cavalos_filtrado["Desempenho Médio Ajustado"].mean()
+#         desvio_desemp = df_cavalos_filtrado["Desempenho Médio Ajustado"].std()
 
-        # 🔹 Aplica filtro baseado no desvio padrão
-        limite_exclusao = media_desemp - (fator_exclusao * desvio_desemp)
-        df_cavalos_filtrado = df_cavalos_filtrado[df_cavalos_filtrado["Desempenho Médio Ajustado"] >= limite_exclusao]
+#         # 🔹 Aplica filtro baseado no desvio padrão
+#         limite_exclusao = media_desemp - (fator_exclusao * desvio_desemp)
+#         df_cavalos_filtrado = df_cavalos_filtrado[df_cavalos_filtrado["Desempenho Médio Ajustado"] >= limite_exclusao]
 
-    else:
-        st.warning("⚠️ Dados de desempenho ausentes! Nenhum cavalo foi filtrado.")
+#     else:
+#         st.warning("⚠️ Dados de desempenho ausentes! Nenhum cavalo foi filtrado.")
 
-    return df_cavalos_filtrado
+#     return df_cavalos_filtrado
 
 # --- Interface Streamlit ---
 st.title("Apostas | Estratégias Dutching")
