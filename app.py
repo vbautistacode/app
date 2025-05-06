@@ -482,7 +482,7 @@ with tab4:
         df_cavalos = pd.DataFrame(columns=["Nome", "Odds", "Dutching Bet"])
     
     # 🔹 Aplicar filtro para excluir cavalos com desempenho abaixo da média estatística
-    df_cavalos_filtrado = filtrar_cavalos(df_cavalos, df_desempenho, fator_exclusao=1.0)
+        df_cavalos_filtrado = filtrar_cavalos(df_cavalos, df_desempenho, fator_exclusao=1.0)
     
     # 🔹 Aplicar rebalanceamento após o filtro
         if not df_cavalos_filtrado.empty:
