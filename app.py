@@ -113,7 +113,6 @@ def calcular_desempenho_equipes(team_data):
 
     return pd.DataFrame(df_desempenho_lista).sort_values(by="Desempenho Médio Ajustado", ascending=False)
 
-
 # 🔹 Função para rebalancear apostas com normalização do desempenho
 def rebalance_bets(df_cavalos, df_desempenho):
     """ Ajusta as apostas Dutching com base na normalização do desempenho das equipes. """
@@ -473,8 +472,8 @@ with tab4:
 # Exibir melhor equipe
         st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
         st.dataframe(df_desempenho)
-
-# 🔹 Carregar dados preenchidos da sessão
+        st.write("🔎 Colunas disponíveis em df_cavalos_filtrado:", df_cavalos_filtrado.columns)
+# Rebalanceamento 🔹 Carregar dados preenchidos da sessão
     if "team_data" in st.session_state and st.session_state["team_data"]:
         df_desempenho = pd.DataFrame(st.session_state["team_data"])
     else:
