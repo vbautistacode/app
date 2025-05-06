@@ -113,10 +113,12 @@ def calcular_desempenho_equipes(team_data):
 
     return pd.DataFrame(df_desempenho_lista).sort_values(by="Desempenho Médio Ajustado", ascending=False)
 
-# 🔹 Função para rebalancear apostas com normalização do desempenho
+import pandas as pd
+import streamlit as st
+
 def rebalance_bets(df_cavalos, df_desempenho):
     """ Ajusta as apostas Dutching com base na normalização do desempenho das equipes. """
-    
+
     # 🔹 Verificar se df_desempenho contém os dados necessários
     if df_desempenho.empty or "Nome da Equipe" not in df_desempenho.columns:
         st.warning("⚠️ Nenhum dado de desempenho disponível. Retornando valores sem ajuste.")
@@ -131,10 +133,20 @@ def rebalance_bets(df_cavalos, df_desempenho):
         return df_cavalos.copy()
 
     # 🔹 Normalizar valores de desempenho para rebalancear apostas
-    min_desemp = df_desempenho["Desempenho Médio Ajustado"].min()
-    max_desemp = df_desempenho["Desempenho Médio Ajustado"].max()
+    if "Desempenho Médio Ajustado" in df_desempenho.columns:
+        min_desemp = df_desempenho["Desempenho Médio Ajustado"].min()
+        max_desemp = df_desempenho["Desempenho Médio Ajustado"].max()
 
-    df_desempenho["Desempenho Normalizado"] = (df_desempenho["Desempenho Médio Ajustado"] - min_desemp) / (max_desemp - min_desemp)
+        # 🔹 Evitar erro de divisão por zero
+        if min_desemp != max_desemp:
+            df_desempenho["Desempenho Normalizado"] = (df_desempenho["Desempenho Médio Ajustado"] - min_desemp) / (max_desemp - min_desemp)
+        else:
+            df_desempenho["Desempenho Normalizado"] = 0  # Caso todos os valores sejam iguais
+
+        df_desempenho["Desempenho Normalizado"] = df_desempenho["Desempenho Normalizado"].fillna(0)
+    else:
+        st.error("❌ Erro: 'Desempenho Médio Ajustado' não foi encontrado!")
+        return df_cavalos.copy()
 
     # 🔹 Realizar merge entre apostas e desempenho
     df_cavalos_filtrado = df_cavalos.merge(df_desempenho, on="Nome", how="left")
@@ -142,7 +154,7 @@ def rebalance_bets(df_cavalos, df_desempenho):
     # 🔹 Ajustar apostas proporcionalmente ao desempenho normalizado
     if "Desempenho Normalizado" in df_cavalos_filtrado.columns:
         df_cavalos_filtrado["Desempenho Normalizado"] = df_cavalos_filtrado["Desempenho Normalizado"].fillna(0)
-        df_cavalos_filtrado["Dutching Bet Ajustado"] = df_cavalos_filtrado["Dutching Bet"] * (1 + df_cavalos_filtrado["Desempenho Normalizado"])
+        df_cavalos_filtrado["Dutching Bet Ajustado"] = df_cavalos_filtrado["Dutching Bet"] * (1 + df_cavalos_filtrado["Desempenho Normalizado"] * 1.5)  # Ajuste um pouco mais forte
     else:
         st.warning("⚠️ A coluna 'Desempenho Normalizado' não foi encontrada! O ajuste não será aplicado.")
         df_cavalos_filtrado["Dutching Bet Ajustado"] = df_cavalos_filtrado["Dutching Bet"]  # Mantém valores originais
@@ -472,9 +484,7 @@ with tab4:
 # Exibir melhor equipe
         st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
         st.dataframe(df_desempenho)
-        
-        st.write("🔎 Colunas disponíveis em df_desempenho:", df_desempenho.columns)
-        
+                
 # Rebalanceamento 🔹 Carregar dados preenchidos da sessão
     if "team_data" in st.session_state and st.session_state["team_data"]:
         df_desempenho = pd.DataFrame(st.session_state["team_data"])
