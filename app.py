@@ -430,15 +430,10 @@ with tab4:
     
 # Cálculo de probabilidades e apostas Dutching
     if not df_cavalos.empty and "Odds" in df_cavalos.columns:      
-# Criar caixa de seleção para ativar ou desativar o filtro
-        filtrar_nomes = st.checkbox("Ativar filtro de seleção de cavalos")
-    if filtrar_nomes:
 # Criar seletor de nomes com múltipla seleção
         nomes_selecionados = st.multiselect("Selecione os cavalos:", df_cavalos["Nome"].unique())
-# Aplicar filtro ao DataFrame
+# Aplicar filtro ao DataFrame antes dos cálculos
         df_cavalos_filtrado = df_cavalos[df_cavalos["Nome"].isin(nomes_selecionados)] if nomes_selecionados else df_cavalos
-    else:
-        df_cavalos_filtrado = df_cavalos  # Se o checkbox estiver desativado, exibe todos os dados
 # Realizar cálculos apenas nos dados filtrados
         df_cavalos_filtrado["Probabilidade"] = (1 / df_cavalos_filtrado["Odds"]).round(2)
         df_cavalos_filtrado["Dutching Bet"] = calculate_dutching(df_cavalos_filtrado["Odds"], bankroll, np.ones(len(df_cavalos_filtrado)))
