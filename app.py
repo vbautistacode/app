@@ -457,6 +457,7 @@ with tab4:
         st.write("")
         st.markdown("<h5 style='text-align: center;'>| Apostas Rebalanceadas (Filtro por Desvio Padrão)</h5>", unsafe_allow_html=True)
         # st.write("##### | Apostas Rebalanceadas (Filtro por Desvio Padrão)")
+        st.write("")
 # 🔹 Criar layout com duas colunas
     col1, col2 = st.columns(2)
     
@@ -477,7 +478,6 @@ with tab4:
     
 # 🔹 Aplicar rebalanceamento pós-filtragem
             df_cavalos_filtrado["Dutching Bet Ajustado"] = df_cavalos_filtrado["Adjusted Bet"]
-            st.write("")
             st.write("")
             st.write("")
             st.write("")
