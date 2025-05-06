@@ -469,24 +469,27 @@ with tab4:
         st.error("❌ Erro: A coluna 'Nome' não está presente em um dos DataFrames!")
         st.write("Colunas em df_cavalos:", df_cavalos.columns)
         st.write("Colunas em df_desempenho:", df_desempenho.columns)
+        df_cavalos_filtrado = df_cavalos  # Mantém df_cavalos sem alteração
     else:
-        df_desempenho.rename(columns={"Nome da Equipe": "Nome"}, inplace=True)
-        # 🔹 Garantir que não há valores nulos na coluna 'Nome'
+# 🔹 Renomear coluna no desempenho, se necessário
+        df_desempenho.rename(columns={"Nome da Equipe": "Nome"}, inplace=True)    
+# 🔹 Garantir que não há valores nulos na coluna 'Nome'
         df_cavalos["Nome"] = df_cavalos["Nome"].fillna("Desconhecido")
-        df_desempenho["Nome"] = df_desempenho["Nome"].fillna("Desconhecido")
-        df_cavalos_filtrado = df_cavalos.merge(df_desempenho, on="Nome", how="left")
-        df_cavalos_filtrado["Desempenho Médio Ajustado"] = df_cavalos_filtrado["Desempenho Médio Ajustado"].fillna(0)
-        df_cavalos_filtrado["Dutching Bet"] *= (1 + df_cavalos_filtrado["Desempenho Médio Ajustado"] / 100)
-    else:
-        st.warning("⚠️ A coluna 'Nome' não foi encontrada! O merge não será realizado.")
-        df_cavalos_filtrado = df_cavalos
-    else:
-        st.warning("⚠️ Ainda sem dados de desempenho! Apostas permanecerão sem ajustes.")
-        df_cavalos_filtrado = df_cavalos
-
+        df_desempenho["Nome"] = df_desempenho["Nome"].fillna("Desconhecido")    
+# 🔹 Executar o merge corretamente
+        df_cavalos_filtrado = df_cavalos.merge(df_desempenho, on="Nome", how="left")    
+# 🔹 Certificar que 'Desempenho Médio Ajustado' está preenchido corretamente
+        if "Desempenho Médio Ajustado" in df_cavalos_filtrado.columns:
+            df_cavalos_filtrado["Desempenho Médio Ajustado"] = df_cavalos_filtrado["Desempenho Médio Ajustado"].fillna(0)
+            df_cavalos_filtrado["Dutching Bet"] *= (1 + df_cavalos_filtrado["Desempenho Médio Ajustado"] / 100)
+        else:
+            st.warning("⚠️ A coluna 'Desempenho Médio Ajustado' não foi encontrada! O ajuste não será aplicado.")
+# 🔹 Exibir resultados apenas se houver dados filtrados
     if not df_cavalos_filtrado.empty:
         st.write("##### Apostas Rebalanceadas")
         st.dataframe(df_cavalos_filtrado)
+    else:
+        st.warning("⚠️ Ainda sem dados de desempenho! Apostas permanecerão sem ajustes.")
 
 #Função PDF    
 def generate_pdf(df_cavalos_filtrado, df_desempenho, locais_prova):
