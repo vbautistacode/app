@@ -427,9 +427,7 @@ with tab4:
         st.write("##### Resultados | Dutching")
         st.dataframe(df_cavalos[["Nome", "Odds", "Probabilidade", "Dutching Bet", "Lucro Dutch", "ROI-Dutch($)", "ROI (%)"]])
 
-# Exibir melhor equipe
-    st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
-    st.dataframe(df_desempenho)
+
 
 # Ajustar aposta por `melhor_equipe`
     if not df_desempenho.empty:
@@ -437,6 +435,10 @@ with tab4:
         ajuste_percentual = st.slider("Defina o ajuste percentual baseado no desempenho (%)", 90, 110, 100, 1) / 100
         df_cavalos["Adjusted Bet"] = df_cavalos["Dutching Bet"] * ajuste_percentual
 
+# Exibir melhor equipe
+        st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
+        st.dataframe(df_desempenho)
+    
 # Exibir rebalanceamento
         st.write("##### Apostas Rebalanceadas com Desempenho")
         st.dataframe(df_cavalos[["Nome", "Odds", "Dutching Bet", "Adjusted Bet"]])
