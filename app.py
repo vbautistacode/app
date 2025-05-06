@@ -438,12 +438,12 @@ with tab4:
 #🔹Slider
         ajuste_percentual = st.slider("Defina o ajuste percentual baseado no desempenho (%)",  min_value=0.1, max_value=5.0, value=1.0, step=0.1)
         df_cavalos["Adjusted Bet"] = df_cavalos["Dutching Bet"] * ajuste_percentual
-        total_dutching = df_cavalos["Dutching Bet"].sum()
+        total_adjusted = df_cavalos["Adjusted Bet"].sum()
         
 # Exibir rebalanceamento
         st.write("##### Apostas Rebalanceadas com Desempenho")
         st.dataframe(df_cavalos[["Nome", "Odds", "Dutching Bet", "Adjusted Bet"]])
-        st.write(f"💰 **Total de Dutching Bet:** {total_dutching:.2f}")
+        st.write(f"💰 **Total de Dutching Bet:** {total_adjusted:.2f}")
         
 #🔹Slider 
         fator_exclusao = st.radio("Ajuste o fator de exclusão (Desvio Padrão)", [0.0, 0.25, 0.50, 0.75, 1.0, 1.25, 1.50, 0.75, 2.0])
