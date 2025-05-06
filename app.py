@@ -439,7 +439,7 @@ with tab4:
         st.dataframe(df_desempenho)
 
 #🔹Slider
-        ajuste_percentual = st.slider("Defina o ajuste percentual baseado no desempenho (%)",  min_value=0.1, max_value=5.0, value=1.0, step=0.1)
+        ajuste_percentual = st.slider("Defina o ajuste percentual baseado no desempenho (%)",  min_value=0.1, max_value=5.0, value=1.0, step=0.1) / melhor_equipe["Desempenho Médio Ajustado"] 
         df_cavalos["Adjusted Bet"] = df_cavalos["Dutching Bet"] * ajuste_percentual
         df_cavalos["Lucro Adjusted"] = round(df_cavalos["Adjusted Bet"] * df_cavalos["Odds"], 2)
         total_adjusted = df_cavalos["Adjusted Bet"].sum()
