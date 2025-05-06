@@ -477,9 +477,9 @@ with tab4:
         df_cavalos_filtrado = df_cavalos.merge(df_desempenho, on="Nome", how="left")
         df_cavalos_filtrado["Desempenho Médio Ajustado"] = df_cavalos_filtrado["Desempenho Médio Ajustado"].fillna(0)
         df_cavalos_filtrado["Dutching Bet"] *= (1 + df_cavalos_filtrado["Desempenho Médio Ajustado"] / 100)
-        else:
-            st.warning("⚠️ A coluna 'Nome' não foi encontrada! O merge não será realizado.")
-            df_cavalos_filtrado = df_cavalos
+    else:
+        st.warning("⚠️ A coluna 'Nome' não foi encontrada! O merge não será realizado.")
+        df_cavalos_filtrado = df_cavalos
     else:
         st.warning("⚠️ Ainda sem dados de desempenho! Apostas permanecerão sem ajustes.")
         df_cavalos_filtrado = df_cavalos
