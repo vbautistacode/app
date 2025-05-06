@@ -445,12 +445,14 @@ with tab4:
         df_cavalos["Adjusted Bet"] = df_cavalos["Dutching Bet"] * ajuste_percentual
         df_cavalos["Lucro Adjusted"] = round(df_cavalos["Adjusted Bet"] * df_cavalos["Odds"], 2)
         total_adjusted = df_cavalos["Adjusted Bet"].sum()
+        lucro_adjusted = df_cavalos["Lucro Adjusted"] - df_cavalos["Adjusted Bet"]
         st.write("")
     
 # Exibir rebalanceamento
         st.write("##### | Apostas Rebalanceadas com Desempenho")
         st.dataframe(df_cavalos[["Nome", "Odds", "Dutching Bet", "Adjusted Bet", "Lucro Adjusted"]])
         st.write(f"💰 **Total de Bet Ajustado:** {total_adjusted:.2f}")
+        st.write(f"💸 **Lucro:** {lucro_adjusted:.2f}")
         st.write("")
     
 # 🔹 Criar layout com duas colunas
