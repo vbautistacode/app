@@ -476,34 +476,12 @@ with tab4:
 # Exibir melhor equipe
         st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
         st.dataframe(df_desempenho)
-
-        st.write("🔎 Dados carregados de df_desempenho:")
-        st.dataframe(df_desempenho)
-
-        st.write("🔎 Dados carregados de df_cavalos:")
-        st.dataframe(df_cavalos)
-
     
-# 🔹 Carregar dados de desempenho da sessão
-    df_desempenho = st.session_state.get("team_data", [])
+# 🔹 Exibir resultados apenas com Nome, Odds e Dutching Bet Ajustado
+if not df_cavalos_filtrado.empty and "Dutching Bet Ajustado" in df_cavalos_filtrado.columns:
+    st.write("### Apostas Rebalanceadas (Ajuste Aplicado)")
     
-    if isinstance(df_desempenho, list) and len(df_desempenho) > 0:
-        df_desempenho = pd.DataFrame(df_desempenho)
-    
-        if "Nome da Equipe" not in df_desempenho.columns or "Desempenho Médio Ajustado" not in df_desempenho.columns:
-            st.error("❌ Erro: Dados de desempenho estão incompletos! Verifique se foram carregados corretamente.")
-    else:
-        st.warning("⚠️ Nenhum dado válido de desempenho foi encontrado.")
-        df_desempenho = pd.DataFrame(columns=["Nome da Equipe", "Desempenho Médio Ajustado"])
-    
-    # 🔹 Carregar dados de apostas da sessão
-    df_cavalos = st.session_state.get("horse_data", [])
-    
-    if isinstance(df_cavalos, list) and len(df_cavalos) > 0:
-        df_cavalos = pd.DataFrame(df_cavalos)
-    
-        if "Nome" not in df_cavalos.columns or "Dutching Bet" not in df_cavalos.columns:
-            st.error("❌ Erro: Dados de apostas estão incompletos! Verifique se foram carregados corretamente.")
-    else:
-        st.warning("⚠️ Nenhum dado válido de apostas foi encontrado.")
-        df_cavalos = pd.DataFrame(columns=["Nome", "Odds", "Dutching Bet"])
+    # 🔹 Exibe tabela formatada apenas com dados essenciais
+    st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Dutching Bet Ajustado"]])
+else:
+    st.warning("⚠️ Nenhum ajuste foi aplicado às apostas devido à ausência de dados válidos.")
