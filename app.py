@@ -485,16 +485,23 @@ with tab4:
         df_cavalos_filtrado = filtrar_cavalos(df_cavalos, df_desempenho, fator_exclusao=1.0)
     
     # 🔹 Aplicar rebalanceamento após o filtro
-        if not df_cavalos_filtrado.empty:
-            df_cavalos_filtrado = rebalance_bets(df_cavalos_filtrado, df_desempenho)
-        else:
-            st.warning("⚠️ Todos os cavalos estavam abaixo do critério mínimo e foram removidos!")
-            df_cavalos_filtrado = pd.DataFrame(columns=["Nome", "Odds", "Dutching Bet Ajustado"])
-        
-        # 🔹 Exibir resultados apenas com Nome, Odds e Dutching Bet Ajustado
-        if not df_cavalos_filtrado.empty and "Dutching Bet Ajustado" in df_cavalos_filtrado.columns:
-            st.write("### Apostas Rebalanceadas (Filtragem e Ajuste Aplicado)")
-            st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Dutching Bet Ajustado"]])
-        else:
-            st.warning("⚠️ Nenhum ajuste foi aplicado às apostas devido à ausência de dados válidos.")
+        # 🔹 Adicionar um controle deslizante para ajustar o fator de exclusão
+fator_exclusao = st.slider("Ajuste o fator de exclusão (Desvio padrão)", 0.0, 2.0, 1.0, 0.1)
+
+# 🔹 Aplicar filtragem com base no fator ajustado manualmente
+    df_cavalos_filtrado = filtrar_cavalos(df_cavalos, df_desempenho, fator_exclusao)
+
+# 🔹 Continuar com o rebalanceamento após a filtragem
+    if not df_cavalos_filtrado.empty:
+        df_cavalos_filtrado = rebalance_bets(df_cavalos_filtrado, df_desempenho)
+    else:
+        st.warning("⚠️ Todos os cavalos estavam abaixo do critério mínimo e foram removidos!")
+        df_cavalos_filtrado = pd.DataFrame(columns=["Nome", "Odds", "Dutching Bet Ajustado"])
     
+    # 🔹 Exibir resultados ajustados
+    if not df_cavalos_filtrado.empty and "Dutching Bet Ajustado" in df_cavalos_filtrado.columns:
+        st.write("### Apostas Rebalanceadas (Filtragem e Ajuste Aplicado)")
+        st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Dutching Bet Ajustado"]])
+    else:
+        st.warning("⚠️ Nenhum ajuste foi aplicado às apostas devido à ausência de dados válidos.")
+        
