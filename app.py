@@ -476,7 +476,8 @@ with tab4:
 # Exibir melhor equipe
         st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
         st.dataframe(df_desempenho)
-
+    if 'df_cavalos_filtrado' not in locals():
+        st.error("❌ Erro: df_cavalos_filtrado não foi criado corretamente!")
         st.write("🔎 Colunas disponíveis no df_cavalos_filtrado:", df_cavalos_filtrado.columns)
     
 # Rebalancear apostas com base no desempenho das equipes    
