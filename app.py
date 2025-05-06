@@ -113,29 +113,6 @@ def calcular_desempenho_equipes(team_data):
 
     return pd.DataFrame(df_desempenho_lista).sort_values(by="Desempenho Médio Ajustado", ascending=False)
 
-# def filtrar_cavalos(df_cavalos, df_desempenho, fator_exclusao=1.0):
-# #Remove cavalos com desempenho abaixo da média estatística.
-
-#     # 🔹 Renomeia a coluna para permitir o merge
-#     df_desempenho.rename(columns={"Nome da Equipe": "Nome"}, inplace=True)
-
-#     # 🔹 Realiza o merge dos dados
-#     df_cavalos_filtrado = df_cavalos.merge(df_desempenho, on="Nome", how="left")
-
-#     if "Desempenho Médio Ajustado" in df_cavalos_filtrado.columns:
-#         # 🔹 Calcula média e desvio padrão
-#         media_desemp = df_cavalos_filtrado["Desempenho Médio Ajustado"].mean()
-#         desvio_desemp = df_cavalos_filtrado["Desempenho Médio Ajustado"].std()
-
-#         # 🔹 Aplica filtro baseado no desvio padrão
-#         limite_exclusao = media_desemp - (fator_exclusao * desvio_desemp)
-#         df_cavalos_filtrado = df_cavalos_filtrado[df_cavalos_filtrado["Desempenho Médio Ajustado"] >= limite_exclusao]
-
-#     else:
-#         st.warning("⚠️ Dados de desempenho ausentes! Nenhum cavalo foi filtrado.")
-
-#     return df_cavalos_filtrado
-
 # --- Interface Streamlit ---
 st.title("Apostas | Estratégias Dutching")
 
@@ -459,6 +436,14 @@ with tab4:
 # Exibir melhor equipe
         st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
         st.dataframe(df_desempenho)
-
+# Exibir rebalanceamento
         st.write("### Apostas Ajustadas com Desempenho")
         st.dataframe(df_cavalos[["Nome", "Odds", "Dutching Bet", "Adjusted Bet"]])
+# 🔹 Aplicar rebalanceamento diretamente sobre Adjusted_Bet
+    if not df_cavalos.empty and "Adjusted Bet" in df_cavalos.columns:
+        df_cavalos["Dutching Bet Ajustado"] = df_cavalos["Adjusted Bet"]
+        st.write("### Apostas Rebalanceadas (Base Adjusted_Bet)")
+        st.dataframe(df_cavalos[["Nome", "Odds", "Dutching Bet Ajustado"]])
+    else:
+        st.warning("⚠️ Nenhum ajuste foi aplicado às apostas devido à ausência de dados válidos.")
+        
