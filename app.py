@@ -436,7 +436,7 @@ with tab4:
         st.dataframe(df_desempenho)
         
 #🔹Slider
-        ajuste_percentual = st.slider("Defina o ajuste percentual baseado no desempenho (%)", 90, 110, 100, 1) / 100
+        ajuste_percentual = st.select_slider("Defina o ajuste percentual baseado no desempenho (%)", options=[0.50, 0.80, 0.90 , 1.1, 1.25, 1.5])
         df_cavalos["Adjusted Bet"] = df_cavalos["Dutching Bet"] * ajuste_percentual
         
 # Exibir rebalanceamento
@@ -444,7 +444,7 @@ with tab4:
         st.dataframe(df_cavalos[["Nome", "Odds", "Dutching Bet", "Adjusted Bet"]])
 
 #🔹Slider
-        fator_exclusao = st.radio("Ajuste o fator de exclusão (DP)", [0.0, 0.25, 0.50, 1.0, 1.25, 1.50, 2.0])
+        fator_exclusao = st.radio("Ajuste o fator de exclusão (Desvio Padrão)", [0.0, 0.25, 0.50, 0.75, 1.0, 1.25, 1.50, 0.75, 2.0])
     
 # 🔹 Aplicar filtragem para excluir cavalos abaixo do limite estatístico
     if not df_cavalos.empty and "Adjusted Bet" in df_cavalos.columns:
