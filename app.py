@@ -489,6 +489,18 @@ with tab4:
     df_desempenho = st.session_state.get("team_data", None)
     df_cavalos = st.session_state.get("horse_data", None)
     
+    if df_desempenho and isinstance(df_desempenho, list) and len(df_desempenho) > 0:
+        df_desempenho = pd.DataFrame(df_desempenho)
+    else:
+        st.warning("⚠️ Nenhum dado de desempenho disponível!")
+        df_desempenho = pd.DataFrame(columns=["Nome da Equipe", "Desempenho Médio Ajustado"])
+    
+    if df_cavalos and isinstance(df_cavalos, list) and len(df_cavalos) > 0:
+        df_cavalos = pd.DataFrame(df_cavalos)
+    else:
+        st.warning("⚠️ Nenhum dado de apostas disponível!")
+        df_cavalos = pd.DataFrame(columns=["Nome", "Odds", "Dutching Bet"])
+        
     # 🔹 Criar DataFrames somente se houver dados válidos
     if df_desempenho:
         df_desempenho = pd.DataFrame(df_desempenho)
@@ -521,4 +533,3 @@ with tab4:
         st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Dutching Bet", "Desempenho Normalizado", "Dutching Bet Ajustado"]])
     else:
         st.warning("⚠️ Ainda sem dados de desempenho! Apostas permanecerão sem ajustes.")
-    
