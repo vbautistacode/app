@@ -69,6 +69,16 @@ if "initialized" not in st.session_state:
     load_data()
     st.session_state["initialized"] = True
 
+# 🔹 Bloco para armazenar variáveis persistentes
+st.session_state.setdefault("horse_data", [])
+st.session_state.setdefault("team_data", [])
+st.session_state.setdefault("Nome", "Cavalo_Default")
+st.session_state.setdefault("df_cavalos", pd.DataFrame(columns=["Nome", "Odds", "Dutching Bet", "Lucro Dutch"]))
+st.session_state.setdefault("df_desempenho", pd.DataFrame(columns=["Nome da Equipe", "Desempenho Médio Ajustado"]))
+st.session_state.setdefault("bankroll", 1000.0)  # Valor padrão do Bankroll
+st.session_state.setdefault("ajuste_percentual", 1.0)
+st.session_state.setdefault("fator_exclusao", 0.0)
+
 st.session_state.setdefault("horse_data", [])
 st.session_state.setdefault("team_data", [])
 st.session_state.setdefault("Nome", "Cavalo_Default")
