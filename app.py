@@ -114,7 +114,7 @@ def calcular_desempenho_equipes(team_data):
     return pd.DataFrame(df_desempenho_lista).sort_values(by="Desempenho Médio Ajustado", ascending=False)
 
 def filtrar_cavalos(df_cavalos, df_desempenho, fator_exclusao=1.0):
-    """ Remove cavalos com desempenho abaixo da média estatística. """
+#Remove cavalos com desempenho abaixo da média estatística.
 
     # 🔹 Renomeia a coluna para permitir o merge
     df_desempenho.rename(columns={"Nome da Equipe": "Nome"}, inplace=True)
@@ -496,12 +496,11 @@ with tab4:
         df_cavalos_filtrado = rebalance_bets(df_cavalos_filtrado, df_desempenho)
     else:
         st.warning("⚠️ Todos os cavalos estavam abaixo do critério mínimo e foram removidos!")
-        df_cavalos_filtrado = pd.DataFrame(columns=["Nome", "Odds", "Dutching Bet Ajustado"])
+        df_cavalos_filtrado = pd.DataFrame(columns=["Nome", "Odds", "Dutching Bet"])
     
     # 🔹 Exibir resultados ajustados
     if not df_cavalos_filtrado.empty and "Dutching Bet Ajustado" in df_cavalos_filtrado.columns:
         st.write("### Apostas Rebalanceadas (Filtragem e Ajuste Aplicado)")
-        st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Dutching Bet Ajustado"]])
+        st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Dutching Bet"]])
     else:
         st.warning("⚠️ Nenhum ajuste foi aplicado às apostas devido à ausência de dados válidos.")
-        
