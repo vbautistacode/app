@@ -448,7 +448,7 @@ with tab4:
         df_cavalos["Adjusted Bet"] = round(df_cavalos["Dutching Bet"] * ajuste_percentual, 2)
         df_cavalos["Gain Adjusted"] = round(df_cavalos["Adjusted Bet"] * df_cavalos["Odds"], 2)
         total_adjusted = df_cavalos["Adjusted Bet"].sum()
-        lucro_adjusted = df_cavalos["Gain Adjusted"].sum() - df_cavalos["Adjusted Bet"].sum()
+        lucro_adjusted = df_cavalos["Gain Adjusted"].iloc[0] 
         st.write("")
     
 # Exibir rebalanceamento
