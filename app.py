@@ -416,19 +416,19 @@ with tab4:
         bankroll = st.number_input("Digite o valor do Bankroll:", min_value=100.0, max_value=100000.0, step=10.0, value=1000.0, key="bankroll_input")
     else:
         st.warning("⚠️ Nenhum dado de cavalos disponível.")
-        df_cavalos = pd.DataFrame(columns=["Nome", "Odds", "Dutching Bet", "Lucro Dutch"])
+        df_cavalos = pd.DataFrame(columns=["Nome", "Odds", "Dutching Bet", "Gain Dutch"])
     
 # Cálculo de probabilidades e apostas Dutching
     if not df_cavalos.empty and "Odds" in df_cavalos.columns:
         df_cavalos["Probabilidade"] = (1 / df_cavalos["Odds"]).round(2)
         df_cavalos["Dutching Bet"] = calculate_dutching(df_cavalos["Odds"], bankroll, np.ones(len(df_cavalos)))
-        df_cavalos["Lucro Dutch"] = round(df_cavalos["Odds"] * df_cavalos["Dutching Bet"], 2)
-        df_cavalos["ROI-Dutch"] = round((df_cavalos["Lucro Dutch"] - df_cavalos["Dutching Bet"]), 2)
-        df_cavalos["ROI (%)"] = round((df_cavalos["Lucro Dutch"] / df_cavalos["Dutching Bet"]) * 100, 2)
+        df_cavalos["Gain Dutch"] = round(df_cavalos["Odds"] * df_cavalos["Dutching Bet"], 2)
+        df_cavalos["ROI-Dutch"] = round((df_cavalos["Gain Dutch"] - df_cavalos["Dutching Bet"]), 2)
+        df_cavalos["ROI (%)"] = round((df_cavalos["Gain Dutch"] / df_cavalos["Dutching Bet"]) * 100, 2)
         total_dutching = df_cavalos["Dutching Bet"].sum()
         lucro = df_cavalos["ROI-Dutch"].sum()
         st.write("##### | Resultados")
-        st.dataframe(df_cavalos[["Nome", "Odds", "Probabilidade", "Dutching Bet", "Lucro Dutch", "ROI-Dutch", "ROI (%)"]])
+        st.dataframe(df_cavalos[["Nome", "Odds", "Probabilidade", "Dutching Bet", "Gain Dutch", "ROI-Dutch", "ROI (%)"]])
         st.write(f"💰 **Total de Aposta:** {total_dutching:.2f}")
         st.write(f"💸 **Retorno Esperado:** {lucro:.2f}")
         st.write("")
@@ -445,14 +445,14 @@ with tab4:
         desempenho_ajustado = melhor_equipe.get("Desempenho Médio Ajustado", 1.0)  # Valor padrão seguro
         ajuste_percentual = st.slider("Defina o ajuste percentual baseado no desempenho (%)", 0.1, 2.0, 0.2, 0.05) / max(desempenho_ajustado, 0.01)
         df_cavalos["Adjusted Bet"] = round(df_cavalos["Dutching Bet"] * ajuste_percentual, 2)
-        df_cavalos["Lucro Adjusted"] = round(df_cavalos["Adjusted Bet"] * df_cavalos["Odds"], 2)
+        df_cavalos["Gain Adjusted"] = round(df_cavalos["Adjusted Bet"] * df_cavalos["Odds"], 2)
         total_adjusted = df_cavalos["Adjusted Bet"].sum()
-        lucro_adjusted = df_cavalos["Lucro Adjusted"].sum() - df_cavalos["Adjusted Bet"].sum()
+        lucro_adjusted = df_cavalos["Gain Adjusted"].sum() - df_cavalos["Adjusted Bet"].sum()
         st.write("")
     
 # Exibir rebalanceamento
         st.write("##### | Apostas Rebalanceadas com Desempenho")
-        st.dataframe(df_cavalos[["Nome", "Odds", "Dutching Bet", "Adjusted Bet", "Lucro Adjusted"]])
+        st.dataframe(df_cavalos[["Nome", "Odds", "Dutching Bet", "Adjusted Bet", "Gain Adjusted"]])
         st.write(f"💰 **Total de Aposta Ajustado:** {total_adjusted:.2f}")
         st.write(f"💸 **Retorno Esperado:** {lucro_adjusted:.2f}")
         st.write("")
@@ -505,7 +505,7 @@ with tab4:
     
         <h2>📊 Totais</h2>
         <p><strong>Total de Bet Ajustado:</strong> {total_adjusted:.2f}</p>
-        <p><strong>Lucro Ajustado:</strong> {lucro_adjusted:.2f}</p>
+        <p><strong>Gain Ajustado:</strong> {lucro_adjusted:.2f}</p>
         """
     
 # 🔹 Salvar arquivo HTML temporário e converter para PDF
