@@ -456,8 +456,8 @@ with tab4:
         st.write(f"💰 **Total de Aposta Ajustado:** {total_adjusted:.2f}")
         st.write(f"💸 **Retorno Esperado:** {lucro_adjusted:.2f}")
         st.write("")
+# st.write("##### | Apostas Rebalanceadas (Filtro por Desvio Padrão)")
         st.markdown("<h5 style='text-align: center;'>| Apostas Rebalanceadas (Filtro por Desvio Padrão)</h5>", unsafe_allow_html=True)
-        # st.write("##### | Apostas Rebalanceadas (Filtro por Desvio Padrão)")
         st.write("")
         
 # 🔹 Criar layout com duas colunas
@@ -480,10 +480,16 @@ with tab4:
     
 # 🔹 Aplicar rebalanceamento pós-filtragem
             df_cavalos_filtrado["Dutching Bet Ajustado"] = df_cavalos_filtrado["Adjusted Bet"]
+            total_apostado = df_cavalos_filtrado["Dutching Bet Ajustado"].sum()
+            retorno_esperado = (df_cavalos_filtrado["Dutching Bet Ajustado"] * df_cavalos_filtrado["Odds"]).sum()
             st.write("")
             st.write("")
             st.write("")
             st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Dutching Bet Ajustado"]])
+# 🔹 Exibir total apostado e retorno esperado
+        st.write(f"💰 **Total Apostado (pós filtro):** {total_apostado:.2f}")
+        st.write(f"📈 **Retorno Esperado:** {retorno_esperado:.2f}")
+        
         else:
             st.warning("⚠️ Nenhum ajuste foi aplicado às apostas devido à ausência de dados válidos.")
             
