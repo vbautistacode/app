@@ -477,6 +477,13 @@ with tab4:
         st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
         st.dataframe(df_desempenho)
 
+        st.write("🔎 Dados carregados de df_desempenho:")
+        st.dataframe(df_desempenho)
+
+        st.write("🔎 Dados carregados de df_cavalos:")
+        st.dataframe(df_cavalos)
+
+    
 # 🔹 Carregar dados de desempenho da sessão
     df_desempenho = st.session_state.get("team_data", [])
     
