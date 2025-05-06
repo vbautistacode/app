@@ -432,6 +432,7 @@ with tab4:
         st.write(f"💰 **Total de Aposta:** {total_dutching:.2f}")
         st.write(f"💸 **Retorno Esperado:** {lucro:.2f}")
         st.write("")
+        st.divider()  # Adiciona uma linha separadora
 
 # Ajustar aposta por `melhor_equipe`
     if not df_desempenho.empty:
@@ -440,6 +441,7 @@ with tab4:
 # Exibir melhor equipe
         st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
         st.dataframe(df_desempenho)
+        st.divider()  # Adiciona uma linha separadora
 
 #🔹Slide
         desempenho_ajustado = melhor_equipe.get("Desempenho Médio Ajustado", 1.0)  # Valor padrão seguro
@@ -455,6 +457,7 @@ with tab4:
         st.dataframe(df_cavalos[["Nome", "Odds", "Dutching Bet", "Adjusted Bet", "Gain Adjusted"]])
         st.write(f"💰 **Total de Aposta Ajustado:** {total_adjusted:.2f}")
         st.write(f"💸 **Retorno Esperado:** {lucro_adjusted:.2f}")
+        st.divider()  # Adiciona uma linha separadora
         st.write("")
 # st.write("##### | Apostas Rebalanceadas (Filtro por Desvio Padrão)")
         st.markdown("<h5 style='text-align: center;'>| Apostas Rebalanceadas (Filtro por Desvio Padrão)</h5>", unsafe_allow_html=True)
@@ -491,32 +494,4 @@ with tab4:
             st.write(f"📈 **Retorno Esperado:** {retorno_esperado:.2f}")
         else:
             st.warning("⚠️ Nenhum ajuste foi aplicado às apostas devido à ausência de dados válidos.")
-            
-# 🔹 Função para gerar PDF
-    def gerar_pdf(df_cavalos, df_desempenho, total_adjusted, lucro_adjusted):
-        html_content = f"""
-        <h1 style='text-align: center;'>Dutching e Performance de Equipes</h1>
-        
-        <h2>🏆 Melhor Equipe</h2>
-        <p><strong>{df_desempenho.iloc[0]['Nome da Equipe']}</strong> com Desempenho Médio de {df_desempenho.iloc[0]['Desempenho Médio Ajustado']:.2f}</p>
-    
-        <h2>Apostas Rebalanceadas</h2>
-        {df_cavalos.to_html(index=False)}
-    
-        <h2>📊 Totais</h2>
-        <p><strong>Total de Bet Ajustado:</strong> {total_adjusted:.2f}</p>
-        <p><strong>Gain Ajustado:</strong> {lucro_adjusted:.2f}</p>
-        """
-    
-# 🔹 Salvar arquivo HTML temporário e converter para PDF
-        with open("relatorio.html", "w") as f:
-            f.write(html_content)
-    
-        pdfkit.from_file("relatorio.html", "relatorio.pdf")
-    
-        st.success("✅ Relatório PDF gerado com sucesso!")
-    
-# 🔹 Botão para salvar relatório em PDF
-    if st.button("📄 Salvar Relatório em PDF"):
-        gerar_pdf(df_cavalos, df_desempenho, total_adjusted, lucro_adjusted)
-        st.write("📥 **Baixe o arquivo gerado:** [relatorio.pdf](relatorio.pdf)")
+            st.divider()  # Adiciona uma linha separadora
