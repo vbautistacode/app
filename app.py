@@ -115,30 +115,30 @@ def calcular_desempenho_equipes(team_data):
 
 #Rebalanceia as apostas com base no desempenho das equipes
 def rebalance_bets(df_cavalos, bankroll, df_desempenho):
-# 🔹 Verificar se os DataFrames estão vazios antes de processar
-    if df_cavalos.empty:
-        st.warning("⚠️ O DataFrame de cavalos está vazio! Retornando sem ajustes.")
-        return df_cavalos    
-    if df_desempenho.empty:
+#Função para recalcular as apostas com base no desempenho das equipes.
+# 🔹 Validar se `df_desempenho` está preenchido corretamente
+    if df_desempenho.empty or "Nome da Equipe" not in df_desempenho.columns:
         st.warning("⚠️ Nenhum dado de desempenho disponível. Retornando valores sem ajuste.")
         return df_cavalos
-# 🔹 Garantir que 'Nome' exista nos dois DataFrames antes do merge
-    if "Nome" not in df_cavalos.columns or "Nome" not in df_desempenho.columns:
-        st.error("❌ Erro: A coluna 'Nome' não foi encontrada em um dos DataFrames!")
-        return df_cavalos    
-    df_cavalos = df_cavalos.copy()
-    df_cavalos = df_cavalos.merge(df_desempenho, on="Nome", how="left")
-# 🔹 Certificar que 'Desempenho Médio Ajustado' foi criado corretamente
-    if "Desempenho Médio Ajustado" not in df_cavalos.columns:
-        st.warning("⚠️ A coluna 'Desempenho Médio Ajustado' não foi encontrada após o merge. Verifique os dados.")
+# 🔹 Renomear coluna para garantir compatibilidade no merge
+    df_desempenho.rename(columns={"Nome da Equipe": "Nome"}, inplace=True)
+# 🔹 Validar se `df_cavalos` contém a coluna necessária para o merge
+    if "Nome" not in df_cavalos.columns:
+        st.error("❌ Erro: A coluna 'Nome' não está presente em df_cavalos!")
         return df_cavalos
-    df_cavalos["Desempenho Médio Ajustado"] = df_cavalos["Desempenho Médio Ajustado"].fillna(0)
-# 🔹 Aplicar ajustes apenas se 'Dutching Bet' existir
-    if "Dutching Bet" in df_cavalos.columns:
-        df_cavalos["Dutching Bet"] *= (1 + df_cavalos["Desempenho Médio Ajustado"] / 100)
+# 🔹 Garantir que não há valores nulos na coluna 'Nome'
+    df_cavalos["Nome"] = df_cavalos["Nome"].fillna("Desconhecido")
+    df_desempenho["Nome"] = df_desempenho["Nome"].fillna("Desconhecido")
+# 🔹 Executar o merge corretamente
+    df_cavalos_filtrado = df_cavalos.merge(df_desempenho, on="Nome", how="left")
+# 🔹 Certificar que 'Desempenho Médio Ajustado' está preenchido corretamente
+    if "Desempenho Médio Ajustado" in df_cavalos_filtrado.columns:
+        df_cavalos_filtrado["Desempenho Médio Ajustado"] = df_cavalos_filtrado["Desempenho Médio Ajustado"].fillna(0)
+        df_cavalos_filtrado["Dutching Bet"] *= (1 + df_cavalos_filtrado["Desempenho Médio Ajustado"] / 100)
     else:
-        st.warning("⚠️ A coluna 'Dutching Bet' não foi encontrada! Verifique os cálculos anteriores.")
-    return df_cavalos
+        st.warning("⚠️ A coluna 'Desempenho Médio Ajustado' não foi encontrada! O ajuste não será aplicado.")
+
+    return df_cavalos_filtrado
 
 # --- Interface Streamlit ---
 st.title("Apostas | Estratégias Dutching")
