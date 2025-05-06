@@ -456,8 +456,8 @@ with tab4:
     
 # 🔹 Coluna 1: Slider para ajuste do fator de exclusão
     with col1:
-        fator_exclusao = st.radio("Ajuste o fator de exclusão (Desvio Padrão)", [0.0, 0.25, 0.50, 0.75, 1.0, 1.25, 1.50, 1.75, 2.0])
         st.write("##### | Apostas Rebalanceadas (Filtro por Desvio Padrão)")
+        fator_exclusao = st.radio("Ajuste o fator de exclusão (Desvio Padrão)", [0.0, 0.25, 0.50, 0.75, 1.0, 1.25, 1.50, 1.75, 2.0])
         
 # 🔹 Coluna 2: Aplicação do filtro e exibição das apostas ajustadas
     with col2:
