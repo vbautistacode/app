@@ -426,7 +426,7 @@ with tab4:
         df_cavalos["ROI-Dutch"] = round((df_cavalos["Gain Dutch"] - df_cavalos["Dutching Bet"]), 2)
         df_cavalos["ROI (%)"] = round((df_cavalos["Gain Dutch"] / df_cavalos["Dutching Bet"]) * 100, 2)
         total_dutching = df_cavalos["Dutching Bet"].sum()
-        lucro = df_cavalos["ROI-Dutch"].iloc[0]
+        lucro = df_cavalos["Gain-Dutch"].iloc[0]
         st.dataframe(df_cavalos[["Nome", "Odds", "Probabilidade", "Dutching Bet", "Gain Dutch", "ROI-Dutch", "ROI (%)"]])
         st.write(f"💰 **Total de Aposta:** {total_dutching:.2f}")
         st.write(f"💸 **Retorno Esperado:** {lucro:.2f}")
