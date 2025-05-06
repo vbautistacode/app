@@ -473,6 +473,10 @@ with tab4:
         st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
         st.dataframe(df_desempenho)
         
+        st.write("🔎 Colunas de df_desempenho:", df_desempenho.columns)
+    if "Desempenho Médio Ajustado" not in df_desempenho.columns:
+        st.error("❌ Erro: A coluna 'Desempenho Médio Ajustado' não foi encontrada em df_desempenho!")
+        
 # Rebalanceamento 🔹 Carregar dados preenchidos da sessão
     if "team_data" in st.session_state and st.session_state["team_data"]:
         df_desempenho = pd.DataFrame(st.session_state["team_data"])
