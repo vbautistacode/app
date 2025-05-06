@@ -113,43 +113,26 @@ def calcular_desempenho_equipes(team_data):
 
     return pd.DataFrame(df_desempenho_lista).sort_values(by="Desempenho Médio Ajustado", ascending=False)
 
-def rebalance_bets(df_cavalos, df_desempenho):
-    """ Ajusta as apostas Dutching com base na normalização do desempenho das equipes. """
+def filtrar_cavalos(df_cavalos, df_desempenho, fator_exclusao=1.0):
+    """ Remove cavalos com desempenho abaixo da média estatística. """
 
-    # 🔹 Verificar se df_desempenho contém os dados necessários
-    if df_desempenho.empty or "Nome da Equipe" not in df_desempenho.columns or "Desempenho Médio Ajustado" not in df_desempenho.columns:
-        st.warning("⚠️ Nenhum dado de desempenho disponível. Retornando valores sem ajuste.")
-        return df_cavalos.copy()
-
-    # 🔹 Renomear coluna para compatibilidade no merge
+    # 🔹 Renomeia a coluna para permitir o merge
     df_desempenho.rename(columns={"Nome da Equipe": "Nome"}, inplace=True)
 
-    # 🔹 Garantir que df_cavalos possui a coluna 'Nome'
-    if "Nome" not in df_cavalos.columns:
-        st.error("❌ Erro: A coluna 'Nome' não está presente em df_cavalos!")
-        return df_cavalos.copy()
-
-    # 🔹 Normalizar valores de desempenho
-    min_desemp = df_desempenho["Desempenho Médio Ajustado"].min()
-    max_desemp = df_desempenho["Desempenho Médio Ajustado"].max()
-
-    if min_desemp != max_desemp:
-        df_desempenho["Desempenho Normalizado"] = (df_desempenho["Desempenho Médio Ajustado"] - min_desemp) / (max_desemp - min_desemp)
-    else:
-        df_desempenho["Desempenho Normalizado"] = 0  # Caso todos os valores sejam iguais
-
-    df_desempenho["Desempenho Normalizado"] = df_desempenho["Desempenho Normalizado"].fillna(0)
-
-    # 🔹 Realizar merge entre apostas e desempenho
+    # 🔹 Realiza o merge dos dados
     df_cavalos_filtrado = df_cavalos.merge(df_desempenho, on="Nome", how="left")
 
-    # 🔹 Ajustar apostas proporcionalmente ao desempenho normalizado
-    if "Desempenho Normalizado" in df_cavalos_filtrado.columns:
-        df_cavalos_filtrado["Desempenho Normalizado"] = df_cavalos_filtrado["Desempenho Normalizado"].fillna(0)
-        df_cavalos_filtrado["Dutching Bet Ajustado"] = df_cavalos_filtrado["Dutching Bet"] * (1 + df_cavalos_filtrado["Desempenho Normalizado"] * 1.5)  # Ajuste proporcional
+    if "Desempenho Médio Ajustado" in df_cavalos_filtrado.columns:
+        # 🔹 Calcula média e desvio padrão
+        media_desemp = df_cavalos_filtrado["Desempenho Médio Ajustado"].mean()
+        desvio_desemp = df_cavalos_filtrado["Desempenho Médio Ajustado"].std()
+
+        # 🔹 Aplica filtro baseado no desvio padrão
+        limite_exclusao = media_desemp - (fator_exclusao * desvio_desemp)
+        df_cavalos_filtrado = df_cavalos_filtrado[df_cavalos_filtrado["Desempenho Médio Ajustado"] >= limite_exclusao]
+
     else:
-        st.warning("⚠️ A coluna 'Desempenho Normalizado' não foi encontrada! O ajuste não será aplicado.")
-        df_cavalos_filtrado["Dutching Bet Ajustado"] = df_cavalos_filtrado["Dutching Bet"]  # Mantém valores originais
+        st.warning("⚠️ Dados de desempenho ausentes! Nenhum cavalo foi filtrado.")
 
     return df_cavalos_filtrado
 
@@ -477,11 +460,41 @@ with tab4:
         st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
         st.dataframe(df_desempenho)
     
-# 🔹 Exibir resultados apenas com Nome, Odds e Dutching Bet Ajustado
-if not df_cavalos_filtrado.empty and "Adjusted Bet" in df_cavalos_filtrado.columns:
-    st.write("#### Apostas Rebalanceadas (Ajuste Aplicado)")
+# 🔹 Carregar dados de desempenho e apostas da sessão
+    df_desempenho = st.session_state.get("team_data", [])
+    df_cavalos = st.session_state.get("horse_data", [])
     
-    # 🔹 Exibe tabela formatada apenas com dados essenciais
-    st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Adjusted Bet"]])
-else:
-    st.warning("⚠️ Nenhum ajuste foi aplicado às apostas devido à ausência de dados válidos.")
+    # 🔹 Criar DataFrames apenas se houver dados válidos
+    if isinstance(df_desempenho, list) and len(df_desempenho) > 0:
+        df_desempenho = pd.DataFrame(df_desempenho)
+        if "Nome da Equipe" not in df_desempenho.columns or "Desempenho Médio Ajustado" not in df_desempenho.columns:
+            st.error("❌ Erro: Dados de desempenho incompletos!")
+    else:
+        st.warning("⚠️ Nenhum dado válido de desempenho foi encontrado!")
+        df_desempenho = pd.DataFrame(columns=["Nome da Equipe", "Desempenho Médio Ajustado"])
+    
+    if isinstance(df_cavalos, list) and len(df_cavalos) > 0:
+        df_cavalos = pd.DataFrame(df_cavalos)
+        if "Nome" not in df_cavalos.columns or "Dutching Bet" not in df_cavalos.columns:
+            st.error("❌ Erro: Dados de apostas incompletos!")
+    else:
+        st.warning("⚠️ Nenhum dado válido de apostas foi encontrado!")
+        df_cavalos = pd.DataFrame(columns=["Nome", "Odds", "Dutching Bet"])
+    
+    # 🔹 Aplicar filtro para excluir cavalos com desempenho abaixo da média estatística
+    df_cavalos_filtrado = filtrar_cavalos(df_cavalos, df_desempenho, fator_exclusao=1.0)
+    
+    # 🔹 Aplicar rebalanceamento após o filtro
+    if not df_cavalos_filtrado.empty:
+        df_cavalos_filtrado = rebalance_bets(df_cavalos_filtrado, df_desempenho)
+    else:
+        st.warning("⚠️ Todos os cavalos estavam abaixo do critério mínimo e foram removidos!")
+        df_cavalos_filtrado = pd.DataFrame(columns=["Nome", "Odds", "Dutching Bet Ajustado"])
+    
+    # 🔹 Exibir resultados apenas com Nome, Odds e Dutching Bet Ajustado
+    if not df_cavalos_filtrado.empty and "Dutching Bet Ajustado" in df_cavalos_filtrado.columns:
+        st.write("### Apostas Rebalanceadas (Filtragem e Ajuste Aplicado)")
+        st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Dutching Bet Ajustado"]])
+    else:
+        st.warning("⚠️ Nenhum ajuste foi aplicado às apostas devido à ausência de dados válidos.")
+    
