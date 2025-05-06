@@ -459,48 +459,6 @@ with tab4:
 # Exibir melhor equipe
         st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
         st.dataframe(df_desempenho)
-    
-# 🔹 Carregar dados de desempenho e apostas da sessão
-    df_desempenho = st.session_state.get("team_data", [])
-    df_cavalos = st.session_state.get("horse_data", [])
-    
-    # 🔹 Criar DataFrames apenas se houver dados válidos
-    if isinstance(df_desempenho, list) and len(df_desempenho) > 0:
-        df_desempenho = pd.DataFrame(df_desempenho)
-        if "Nome da Equipe" not in df_desempenho.columns or "Desempenho Médio Ajustado" not in df_desempenho.columns:
-            st.error("❌ Erro: Dados de desempenho incompletos!")
-    else:
-        st.warning("⚠️ Nenhum dado válido de desempenho foi encontrado!")
-        df_desempenho = pd.DataFrame(columns=["Nome da Equipe", "Desempenho Médio Ajustado"])
-    
-    if isinstance(df_cavalos, list) and len(df_cavalos) > 0:
-        df_cavalos = pd.DataFrame(df_cavalos)
-        if "Nome" not in df_cavalos.columns or "Dutching Bet" not in df_cavalos.columns:
-            st.error("❌ Erro: Dados de apostas incompletos!")
-    else:
-        st.warning("⚠️ Nenhum dado válido de apostas foi encontrado!")
-        df_cavalos = pd.DataFrame(columns=["Nome", "Odds", "Dutching Bet"])
-    
-    # 🔹 Aplicar filtro para excluir cavalos com desempenho abaixo da média estatística
-        df_cavalos_filtrado = filtrar_cavalos(df_cavalos, df_desempenho, fator_exclusao=1.0)
-    
-    # 🔹 Aplicar rebalanceamento após o filtro
-        # 🔹 Adicionar um controle deslizante para ajustar o fator de exclusão
-        fator_exclusao = st.slider("Ajuste o fator de exclusão (Desvio padrão)", 0.0, 2.0, 1.0, 0.1)
 
-# 🔹 Aplicar filtragem com base no fator ajustado manualmente
-        df_cavalos_filtrado = filtrar_cavalos(df_cavalos, df_desempenho, fator_exclusao)
-
-# 🔹 Continuar com o rebalanceamento após a filtragem
-    if not df_cavalos_filtrado.empty:
-        df_cavalos_filtrado = rebalance_bets(df_cavalos_filtrado, df_desempenho)
-    else:
-        st.warning("⚠️ Todos os cavalos estavam abaixo do critério mínimo e foram removidos!")
-        df_cavalos_filtrado = pd.DataFrame(columns=["Nome", "Odds", "Dutching Bet"])
-    
-    # 🔹 Exibir resultados ajustados
-    if not df_cavalos_filtrado.empty and "Dutching Bet Ajustado" in df_cavalos_filtrado.columns:
-        st.write("### Apostas Rebalanceadas (Filtragem e Ajuste Aplicado)")
-        st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Dutching Bet"]])
-    else:
-        st.warning("⚠️ Nenhum ajuste foi aplicado às apostas devido à ausência de dados válidos.")
+        st.write("### Apostas Ajustadas com Desempenho")
+        st.dataframe(df_cavalos[["Nome", "Odds", "Dutching Bet", "Adjusted Bet"]])
