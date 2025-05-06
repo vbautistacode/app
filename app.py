@@ -440,11 +440,6 @@ with tab4:
         st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
         st.dataframe(df_desempenho)
     
-        df_cavalos_filtrado = rebalance_bets(df_cavalos, df_desempenho)
-
-    if df_cavalos_filtrado is None:
-        st.error("❌ Erro: rebalance_bets() não retornou um DataFrame!")
-    
 #Função PDF    
 def generate_pdf(df_cavalos_filtrado, df_desempenho, locais_prova):
     pdf = FPDF()
