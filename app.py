@@ -427,11 +427,9 @@ with tab4:
         df_cavalos["ROI (%)"] = round((df_cavalos["Gain Dutch"] / df_cavalos["Dutching Bet"]) * 100, 2)
         total_dutching = df_cavalos["Dutching Bet"].sum()
         lucro = df_cavalos["ROI-Dutch"].sum()
-        st.write("##### | Resultados")
         st.dataframe(df_cavalos[["Nome", "Odds", "Probabilidade", "Dutching Bet", "Gain Dutch", "ROI-Dutch", "ROI (%)"]])
         st.write(f"💰 **Total de Aposta:** {total_dutching:.2f}")
         st.write(f"💸 **Retorno Esperado:** {lucro:.2f}")
-        st.write("")
         st.divider()  # Adiciona uma linha separadora
 
 # Ajustar aposta por `melhor_equipe`
