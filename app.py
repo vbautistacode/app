@@ -442,6 +442,7 @@ with tab4:
         st.divider()  # Adiciona uma linha separadora
 
 #🔹Slide
+        st.write("##### | Apostas Rebalanceadas com Desempenho")
         desempenho_ajustado = melhor_equipe.get("Desempenho Médio Ajustado", 1.0)  # Valor padrão seguro
         ajuste_percentual = st.slider("Defina o ajuste percentual baseado no desempenho (%)", 0.1, 2.0, 0.2, 0.05) / max(desempenho_ajustado, 0.01)
         df_cavalos["Adjusted Bet"] = round(df_cavalos["Dutching Bet"] * ajuste_percentual, 2)
@@ -451,12 +452,10 @@ with tab4:
         st.write("")
     
 # Exibir rebalanceamento
-        st.write("##### | Apostas Rebalanceadas com Desempenho")
         st.dataframe(df_cavalos[["Nome", "Odds", "Dutching Bet", "Adjusted Bet", "Gain Adjusted"]])
         st.write(f"💰 **Total de Aposta Ajustado:** {total_adjusted:.2f}")
         st.write(f"💸 **Retorno Esperado:** {lucro_adjusted:.2f}")
         st.divider()  # Adiciona uma linha separadora
-        st.write("")
 # st.write("##### | Apostas Rebalanceadas (Filtro por Desvio Padrão)")
         st.markdown("<h5 style='text-align: center;'>| Apostas Rebalanceadas (Filtro por Desvio Padrão)</h5>", unsafe_allow_html=True)
         st.write("")
