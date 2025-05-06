@@ -424,9 +424,11 @@ with tab4:
         df_cavalos["Lucro Dutch"] = round(df_cavalos["Odds"] * df_cavalos["Dutching Bet"], 2)
         df_cavalos["ROI-Dutch($)"] = round((df_cavalos["Lucro Dutch"] - df_cavalos["Dutching Bet"]), 2)
         df_cavalos["ROI (%)"] = round((df_cavalos["Lucro Dutch"] / df_cavalos["Dutching Bet"]) * 100, 2)
+        total_dutching = df_cavalos["Dutching Bet"].sum()
         st.write("##### Resultados | Dutching")
         st.dataframe(df_cavalos[["Nome", "Odds", "Probabilidade", "Dutching Bet", "Lucro Dutch", "ROI-Dutch($)", "ROI (%)"]])
-
+        st.write(f"💰 **Total de Dutching Bet:** {total_dutching:.2f}")
+        
 # Ajustar aposta por `melhor_equipe`
     if not df_desempenho.empty:
         melhor_equipe = df_desempenho.iloc[0]
@@ -443,7 +445,7 @@ with tab4:
 # Exibir rebalanceamento
         st.write("##### Apostas Rebalanceadas com Desempenho")
         st.dataframe(df_cavalos[["Nome", "Odds", "Dutching Bet", "Adjusted Bet"]])
-        st.write(f"💰 **Total de Dutching Bet:** {total_adjusted:.2f}")
+        st.write(f"💰 **Total de Bet Ajustado:** {total_adjusted:.2f}")
         
 #🔹Slider 
         fator_exclusao = st.radio("Ajuste o fator de exclusão (Desvio Padrão)", [0.0, 0.25, 0.50, 0.75, 1.0, 1.25, 1.50, 0.75, 2.0])
