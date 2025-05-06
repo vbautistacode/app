@@ -429,17 +429,27 @@ with tab4:
         df_cavalos = pd.DataFrame(columns=["Nome", "Odds", "Dutching Bet", "Gain Dutch"])
     
 # Cálculo de probabilidades e apostas Dutching
-    if not df_cavalos.empty and "Odds" in df_cavalos.columns:
-        df_cavalos["Probabilidade"] = (1 / df_cavalos["Odds"]).round(2)
-        df_cavalos["Dutching Bet"] = calculate_dutching(df_cavalos["Odds"], bankroll, np.ones(len(df_cavalos)))
-        df_cavalos["Gain Dutch"] = round(df_cavalos["Odds"] * df_cavalos["Dutching Bet"], 2)
-        df_cavalos["ROI-Dutch"] = round((df_cavalos["Gain Dutch"] - df_cavalos["Dutching Bet"]), 2)
-        df_cavalos["ROI (%)"] = round((df_cavalos["Gain Dutch"] / df_cavalos["Dutching Bet"]) * 100, 2)
-        total_dutching = df_cavalos["Dutching Bet"].sum()
-        lucro = df_cavalos["Gain Dutch"].iloc[0]
-        st.dataframe(df_cavalos[["Nome", "Odds", "Probabilidade", "Dutching Bet", "Gain Dutch", "ROI-Dutch", "ROI (%)"]])
+    if not df_cavalos.empty and "Odds" in df_cavalos.columns:        
+# Criar seletor de nomes para filtrar os cavalos
+        nomes_selecionados = st.multiselect("Selecione os cavalos para aplicar o filtro:", df_cavalos["Nome"].unique())
+# Aplicar filtro ao DataFrame antes dos cálculos
+        if nomes_selecionados:
+            df_cavalos_filtrado = df_cavalos[df_cavalos["Nome"].isin(nomes_selecionados)]
+        else:
+            df_cavalos_filtrado = df_cavalos  # Se nada for selecionado, todos os dados são usados    
+# Realizar cálculos apenas nos dados filtrados
+        df_cavalos_filtrado["Probabilidade"] = (1 / df_cavalos_filtrado["Odds"]).round(2)
+        df_cavalos_filtrado["Dutching Bet"] = calculate_dutching(df_cavalos_filtrado["Odds"], bankroll, np.ones(len(df_cavalos_filtrado)))
+        df_cavalos_filtrado["Gain Dutch"] = round(df_cavalos_filtrado["Odds"] * df_cavalos_filtrado["Dutching Bet"], 2)
+        df_cavalos_filtrado["ROI-Dutch"] = round((df_cavalos_filtrado["Gain Dutch"] - df_cavalos_filtrado["Dutching Bet"]), 2)
+        df_cavalos_filtrado["ROI (%)"] = round((df_cavalos_filtrado["Gain Dutch"] / df_cavalos_filtrado["Dutching Bet"]) * 100, 2)    
+# Calcular totais
+        total_dutching = df_cavalos_filtrado["Dutching Bet"].sum()
+        lucro = df_cavalos_filtrado["Gain Dutch"].iloc[0]
+# Exibir os resultados filtrados
+        st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Probabilidade", "Dutching Bet", "Gain Dutch", "ROI-Dutch", "ROI (%)"]])
         st.write(f"💰 **Total de Aposta:** R$ {total_dutching:.2f}")
-        st.write(f"💸 **Retorno Esperado:** R$ {lucro:.2f}")
+        st.write(f"📈 **Retorno Esperado:** R$ {lucro:.2f}")
         st.divider()  # Adiciona uma linha separadora
 
 # Ajustar aposta por `melhor_equipe`
@@ -477,7 +487,7 @@ with tab4:
     
 # 🔹 Coluna 1: Slider para ajuste do fator de exclusão
     with col1:
-        fator_exclusao = st.radio("Ajuste o fator de exclusão (Desvio Padrão)", [0.0, 0.25, 0.50, 0.75, 1.0, 1.25, 1.50, 1.75, 2.0])
+        fator_exclusao = st.radio("Ajuste o fator de exclusão (Desvio Padrão)", [0.0, 0.25, 0.50, 0.75, 1.0])
         
 # 🔹 Coluna 2: Aplicação do filtro e exibição das apostas ajustadas
     with col2:
