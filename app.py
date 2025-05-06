@@ -117,7 +117,6 @@ def rebalance_bets(df_cavalos, df_desempenho):
 #Reajusta as apostas Dutching com base no peso relativo ao desempenho das equipes.
 # 🔹 Verificar se df_desempenho contém a coluna necessária
     if df_desempenho.empty or "Nome da Equipe" not in df_desempenho.columns:
-        st.warning("⚠️ Nenhum dado de desempenho disponível. Retornando valores sem ajuste.")
         return df_cavalos.copy()
 # 🔹 Renomear coluna para compatibilidade no merge
     df_desempenho.rename(columns={"Nome da Equipe": "Nome"}, inplace=True)
@@ -485,11 +484,11 @@ with tab4:
 df_cavalos_filtrado = rebalance_bets(df_cavalos, df_desempenho)
 
 # 🔹 Exibir resultados apenas se houver dados filtrados
-if not df_cavalos_filtrado.empty:
-    st.write("### Apostas Rebalanceadas")
-    st.dataframe(df_cavalos_filtrado)
-else:
-    st.warning("⚠️ Ainda sem dados de desempenho! Apostas permanecerão sem ajustes.")
+    if not df_cavalos_filtrado.empty:
+        st.write("### Apostas Rebalanceadas")
+        st.dataframe(df_cavalos_filtrado)
+    else:
+        st.warning("⚠️ Ainda sem dados de desempenho! Apostas permanecerão sem ajustes.")
     
 #Função PDF    
 def generate_pdf(df_cavalos_filtrado, df_desempenho, locais_prova):
@@ -520,7 +519,7 @@ def generate_pdf(df_cavalos_filtrado, df_desempenho, locais_prova):
         if "locais_prova" in st.session_state and st.session_state["locais_prova"]:
             locais_prova = st.session_state["locais_prova"]  # Recupera local da prova da aba1
             pdf_file = generate_pdf(df_cavalos_filtrado, df_desempenho, locais_prova)
-            with open(pdf_file, "rb") as f:
-                st.download_button(label="📄 Baixar Relatório em PDF", data=f, file_name=pdf_file, mime="application/pdf")
-        else:
-            st.warning("⚠️ O local da prova ainda não foi definido na aba1! Adicione antes de gerar o relatório.")
+        with open(pdf_file, "rb") as f:
+            st.download_button(label="📄 Baixar Relatório em PDF", data=f, file_name=pdf_file, mime="application/pdf")
+    else:
+        st.warning("⚠️ O local da prova ainda não foi definido na aba1! Adicione antes de gerar o relatório.")
