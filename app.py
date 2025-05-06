@@ -433,10 +433,7 @@ with tab4:
 # Criar seletor de nomes para filtrar os cavalos
         nomes_selecionados = st.multiselect("Selecione os cavalos para aplicar o filtro:", df_cavalos["Nome"].unique())
 # Aplicar filtro ao DataFrame antes dos cálculos
-        if nomes_selecionados:
-            df_cavalos_filtrado = df_cavalos[df_cavalos["Nome"].isin(nomes_selecionados)]
-        else:
-            df_cavalos_filtrado = df_cavalos  # Se nada for selecionado, todos os dados são usados    
+        df_cavalos_filtrado = df_cavalos[df_cavalos["Nome"].isin(nomes_selecionados)] if nomes_selecionados else df_cavalos
 # Realizar cálculos apenas nos dados filtrados
         df_cavalos_filtrado["Probabilidade"] = (1 / df_cavalos_filtrado["Odds"]).round(2)
         df_cavalos_filtrado["Dutching Bet"] = calculate_dutching(df_cavalos_filtrado["Odds"], bankroll, np.ones(len(df_cavalos_filtrado)))
@@ -450,7 +447,7 @@ with tab4:
         st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Probabilidade", "Dutching Bet", "Gain Dutch", "ROI-Dutch", "ROI (%)"]])
         st.write(f"💰 **Total de Aposta:** R$ {total_dutching:.2f}")
         st.write(f"📈 **Retorno Esperado:** R$ {lucro:.2f}")
-        st.divider()  # Adiciona uma linha separadora
+        st.divider()
 
 # Ajustar aposta por `melhor_equipe`
     if not df_desempenho.empty:
