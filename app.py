@@ -482,7 +482,7 @@ with tab4:
             df_cavalos_filtrado["Dutching Bet Ajustado"] = df_cavalos_filtrado["Adjusted Bet"]
             df_cavalos_filtrado["Lucro Potencial"] = df_cavalos_filtrado["Dutching Bet Ajustado"] * df_cavalos_filtrado["Odds"]
             total_apostado = df_cavalos_filtrado["Dutching Bet Ajustado"].sum()
-            retorno_esperado = ((df_cavalos_filtrado["Dutching Bet Ajustado"] * df_cavalos_filtrado["Odds"]).sum()) - df_cavalos_filtrado["Dutching Bet Ajustado"].sum()
+            retorno_esperado = ((df_cavalos_filtrado["Dutching Bet Ajustado"].iloc[0]
             st.write("")
             st.write("")
             st.write("")
