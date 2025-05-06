@@ -428,8 +428,8 @@ with tab4:
         total_dutching = df_cavalos["Dutching Bet"].sum()
         lucro = df_cavalos["Gain Dutch"].iloc[0]
         st.dataframe(df_cavalos[["Nome", "Odds", "Probabilidade", "Dutching Bet", "Gain Dutch", "ROI-Dutch", "ROI (%)"]])
-        st.write(f"💰 **Total de Aposta:** {total_dutching:.2f}")
-        st.write(f"💸 **Retorno Esperado:** {lucro:.2f}")
+        st.write(f"💰 **Total de Aposta:** R$ {total_dutching:.2f}")
+        st.write(f"💸 **Retorno Esperado:** R$ {lucro:.2f}")
         st.divider()  # Adiciona uma linha separadora
 
 # Ajustar aposta por `melhor_equipe`
@@ -453,8 +453,8 @@ with tab4:
     
 # Exibir rebalanceamento
         st.dataframe(df_cavalos[["Nome", "Odds", "Dutching Bet", "Adjusted Bet", "Gain Adjusted"]])
-        st.write(f"💰 **Total de Aposta Ajustado:** {total_adjusted:.2f}")
-        st.write(f"💸 **Retorno Esperado:** {lucro_adjusted:.2f}")
+        st.write(f"💰 **Total de Aposta Ajustado:** R$ {total_adjusted:.2f}")
+        st.write(f"💸 **Retorno Esperado:** R$ {lucro_adjusted:.2f}")
         st.divider()  # Adiciona uma linha separadora
 # st.write("##### | Apostas Rebalanceadas (Filtro por Desvio Padrão)")
         st.markdown("<h5 style='text-align: center;'>| Apostas Rebalanceadas (Filtro por Desvio Padrão)</h5>", unsafe_allow_html=True)
@@ -488,8 +488,8 @@ with tab4:
             st.write("")
             st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Bet Ajustado", "Lucro Potencial"]])
 # 🔹 Exibir total apostado e retorno esperado
-            st.write(f"💰 **Total Apostado (pós filtro):** {total_apostado:.2f}")
-            st.write(f"📈 **Retorno Esperado:** {retorno_esperado:.2f}")
+            st.write(f"💰 **Total Apostado (pós filtro):** R$ {total_apostado:.2f}")
+            st.write(f"📈 **Retorno Esperado:** R$ {retorno_esperado:.2f}")
         else:
             st.warning("⚠️ Nenhum ajuste foi aplicado às apostas devido à ausência de dados válidos.")
             st.divider()  # Adiciona uma linha separadora
