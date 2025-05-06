@@ -488,8 +488,8 @@ with tab4:
             st.write("")
             st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Bet Ajustado", "Lucro Potencial"]])
 # 🔹 Exibir total apostado e retorno esperado
-            st.write(f"💰 **Total Apostado (pós filtro):** R${total_apostado:.2f}")
-            st.write(f"📈 **Retorno Esperado:** R${retorno_esperado:.2f}")
+            st.write(f"💰 **Total Apostado (pós filtro):** R$ {total_apostado:.2f}")
+            st.write(f"📈 **Retorno Esperado:** R$ {retorno_esperado:.2f}")
         else:
             st.warning("⚠️ Nenhum ajuste foi aplicado às apostas devido à ausência de dados válidos.")
             st.divider()  # Adiciona uma linha separadora
