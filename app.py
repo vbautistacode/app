@@ -114,10 +114,6 @@ def calcular_desempenho_equipes(team_data):
     return pd.DataFrame(df_desempenho_lista).sort_values(by="Desempenho Médio Ajustado", ascending=False)
 
 def rebalance_bets(df_cavalos, df_desempenho):
-import pandas as pd
-import streamlit as st
-
-def rebalance_bets(df_cavalos, df_desempenho):
     """ Reajusta as apostas Dutching com base na normalização do desempenho das equipes. """
 
     # 🔹 Verificar se df_desempenho contém a coluna necessária
