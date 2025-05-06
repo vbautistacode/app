@@ -486,8 +486,8 @@ df_cavalos_filtrado = rebalance_bets(df_cavalos, df_desempenho)
 
 # 🔹 Exibir resultados apenas se houver dados filtrados
     if not df_cavalos_filtrado.empty:
-        st.write("### Apostas Rebalanceadas")
-        st.dataframe(df_cavalos_filtrado)
+            st.write("### Apostas Rebalanceadas")
+            st.dataframe(df_cavalos_filtrado)
     else:
         st.warning("⚠️ Ainda sem dados de desempenho! Apostas permanecerão sem ajustes.")
     
