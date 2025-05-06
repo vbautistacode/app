@@ -443,30 +443,16 @@ with tab4:
         st.write("##### Apostas Rebalanceadas com Desempenho")
         st.dataframe(df_cavalos[["Nome", "Odds", "Dutching Bet", "Adjusted Bet"]])
 
-# 🔹 Criar layout com duas colunas
-col1, col2 = st.columns(2)
-
-# 🔹 Exibir o slider na primeira coluna
-with col1:
-    fator_exclusao = st.radio("Ajuste o fator de exclusão (Desvio Padrão)", [0.0, 0.25, 0.50, 0.75, 1.0, 1.25, 1.50, 1.75, 2.0])
-
-# 🔹 Exibir métricas estatísticas na segunda coluna
-with col2:
-    if not df_cavalos.empty and "Adjusted Bet" in df_cavalos.columns:
-        media_apostas = df_cavalos["Adjusted Bet"].mean()
-        desvio_apostas = df_cavalos["Adjusted Bet"].std()
-        st.write("📊 **Média das apostas:**", round(media_apostas, 2))
-        st.write("📉 **Desvio padrão das apostas:**", round(desvio_apostas, 2))
-
-# 🔹 Aplicar filtragem para excluir cavalos abaixo do limite estatístico
-if not df_cavalos.empty and "Adjusted Bet" in df_cavalos.columns:
-    limite_exclusao = media_apostas - (fator_exclusao * desvio_apostas)
-    df_cavalos_filtrado = df_cavalos[df_cavalos["Adjusted Bet"] >= limite_exclusao]
-
-    # 🔹 Aplicar rebalanceamento pós-filtragem
-    df_cavalos_filtrado["Dutching Bet Ajustado"] = df_cavalos_filtrado["Adjusted Bet"]
-
-    st.write("##### Apostas Rebalanceadas (Filtro por Desvio Padrão)")
-    st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Dutching Bet Ajustado"]])
-else:
-    st.warning("⚠️ Nenhum ajuste foi aplicado às apostas devido à ausência de dados válidos.")
+#🔹Slider 
+        fator_exclusao = st.radio("Ajuste o fator de exclusão (Desvio Padrão)", [0.0, 0.25, 0.50, 0.75, 1.0, 1.25, 1.50, 0.75, 2.0])
+# Aplicar filtragem para excluir cavalos abaixo do limite estatístico
+        if not df_cavalos.empty and "Adjusted Bet" in df_cavalos.columns:
+            media_apostas = df_cavalos["Adjusted Bet"].mean()
+            desvio_apostas = df_cavalos["Adjusted Bet"].std()
+            limite_exclusao = media_apostas - (fator_exclusao * desvio_apostas)
+            df_cavalos_filtrado = df_cavalos[df_cavalos["Adjusted Bet"] >= limite_exclusao]
+            
+# Aplicar rebalanceamento pós-filtrage
+        df_cavalos_filtrado["Dutching Bet Ajustado"] = df_cavalos_filtrado["Adjusted Bet"]
+        st.write("##### Apostas Rebalanceadas (Filtro por Desvio Padrão)")
+        st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Dutching Bet Ajustado"]])
