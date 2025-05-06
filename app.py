@@ -438,35 +438,18 @@ with tab4:
         st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
         st.dataframe(df_desempenho)
 
-# Verificar se há desempenho disponível
-    if not df_desempenho.empty and "Desempenho Médio Ajustado" in df_desempenho.columns:
-        melhor_equipe = df_desempenho.iloc[0]  # Melhor equipe no ranking
-        ajuste_percentual = melhor_equipe["Desempenho Médio Ajustado"] / 100  # Normalização do ajuste
-    else:
-        ajuste_percentual = 1.0  # Valor padrão caso não haja dados
-# Aplicar ajuste às apostas baseado no desempenho
+#🔹Slider
+        ajuste_percentual = st.slider("Defina o ajuste percentual baseado no desempenho (%)",  min_value=0.1, max_value=5.0, value=1.0, step=0.1)
         df_cavalos["Adjusted Bet"] = df_cavalos["Dutching Bet"] * ajuste_percentual
         df_cavalos["Lucro Adjusted"] = round(df_cavalos["Adjusted Bet"] * df_cavalos["Odds"], 2)
         total_adjusted = df_cavalos["Adjusted Bet"].sum()
         st.write("")
+    
 # Exibir rebalanceamento
         st.write("##### | Apostas Rebalanceadas com Desempenho")
         st.dataframe(df_cavalos[["Nome", "Odds", "Dutching Bet", "Adjusted Bet", "Lucro Adjusted"]])
         st.write(f"💰 **Total de Bet Ajustado:** {total_adjusted:.2f}")
         st.write("")
-        
-# #🔹Slider
-#         ajuste_percentual = st.slider("Defina o ajuste percentual baseado no desempenho (%)",  min_value=0.1, max_value=5.0, value=1.0, step=0.1)
-#         df_cavalos["Adjusted Bet"] = df_cavalos["Dutching Bet"] * ajuste_percentual
-#         df_cavalos["Lucro Adjusted"] = round(df_cavalos["Adjusted Bet"] * df_cavalos["Odds"], 2)
-#         total_adjusted = df_cavalos["Adjusted Bet"].sum()
-#         st.write("")
-    
-# # Exibir rebalanceamento
-#         st.write("##### | Apostas Rebalanceadas com Desempenho")
-#         st.dataframe(df_cavalos[["Nome", "Odds", "Dutching Bet", "Adjusted Bet", "Lucro Adjusted"]])
-#         st.write(f"💰 **Total de Bet Ajustado:** {total_adjusted:.2f}")
-#         st.write("")
     
 # 🔹 Criar layout com duas colunas
     col1, col2 = st.columns(2)
