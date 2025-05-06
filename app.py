@@ -463,16 +463,11 @@ with tab4:
         st.write("##### Resultados das Apostas | Dutching")
         st.dataframe(df_cavalos[["Nome", "Odds", "Probabilidade", "Dutching Bet", "Lucro Dutch", "ROI-Dutch($)", "ROI (%)"]])
 
-# Evitar erro ao acessar `melhor_equipe`
-    if not df_desempenho.empty:
-        melhor_equipe = df_desempenho.iloc[0]
-        ajuste_percentual = melhor_equipe["Desempenho Médio Ajustado"] / 100
-        df_cavalos["Adjusted Bet"] = df_cavalos["Dutching Bet"] * (1 + ajuste_percentual)
     
 # Exibir melhor equipe
         st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
         st.dataframe(df_desempenho)
-        st.write("🔎 Colunas disponíveis em df_cavalos_filtrado:", df_cavalos_filtrado.columns)
+        
 # Rebalanceamento 🔹 Carregar dados preenchidos da sessão
     if "team_data" in st.session_state and st.session_state["team_data"]:
         df_desempenho = pd.DataFrame(st.session_state["team_data"])
