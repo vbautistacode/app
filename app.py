@@ -477,8 +477,8 @@ with tab4:
         st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
         st.dataframe(df_desempenho)
 
-        st.write("🔎 Colunas de df_desempenho:", df_desempenho.columns)
-        st.write("🔎 Colunas de df_cavalos:", df_cavalos.columns)
+        st.write("🔎 Dados de df_desempenho antes do rebalanceamento:")
+        st.dataframe(df_desempenho)
     
 # Rebalanceamento 🔹 Carregar dados preenchidos da sessão
     df_desempenho = st.session_state.get("team_data", [])
