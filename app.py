@@ -476,7 +476,11 @@ with tab4:
 # Exibir melhor equipe
         st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
         st.dataframe(df_desempenho)
-                
+
+        st.write("🔎 Dados brutos armazenados na sessão:")
+        st.write("team_data:", st.session_state.get("team_data", "Não encontrado"))
+        st.write("horse_data:", st.session_state.get("horse_data", "Não encontrado"))
+    
 # Rebalanceamento 🔹 Carregar dados preenchidos da sessão
     df_desempenho = st.session_state.get("team_data", [])
     df_cavalos = st.session_state.get("horse_data", [])
