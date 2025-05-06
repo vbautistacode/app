@@ -472,7 +472,9 @@ with tab4:
     
 # 🔹 Aplicar rebalanceamento pós-filtragem
             df_cavalos_filtrado["Dutching Bet Ajustado"] = df_cavalos_filtrado["Adjusted Bet"]
-            
+            st.write("")
+            st.write("")
+            st.write("")
             st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Dutching Bet Ajustado"]])
         else:
             st.warning("⚠️ Nenhum ajuste foi aplicado às apostas devido à ausência de dados válidos.")
