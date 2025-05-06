@@ -454,7 +454,9 @@ with tab4:
 #🔹Slide
         st.write("##### | Apostas Rebalanceadas com Desempenho")
         desempenho_ajustado = melhor_equipe.get("Desempenho Médio Ajustado", 1.0)  # Valor padrão seguro
-        ajuste_percentual = st.slider("Defina o ajuste percentual baseado no desempenho (%)", 0.1, 2.0, 0.2, 0.05) / max(desempenho_ajustado, 0.01)
+        variancia_desempenho = melhor_equipe.get("Variância Desempenho", 0.1)  # Valor padrão seguro
+        ajuste_base = st.slider("Defina o ajuste percentual baseado no desempenho (%)", 0.1, 2.0, 0.2, 0.05)
+        ajuste_percentual = ajuste_base / max(desempenho_ajustado - variancia_desempenho, 0.01)
         df_cavalos["Adjusted Bet"] = round(df_cavalos["Dutching Bet"] * ajuste_percentual, 2)
         df_cavalos["Gain Adjusted"] = round(df_cavalos["Adjusted Bet"] * df_cavalos["Odds"], 2)
         total_adjusted = df_cavalos["Adjusted Bet"].sum()
