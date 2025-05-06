@@ -477,10 +477,19 @@ with tab4:
         st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
         st.dataframe(df_desempenho)
 
-        st.write("🔎 Colunas de df_desempenho:", df_desempenho.columns)
-    
-# Rebalanceamento 🔹 Carregar dados preenchidos da sessão
+# 🔹 Carregar dados preenchidos da sessão
     df_desempenho = st.session_state.get("team_data", [])
+    
+    if isinstance(df_desempenho, list) and len(df_desempenho) > 0:
+        df_desempenho = pd.DataFrame(df_desempenho)
+    
+        if "Nome da Equipe" not in df_desempenho.columns or "Desempenho Médio Ajustado" not in df_desempenho.columns:
+            st.error("❌ Erro: Dados de desempenho estão incompletos! Verifique se foram carregados corretamente.")
+    else:
+        st.warning("⚠️ Nenhum dado válido de desempenho foi encontrado.")
+        df_desempenho = pd.DataFrame(columns=["Nome da Equipe", "Desempenho Médio Ajustado"])
+
+# Rebalanceamento 🔹 Carregar dados preenchidos da sessão
     df_cavalos = st.session_state.get("horse_data", [])
     
     # 🔹 Criar DataFrames somente se houver dados válidos
