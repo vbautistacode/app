@@ -493,25 +493,27 @@ with tab4:
         st.markdown("<h5 style='text-align: center;'>| Apostas Rebalanceadas (Filtro por Desvio Padrão)</h5>", unsafe_allow_html=True)
         st.write("")
         
-# 🔹 Criar layout com duas colunas
+# Criar layout com duas colunas
     col1, col2 = st.columns(2)
     
-# 🔹 Coluna 1: Slider para ajuste do fator de exclusão
+# Coluna 1: Slider para ajuste do fator de exclusão
+if not df_cavalos.empty:
     with col1:
         fator_exclusao = st.radio("Ajuste o fator de exclusão (Desvio Padrão)", [0.0, 0.25, 0.50, 0.75, 1.0])
-        
-# 🔹 Coluna 2: Aplicação do filtro e exibição das apostas ajustadas
+else:
+    st.warning("⚠️ Nenhum dado disponível para ajuste.")       
+# Coluna 2: Aplicação do filtro e exibição das apostas ajustadas
     with col2:
         if not df_cavalos.empty and "Adjusted Bet" in df_cavalos.columns:
-# 🔹 Calcular média e desvio padrão das apostas
+# Calcular média e desvio padrão das apostas
             media_apostas = df_cavalos["Adjusted Bet"].mean()
             desvio_apostas = df_cavalos["Adjusted Bet"].std()
             limite_exclusao = media_apostas - (fator_exclusao * desvio_apostas)
             
-# 🔹 Filtrar cavalos com base no fator de exclusão
+# Filtrar cavalos com base no fator de exclusão
             df_cavalos_filtrado = df_cavalos[df_cavalos["Adjusted Bet"] >= limite_exclusao]
     
-# 🔹 Aplicar rebalanceamento pós-filtragem
+# Aplicar rebalanceamento pós-filtragem
             df_cavalos_filtrado["Bet Ajustado"] = df_cavalos_filtrado["Adjusted Bet"]
             df_cavalos_filtrado["Lucro Potencial"] = round(df_cavalos_filtrado["Bet Ajustado"] * df_cavalos_filtrado["Odds"], 2)
             total_apostado = df_cavalos_filtrado["Bet Ajustado"].sum()
@@ -521,7 +523,7 @@ with tab4:
             st.write("")
             st.write("")
             st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Bet Ajustado", "Lucro Potencial"]].reset_index(drop=True))
-# 🔹 Exibir total apostado e retorno esperado
+# Exibir total apostado e retorno esperado
             st.write(f"💰 **Total Apostado (pós filtro):** R$ {total_apostado:.2f}")
             st.write(f"💸 **Gain Esperado:** R$ {retorno_esperado:.2f}")
             st.write(f"🚀 **Retorno Esperado (bet position):** R$ {retorno_esperado:.2f}")
