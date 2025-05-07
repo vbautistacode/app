@@ -530,3 +530,54 @@ else:
         else:
             st.warning("⚠️ Nenhum ajuste foi aplicado às apostas devido à ausência de dados válidos.")
             st.divider()  # Adiciona uma linha separadora
+
+# import itertools
+
+# def distribuir_aposta(cavalos, odds, investimento_total):
+#     # Passo 1: Ordenar os cavalos pelos menores odds (favoritos)
+#     favoritos = sorted(zip(cavalos, odds), key=lambda x: x[1])[:3]
+#     azarões = sorted(zip(cavalos, odds), key=lambda x: x[1])[3:]
+
+#     # Passo 2: Distribuir 50% do investimento nos favoritos
+#     investimento_favoritos = investimento_total * 0.5
+#     soma_odds_favoritos = sum(odd for _, odd in favoritos)
+    
+#     aposta_favoritos = {cavalo: (odd / soma_odds_favoritos) * investimento_favoritos for cavalo, odd in favoritos}
+    
+#     # Passo 3: Calcular retorno dos favoritos
+#     retorno_favoritos = sum(aposta_favoritos[cavalo] * odd for cavalo, odd in favoritos)
+
+#     # Passo 4: Determinar valor necessário para os azarões para cobrir aposta inicial
+#     investimento_azaroes = investimento_total - investimento_favoritos
+#     soma_odds_azaroes = sum(odd for _, odd in azarões)
+    
+#     aposta_azaroes = {cavalo: (odd / soma_odds_azaroes) * investimento_azaroes for cavalo, odd in azarões}
+    
+#     # Passo 5: Calcular retorno dos azarões
+#     retorno_azaroes = sum(aposta_azaroes[cavalo] * odd for cavalo, odd in azarões)
+
+#     # Exibir resultados
+#     print("\n--- Distribuição das Apostas ---")
+#     print("Favoritos:")
+#     for cavalo, odd in favoritos:
+#         print(f"Cavalo {cavalo}: Odd {odd:.2f} | Aposta R${aposta_favoritos[cavalo]:.2f} | Retorno R${aposta_favoritos[cavalo] * odd:.2f}")
+    
+#     print("\nAzarões:")
+#     for cavalo, odd in azarões:
+#         print(f"Cavalo {cavalo}: Odd {odd:.2f} | Aposta R${aposta_azaroes[cavalo]:.2f} | Retorno R${aposta_azaroes[cavalo] * odd:.2f}")
+    
+#     print("\nResumo:")
+#     print(f"Investimento total: R${investimento_total:.2f}")
+#     print(f"Menor retorno esperado: R${min(retorno_favoritos, retorno_azaroes):.2f}")
+    
+#     if min(retorno_favoritos, retorno_azaroes) >= investimento_total:
+#         print("✅ Aposta otimizada! Nenhum prejuízo garantido.")
+#     else:
+#         print("⚠️ Ajuste necessário! O retorno mínimo ainda está abaixo do investimento.")
+
+# # Exemplo de uso com valores reais
+# cavalos = [1, 2, 3, 4, 5, 6]
+# odds = [1.2, 1.25, 1.44, 1.73, 2.75, 5.00]
+# investimento_total = 250
+
+# distribuir_aposta(cavalos, odds, investimento_total)
