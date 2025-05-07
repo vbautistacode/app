@@ -431,6 +431,7 @@ with tab4:
 # Cálculo de probabilidades e apostas Dutching
     if not df_cavalos.empty and "Odds" in df_cavalos.columns:      
 # Aplicar filtro ao DataFrame antes dos cálculos
+        nomes_selecionados = st.multiselect("Selecione os cavalos:", df_cavalos["Nome"].unique())
         df_cavalos_filtrado = df_cavalos[df_cavalos["Nome"].isin(nomes_selecionados)] if nomes_selecionados else df_cavalos
 # Realizar cálculos apenas nos dados filtrados
         df_cavalos_filtrado["Probabilidade"] = (1 / df_cavalos_filtrado["Odds"]).round(2)
@@ -444,7 +445,6 @@ with tab4:
 # Exibir os resultados filtrados
         st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Probabilidade", "Dutching Bet", "Gain Dutch", "ROI-Dutch", "ROI (%)"]])
 # Criar seletor de nomes com múltipla seleção
-        nomes_selecionados = st.multiselect("Selecione os cavalos:", df_cavalos["Nome"].unique())
         st.write(f"💰 **Total de Aposta:** R$ {total_dutching:.2f}")
         st.write(f"📈 **Retorno Esperado:** R$ {lucro:.2f}")
         st.divider()
