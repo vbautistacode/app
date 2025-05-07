@@ -451,7 +451,7 @@ with tab4:
         lucro = df_cavalos_filtrado["Gain Dutch"].iloc[0]
         lucro1 = df_cavalos_filtrado["Gain Dutch"].sum()
 # Exibir os resultados filtrados
-        st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Probabilidade", "Dutching Bet", "Gain Dutch", "ROI-Dutch", "ROI (%)"]].reset_index(drop=True))
+        st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Probabilidade", "Dutching Bet", "Gain Dutch", "ROI-Dutch", "ROI (%)"]].reset_index(drop=False))
 # Criar seletor de nomes com múltipla seleção
         st.write(f"💰 **Total de Aposta:** R$ {total_dutching:.2f}")
         st.write(f"💸 **Gain Esperado:** R$ {lucro:.2f}")
@@ -464,7 +464,7 @@ with tab4:
         
 # Exibir melhor equipe
         st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
-        st.dataframe(df_desempenho.reset_index(drop=True))
+        st.dataframe(df_desempenho.reset_index(drop=False))
         st.divider()  # Adiciona uma linha separadora
 
 #🔹Slide
@@ -522,7 +522,7 @@ else:
             st.write("")
             st.write("")
             st.write("")
-            st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Bet Ajustado", "Lucro Potencial"]].reset_index(drop=True))
+            st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Bet Ajustado", "Lucro Potencial"]].reset_index(drop=False))
 # Exibir total apostado e retorno esperado
             st.write(f"💰 **Total Apostado (pós filtro):** R$ {total_apostado:.2f}")
             st.write(f"💸 **Gain Esperado:** R$ {retorno_esperado:.2f}")
