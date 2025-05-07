@@ -468,8 +468,8 @@ with tab4:
         st.divider()  # Adiciona uma linha separadora
 
 #🔹Slide
-        nomes_selecionados = st.multiselect("Selecione os cavalos para ajustar:", df_cavalos["Nome"].unique())
         st.write("##### | Apostas Rebalanceadas com Desempenho")
+        nomes_selecionados = st.multiselect("Selecione os cavalos para ajustar:", df_cavalos["Nome"].unique())
         desempenho_ajustado = melhor_equipe.get("Desempenho Médio Ajustado", 1.0)  # Valor padrão seguro
         variancia_desempenho = melhor_equipe.get("Variância Desempenho", 0.1)  # Valor padrão seguro
         ajuste_base = st.slider("Defina o ajuste percentual baseado no desempenho (%)", 0.1, 2.0, 0.2, 0.05)
