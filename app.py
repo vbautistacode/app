@@ -442,11 +442,13 @@ with tab4:
 # Calcular totais
         total_dutching = df_cavalos_filtrado["Dutching Bet"].sum()
         lucro = df_cavalos_filtrado["Gain Dutch"].iloc[0]
+        lucro1 = df_cavalos_filtrado["Gain Dutch"].sum()
 # Exibir os resultados filtrados
         st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Probabilidade", "Dutching Bet", "Gain Dutch", "ROI-Dutch", "ROI (%)"]])
 # Criar seletor de nomes com múltipla seleção
         st.write(f"💰 **Total de Aposta:** R$ {total_dutching:.2f}")
         st.write(f"📈 **Retorno Esperado:** R$ {lucro:.2f}")
+        st.write(f"📈 **Retorno Esperado (bet position):** R$ {lucro1:.2f}")
         st.divider()
 
 # Ajustar aposta por `melhor_equipe`
