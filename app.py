@@ -448,7 +448,7 @@ with tab4:
 # Criar seletor de nomes com múltipla seleção
         st.write(f"💰 **Total de Aposta:** R$ {total_dutching:.2f}")
         st.write(f"📈 **Retorno Esperado:** R$ {lucro:.2f}")
-        st.write(f"📈 **Retorno Esperado (bet position):** R$ {lucro1:.2f}")
+        st.write(f"🚀 **Retorno Esperado (bet position):** R$ {lucro1:.2f}")
         st.divider()
 
 # Ajustar aposta por `melhor_equipe`
