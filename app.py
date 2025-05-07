@@ -464,7 +464,7 @@ with tab4:
         
 # Exibir melhor equipe
         st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
-        st.dataframe(df_desempenho.reset_index(drop=False))
+        st.dataframe(df_desempenho.reset_index(drop=True))
         st.divider()  # Adiciona uma linha separadora
 
 #🔹Slide
