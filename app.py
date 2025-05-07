@@ -100,6 +100,7 @@ def calcular_desempenho_equipes(team_data):
 
     df_desempenho_lista = []
     for team in team_data:
+        # 🔹 Cálculo dos desempenhos individuais
         podiums_horse = team.get("Wins", 0) + team.get("2nds", 0) + team.get("3rds", 0)
         runs_horse = max(team.get("Runs", 1), 1)
         desempenho_horse = podiums_horse / runs_horse
@@ -113,13 +114,19 @@ def calcular_desempenho_equipes(team_data):
         desempenho_trainer = podiums_trainer / runs_trainer
 
         desempenhos = [desempenho_horse, desempenho_jockey, desempenho_trainer]
-        media_desempenho = sum(desempenhos) / len(desempenhos)
+        
+        # 🔹 Melhorando o cálculo com desvio padrão
+        media_desempenho = np.mean(desempenhos)
         variancia_desempenho = np.var(desempenhos)
-        resultado_ajustado = media_desempenho - variancia_desempenho
+        desvio_padrao = np.std(desempenhos)
+
+        # 🔹 Ajuste com ponderação do desvio padrão
+        resultado_ajustado = media_desempenho - (0.5 * desvio_padrao)  # O peso 0.5 pode ser ajustado
 
         df_desempenho_lista.append({
             "Nome da Equipe": team["Nome da Equipe"],
-            "Desempenho Médio Ajustado": round(resultado_ajustado, 2)
+            "Desempenho Médio Ajustado": round(resultado_ajustado, 2),
+            "Desvio Padrão": round(desvio_padrao, 2)
         })
 
     return pd.DataFrame(df_desempenho_lista).sort_values(by="Desempenho Médio Ajustado", ascending=False)
