@@ -454,7 +454,7 @@ with tab4:
         st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Probabilidade", "Dutching Bet", "Gain Dutch", "ROI-Dutch", "ROI (%)"]])
 # Criar seletor de nomes com múltipla seleção
         st.write(f"💰 **Total de Aposta:** R$ {total_dutching:.2f}")
-        st.write(f"📈 **Retorno Esperado:** R$ {lucro:.2f}")
+        st.write(f"💸 **Gain Esperado:** R$ {lucro:.2f}")
         st.write(f"🚀 **Retorno Esperado (bet position):** R$ {lucro1:.2f}")
         st.divider()
 
@@ -477,13 +477,15 @@ with tab4:
         df_cavalos["Gain Adjusted"] = round(df_cavalos["Adjusted Bet"] * df_cavalos["Odds"], 2)
         total_adjusted = df_cavalos["Adjusted Bet"].sum()
         lucro_adjusted = df_cavalos["Gain Adjusted"].iloc[0] 
+        lucro_adjusted1 = df_cavalos["Gain Adjusted"].sum()
         st.write("")
     
 # Exibir rebalanceamento
         st.dataframe(df_cavalos[["Nome", "Odds", "Dutching Bet", "Adjusted Bet", "Gain Adjusted"]])
         st.write(f"💰 **Total de Aposta Ajustado:** R$ {total_adjusted:.2f}")
-        st.write(f"💸 **Retorno Esperado:** R$ {lucro_adjusted:.2f}")
-        st.divider()  # Adiciona uma linha separadora
+        st.write(f"💸 **Gain Esperado:** R$ {lucro_adjusted:.2f}")
+        st.write(f"🚀 **Retorno Esperado (bet position):** R$ {lucro_adjusted1:.2f}")
+        st.divider()
 # st.write("##### | Apostas Rebalanceadas (Filtro por Desvio Padrão)")
         st.markdown("<h5 style='text-align: center;'>| Apostas Rebalanceadas (Filtro por Desvio Padrão)</h5>", unsafe_allow_html=True)
         st.write("")
@@ -511,13 +513,15 @@ with tab4:
             df_cavalos_filtrado["Lucro Potencial"] = round(df_cavalos_filtrado["Bet Ajustado"] * df_cavalos_filtrado["Odds"], 2)
             total_apostado = df_cavalos_filtrado["Bet Ajustado"].sum()
             retorno_esperado = df_cavalos_filtrado["Lucro Potencial"].iloc[0]
+            retorno_esperado = df_cavalos_filtrado["Lucro Potencial"].sum()
             st.write("")
             st.write("")
             st.write("")
             st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Bet Ajustado", "Lucro Potencial"]])
 # 🔹 Exibir total apostado e retorno esperado
             st.write(f"💰 **Total Apostado (pós filtro):** R$ {total_apostado:.2f}")
-            st.write(f"📈 **Retorno Esperado:** R$ {retorno_esperado:.2f}")
+            st.write(f"💸 **Gain Esperado:** R$ {retorno_esperado:.2f}")
+            st.write(f"🚀 **Retorno Esperado (bet position):** R$ {retorno_esperado:.2f}")
         else:
             st.warning("⚠️ Nenhum ajuste foi aplicado às apostas devido à ausência de dados válidos.")
             st.divider()  # Adiciona uma linha separadora
