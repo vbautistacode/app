@@ -468,16 +468,19 @@ with tab4:
         st.divider()  # Adiciona uma linha separadora
 
 #🔹Slide
+        nomes_selecionados = st.multiselect("Selecione os cavalos para ajustar:", df_cavalos["Nome"].unique())
         st.write("##### | Apostas Rebalanceadas com Desempenho")
         desempenho_ajustado = melhor_equipe.get("Desempenho Médio Ajustado", 1.0)  # Valor padrão seguro
         variancia_desempenho = melhor_equipe.get("Variância Desempenho", 0.1)  # Valor padrão seguro
         ajuste_base = st.slider("Defina o ajuste percentual baseado no desempenho (%)", 0.1, 2.0, 0.2, 0.05)
         ajuste_percentual = ajuste_base / max(desempenho_ajustado - variancia_desempenho, 0.01)
-        df_cavalos["Adjusted Bet"] = round(df_cavalos["Dutching Bet"] * ajuste_percentual, 2)
-        df_cavalos["Gain Adjusted"] = round(df_cavalos["Adjusted Bet"] * df_cavalos["Odds"], 2)
-        total_adjusted = df_cavalos["Adjusted Bet"].sum()
-        lucro_adjusted = df_cavalos["Gain Adjusted"].iloc[0] 
-        lucro_adjusted1 = df_cavalos["Gain Adjusted"].sum()
+        # 🔹 Aplicar o ajuste apenas nos cavalos selecionados
+        df_cavalos_filtrado = df_cavalos[df_cavalos["Nome"].isin(nomes_selecionados)] if nomes_selecionados else df_cavalos
+        df_cavalos_filtrado["Adjusted Bet"] = round(df_cavalos_filtrado["Dutching Bet"] * ajuste_percentual, 2)
+        df_cavalos_filtrado["Gain Adjusted"] = round(df_cavalos_filtrado["Adjusted Bet"] * df_cavalos_filtrado["Odds"], 2)
+        total_adjusted = df_cavalos_filtrado["Adjusted Bet"].sum()
+        lucro_adjusted = df_cavalos_filtrado["Gain Adjusted"].iloc[0]
+        lucro_adjusted1 = df_cavalos_filtrado["Gain Adjusted"].sum()
         st.write("")
     
 # Exibir rebalanceamento
