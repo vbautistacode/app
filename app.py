@@ -507,13 +507,6 @@ with tab4:
     # --- Aposta Top 3 ---
 st.write("##### | Aposta Top 3")
 
-# Ajuste do Overround nas odds
-ajuste_percentual = st.number_input("Digite o percentual de redução do Overround (%)", min_value=0.5, max_value=10.0, step=0.5, value=2.0)
-
-if not df_cavalos.empty:
-    df_cavalos["Odd Ajustada"] = df_cavalos["Odds"] * (1 - ajuste_percentual / 100)
-    st.dataframe(df_cavalos[["Nome", "Odds", "Odd Ajustada"]])
-
 # Definir probabilidade histórica de vitória do favorito
 prob_vitoria_favorito = st.number_input("Insira a probabilidade histórica de vitória do favorito (%)", min_value=0.0, max_value=100.0, step=0.1, value=39.68) / 100
 
