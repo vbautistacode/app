@@ -542,7 +542,7 @@ with tab4:
             st.write(f"🥈 **{top_desempenho.iloc[1]['Nome da Equipe']}** → {top_desempenho.iloc[1]['Desempenho Médio Ajustado']:.2f}")
         with col3:
             st.write(f"🥉 **{top_desempenho.iloc[2]['Nome da Equipe']}** → {top_desempenho.iloc[2]['Desempenho Médio Ajustado']:.2f}")
-    
+        st.divider()
         # ✅ Filtrar as equipes restantes
         equipes_restantes = df_desempenho[~df_desempenho["Nome da Equipe"].isin(top_desempenho["Nome da Equipe"])]
     
