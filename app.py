@@ -512,10 +512,11 @@ with tab4:
     st.write("##### | Aposta Top 3")
 
     # ✅ Entrada manual para definir o percentual de redução do Overround
-    ajuste_percentual = st.number_input("Digite o percentual de redução do Overround (%)", min_value=0.1, max_value=2.0, step=0.05, value=0.2)    
+    ajuste_percentual = st.number_input("Digite o percentual de redução do Overround (%)", min_value=0.1, max_value=2.0, step=0.05, value=0.2)
     # ✅ Aplicação do ajuste nas odds com o percentual manual
     if not df_cavalos_filtrado.empty and "Odds" in df_cavalos_filtrado.columns:
         df_cavalos_filtrado["Odd Ajustada"] = df_cavalos_filtrado["Odds"] * (1 - ajuste_percentual / 100)
+        st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Odd Ajustada"]])  # 🔹 Exibe as odds para verificar se o ajuste está funcionando
     else:
         st.warning("⚠️ Nenhum cavalo disponível para ajuste manual.")
 
@@ -523,6 +524,12 @@ with tab4:
     prob_vitoria_favorito = st.number_input("Insira a probabilidade histórica de vitória do favorito (%)",
                                             min_value=0.0, max_value=100.0, step=0.1, value=39.68) / 100
 
+    # ✅ Verificar se há dados antes de chamar distribuir_apostas()
+    if not df_cavalos_filtrado.empty:
+        df_cavalos_filtrado["Valor Apostado"] = distribuir_apostas(df_cavalos_filtrado, bankroll, incluir_desempenho)["valor_apostado"]
+    else:
+        st.warning("⚠️ Nenhum cavalo foi selecionado ou carregado. Não há apostas para calcular.")
+    
     # ✅ Garantir que a coluna existe antes de chamar distribuir_apostas()
     if "Desempenho Médio Ajustado" in df_cavalos_filtrado.columns:
         df_cavalos_filtrado["Valor Apostado"] = distribuir_apostas(df_cavalos_filtrado, bankroll, incluir_desempenho)["valor_apostado"]
@@ -530,7 +537,7 @@ with tab4:
         st.error("Erro: 'Desempenho Médio Ajustado' não foi encontrado no DataFrame de cavalos.")
 
     # ✅ Seleção de cavalos para ajuste
-    nomes_ajuste = st.multiselect("Selecione os cavalos para ajustar:", df_cavalos_filtrado["Nome"].unique())
+    nomes_ajuste = st.multiselect("Selecione os cavalos para apostar:", df_cavalos_filtrado["Nome"].unique())
 
     # ✅ Ajuste percentual baseado no desempenho
     ajuste_base = st.slider("Defina o ajuste percentual baseado no desempenho (%)", 0.1, 3.0, 1.0, 0.05)
