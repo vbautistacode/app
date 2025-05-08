@@ -463,42 +463,38 @@ with tab4:
         bankroll = st.number_input("Digite o valor do Bankroll:", min_value=100.0, max_value=100000.0, step=10.0, value=1000.0, key="bankroll_input")
     else:
         st.warning("⚠️ Nenhum dado de cavalos disponível.")
-    
+        df_cavalos = pd.DataFrame(columns=["Nome", "Odds", "Dutching Bet", "Gain Dutch"])  # 🔹 Criar um DataFrame vazio para evitar erro
+
     # ✅ Garantir que a variável bankroll esteja definida antes de usá-la
     if "bankroll_input" in st.session_state:
         bankroll = st.session_state["bankroll_input"]
     else:
         st.warning("⚠️ O valor do Bankroll não foi definido. Usando valor padrão.")
         bankroll = 1000.0  # 🔹 Definir um valor padrão seguro para evitar erro
-    
-    # ✅ Verificar se há dados antes de criar df_cavalos_filtrado
-    if "horse_data" in st.session_state and st.session_state["horse_data"]:
-        df_cavalos = pd.DataFrame(st.session_state["horse_data"])
-    else:
-        df_cavalos = pd.DataFrame(columns=["Nome", "Odds", "Dutching Bet", "Gain Dutch"])
-    
-    # ✅ Chamar distribuir_apostas somente se houver dados
-    if not df_cavalos_filtrado.empty:
-        df_cavalos_filtrado["Valor Apostado"] = distribuir_apostas(df_cavalos_filtrado, bankroll, incluir_desempenho)["valor_apostado"]
-    else:
-        st.warning("⚠️ Nenhum cavalo foi selecionado ou carregado. Não há apostas para calcular.")
-        
+
     # ✅ Aplicação do filtro antes dos cálculos
     nomes_selecionados = st.multiselect("Selecione os cavalos:", df_cavalos["Nome"].unique())
-    df_cavalos_filtrado = df_cavalos[df_cavalos["Nome"].isin(nomes_selecionados)] if nomes_selecionados else df_cavalos
+    df_cavalos_filtrado = df_cavalos[df_cavalos["Nome"].isin(nomes_selecionados)] if not df_cavalos.empty else None  # 🔹 Se não houver dados, `None`
 
-    # ✅ Opção de ativar ou desativar a análise de desempenho
-    incluir_desempenho = st.checkbox("Incluir análise de desempenho?", value=True)
-
-    # ✅ Verificar se df_desempenho tem dados antes do merge
-    if incluir_desempenho and not df_desempenho.empty and "Desempenho Médio Ajustado" in df_desempenho.columns:
-        df_cavalos_filtrado = df_cavalos_filtrado.merge(df_desempenho[["Nome da Equipe", "Desempenho Médio Ajustado"]],
-                                                         left_on="Nome",
-                                                         right_on="Nome da Equipe",
-                                                         how="left")
-        df_cavalos_filtrado["Desempenho Médio Ajustado"].fillna(1, inplace=True)  # Define 1 como padrão se não houver correspondência
+    # ✅ Exibir alerta ao invés de erro
+    if df_cavalos_filtrado is None or df_cavalos_filtrado.empty:
+        st.warning("⚠️ Nenhum cavalo foi selecionado ou carregado. Adicione dados para calcular as apostas.")
     else:
-        df_cavalos_filtrado["Desempenho Médio Ajustado"] = 1  # 🔹 Garante a existência da coluna
+        # ✅ Opção de ativar ou desativar a análise de desempenho
+        incluir_desempenho = st.checkbox("Incluir análise de desempenho?", value=True)
+
+        # ✅ Verificar se df_desempenho tem dados antes do merge
+        if incluir_desempenho and not df_desempenho.empty and "Desempenho Médio Ajustado" in df_desempenho.columns:
+            df_cavalos_filtrado = df_cavalos_filtrado.merge(df_desempenho[["Nome da Equipe", "Desempenho Médio Ajustado"]],
+                                                             left_on="Nome",
+                                                             right_on="Nome da Equipe",
+                                                             how="left")
+            df_cavalos_filtrado["Desempenho Médio Ajustado"].fillna(1, inplace=True)  # Define 1 como padrão se não houver correspondência
+        else:
+            df_cavalos_filtrado["Desempenho Médio Ajustado"] = 1  # 🔹 Garante a existência da coluna
+
+        # ✅ Chamar distribuir_apostas somente se houver dados
+        df_cavalos_filtrado["Valor Apostado"] = distribuir_apostas(df_cavalos_filtrado, bankroll, incluir_desempenho)["valor_apostado"]
 
     # ✅ Cálculo das probabilidades e apostas Dutching
     if not df_cavalos_filtrado.empty and "Odds" in df_cavalos_filtrado.columns:
