@@ -466,7 +466,7 @@ with tab3:
         
 # --- Aba 4: Resultados ---
 with tab4:
-    st.write("#### | Dutching e Performance de Equipes |")
+    st.write("#### 🏇 | Dutching e Performance de Equipes |")
 # ✅ Exibir local e horário no cabeçalho da Aba 4
 # Divisão em duas colunas
     col1, col2 = st.columns(2)
@@ -524,26 +524,31 @@ with tab4:
         
         st.divider()
         
-    # Exibir dados de desempenho de equipes
-    st.write("#### | Analise de Desempenho |")
-    st.dataframe(df_desempenho[["Nome da Equipe", "Desempenho Médio Ajustado"]])
+    # ✅ Exibir análise de desempenho de equipes
+    st.write("#### 📊 | Análise de Desempenho |")
 
-    # ✅ Garantir que há dados antes de exibir o Top de Desempenho
+    # ✅ Garantir que há dados antes de exibir os desempenhos individuais
     if not df_desempenho.empty and "Desempenho Médio Ajustado" in df_desempenho.columns:
-        # Ordenar do melhor para o pior e selecionar os 3 primeiros
+        
+        # ✅ Exibir desempenho de cada equipe separadamente
+        st.write("🏇 **Desempenho das Equipes**")
+        for index, row in df_desempenho.iterrows():
+            st.write(f"🔹 **{row['Nome da Equipe']}** → Desempenho: {row['Desempenho Médio Ajustado']:.2f}")
+    
+        # ✅ Ordenar do melhor para o pior e selecionar os 3 primeiros
         top_desempenho = df_desempenho.nlargest(3, "Desempenho Médio Ajustado")
     
         # ✅ Exibir o ranking dos melhores desempenhos
-        st.write("🏆 **Top 3 Melhores Desempenhos** 🏆")
+        st.write("\n🏆 **Top 3 Melhores Desempenhos** 🏆")
         for index, row in top_desempenho.iterrows():
-            st.write(f"🔹 **{row['Nome da Equipe']}** → Desempenho: {row['Desempenho Médio Ajustado']:.2f}")
+            st.write(f"🥇 **{row['Nome da Equipe']}** → Desempenho: {row['Desempenho Médio Ajustado']:.2f}")
     else:
-        st.warning("⚠️ Dados insuficientes para calcular o Top de Desempenho.")
+        st.warning("⚠️ Dados insuficientes para calcular o desempenho das equipes.")
         
     st.divider()
     
 # --- Aposta Top 3 ---
-    st.write("#### | Aposta Top 3 |")
+    st.write("#### 🏆 | Aposta Top 3 |")
     
     # ✅ Definir probabilidade histórica de vitória do favorito
     prob_vitoria_favorito = st.number_input(
