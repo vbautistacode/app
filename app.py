@@ -617,20 +617,20 @@ if not df_cavalos_filtrado.empty:
     incluir_desempenho = st.checkbox("Incluir análise de desempenho?", value=True, key="incluir_desempenho_check")
     
     # ✅ Garantir que df_desempenho possui os dados necessários antes do merge
-    if incluir_desempenho and not df_desempenho.empty:
-        if "Nome da Equipe" in df_desempenho.columns and "Desempenho Médio Ajustado" in df_desempenho.columns:
-            
-            # ✅ Renomear coluna para evitar erro de junção
-            df_desempenho.rename(columns={"Nome da Equipe": "Nome"}, inplace=True)
+    #if incluir_desempenho and not df_desempenho.empty:
+    if "Nome da Equipe" in df_desempenho.columns and "Desempenho Médio Ajustado" in df_desempenho.columns:
+        
+        # ✅ Renomear coluna para evitar erro de junção
+        df_desempenho.rename(columns={"Nome da Equipe": "Nome"}, inplace=True)
 
-            # ✅ Realizar merge corretamente
-            df_cavalos_filtrado = df_cavalos_filtrado.merge(df_desempenho, on="Nome", how="left")
-            df_cavalos_filtrado["Desempenho Médio Ajustado"].fillna(1, inplace=True)
+        # ✅ Realizar merge corretamente
+        df_cavalos_filtrado = df_cavalos_filtrado.merge(df_desempenho, on="Nome", how="left")
+        df_cavalos_filtrado["Desempenho Médio Ajustado"].fillna(1, inplace=True)
 
-        else:
-            st.warning("⚠️ O DataFrame de desempenho não tem as colunas esperadas. Verifique os dados antes do merge.")
     else:
-        df_cavalos_filtrado["Desempenho Médio Ajustado"] = 1  # Define valor padrão se não houver análise
+        st.warning("⚠️ O DataFrame de desempenho não tem as colunas esperadas. Verifique os dados antes do merge.")
+    #else:
+        #df_cavalos_filtrado["Desempenho Médio Ajustado"] = 1  # Define valor padrão se não houver análise
 
     # ✅ Exibir dados antes de seguir com cálculos
     st.write("🔍 Visualizando df_cavalos_filtrado após merge:")
