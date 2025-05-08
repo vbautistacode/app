@@ -534,8 +534,8 @@ if not df_favoritos.empty:
         # Cálculo do valor total apostado e do lucro esperado
         total_apostado = df_favoritos["Valor Apostado"].sum()
         retorno_aposta = (df_favoritos["Valor Apostado"] * df_favoritos["Odds"]).sum()
-        lucro_aposta = (df_favoritos["Valor Apostado"] * df_favoritos["Odds"]).sum() - total_apostado
-
+        lucro_aposta = retorno_aposta - total_apostado
+        
         st.write(f"💰 **Total de Aposta:** R$ {total_apostado:.2f}")
         st.write(f"💸 **Gain Esperado:** R$ {retorno_aposta:.2f}")
         st.write(f"✅ **Lucro Esperado:** R$ {lucro_aposta:.2f}")
@@ -550,13 +550,13 @@ if not df_favoritos.empty:
     df_favoritos.dropna(subset=["Odds"], inplace=True)
 
 # Criar "Gain Adjusted" se não existir para evitar erro
-if "Gain Adjusted" not in df_cavalos_ajuste.columns:
+if not df_cavalos_ajuste.empty and "Gain Adjusted" not in df_cavalos_ajuste.columns:
     df_cavalos_ajuste["Gain Adjusted"] = 0
 
 # Calcular retorno máximo e mínimo
 if not df_cavalos_ajuste.empty:
-    retorno_maximo = df_cavalos_ajuste["Gain Adjusted"].max()
-    retorno_minimo = df_cavalos_ajuste["Gain Adjusted"].min()
+    retorno_maximo = df_cavalos_ajuste["Gain Adjusted"].nlargest(3).sum()
+    retorno_minimo = df_cavalos_ajuste["Gain Adjusted"].nsmallest(3).sum()
 
     st.write(f"📈 **Retorno Máximo:** R$ {retorno_maximo:.2f}")
     st.write(f"📉 **Retorno Mínimo:** R$ {retorno_minimo:.2f}")
