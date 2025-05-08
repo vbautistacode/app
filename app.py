@@ -504,10 +504,10 @@ with tab4:
 
     # ✅ Exibir seção "Desempenho"
     st.write("##### | Analise de Desempenho")
-        
     st.write("📊 Dados de Desempenho das Equipes:")
     st.dataframe(df_desempenho)
-
+    st.divider()
+    
     # ✅ Exibir seção "Aposta Top 3"
     st.write("##### | Aposta Top 3")
 
@@ -525,15 +525,17 @@ with tab4:
     else:
         st.error("Erro: 'Desempenho Médio Ajustado' não foi encontrado no DataFrame de cavalos.")
 
-    # ✅ Seção de ajuste de desempenho
-    st.write("##### | Apostas Rebalanceadas com Desempenho")
-
     # ✅ Seleção de cavalos para ajuste
     nomes_ajuste = st.multiselect("Selecione os cavalos para ajustar:", df_cavalos_filtrado["Nome"].unique())
 
     # ✅ Ajuste percentual baseado no desempenho
     ajuste_base = st.slider("Defina o ajuste percentual baseado no desempenho (%)", 0.1, 2.0, 0.2, 0.05)
-    ajuste_percentual = ajuste_base / max(df_desempenho["Desempenho Médio Ajustado"].mean() - df_desempenho["Desvio Padrão"].mean(), 0.01)
+    if not df_desempenho.empty and "Desempenho Médio Ajustado" in df_desempenho.columns and "Desvio Padrão" in df_desempenho.columns:
+        fator_desempenho = max(df_desempenho["Desempenho Médio Ajustado"].mean() - df_desempenho["Desvio Padrão"].mean(), 1.0)  # 🔹 Limita a variação mínima para evitar divisões muito pequenas
+        ajuste_percentual = min(ajuste_base / fator_desempenho, 3)  # 🔹 Limita o ajuste para evitar valores extremos
+    else:
+        st.warning("⚠️ Dados insuficientes para calcular o ajuste. Usando valor padrão.")
+        ajuste_percentual = 1  # 🔹 Valor padrão seguro
 
     # ✅ Aplicação do ajuste apenas nos cavalos selecionados
     df_cavalos_ajuste = df_cavalos_filtrado[df_cavalos_filtrado["Nome"].isin(nomes_ajuste)] if nomes_ajuste else df_cavalos_filtrado
