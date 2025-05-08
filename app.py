@@ -467,7 +467,7 @@ with tab3:
         
 # --- Aba 4: Resultados ---
 with tab4:
-st.write("#### | Dutching e Performance de Equipes |")
+    st.write("#### | Dutching e Performance de Equipes |")
 # ✅ Exibir local e horário no cabeçalho da Aba 4
 # Divisão em duas colunas
     col1, col2 = st.columns(2)
