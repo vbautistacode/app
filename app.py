@@ -605,9 +605,7 @@ with tab4:
         retorno_aposta = (df_favoritos["Valor Apostado"] * df_favoritos["Odds"]).sum()
         lucro_aposta = retorno_aposta - total_apostado
     
-        st.write(f"💰 **Total de Aposta:** R$ {total_apostado:.2f}")
-        st.write(f"💸 **Gain Esperado:** R$ {retorno_aposta:.2f}")
-        st.write(f"✅ **Lucro Esperado:** R$ {lucro_aposta:.2f}")
+        
     else:
         st.warning("⚠️ Nenhum favorito foi identificado, verifique os dados disponíveis.")
     
@@ -622,8 +620,20 @@ with tab4:
     
         retorno_maximo = df_favoritos.nlargest(3, "Odds")["Gain Adjusted"].sum()
         retorno_minimo = df_favoritos.nsmallest(3, "Odds")["Gain Adjusted"].sum()
+
+        # ✅ Criar duas colunas para organizar os blocos
         col1, col2 = st.columns(2)
+        
+        # ✅ Bloco 1 - Exibir informações gerais de aposta
+        with col1:
+            st.write("📊 **Informações da Aposta**")
+            st.write(f"💰 **Total de Aposta:** R$ {total_apostado:.2f}")
+            st.write(f"💸 **Gain Esperado:** R$ {retorno_aposta:.2f}")
+            st.write(f"✅ **Lucro Esperado:** R$ {lucro_aposta:.2f}")
+        
+        # ✅ Bloco 2 - Exibir cálculos de retorno máximo e mínimo
         with col2:
+            st.write("🔝 **Cálculo de Retorno**")
             st.write(f"📈 **Retorno Máximo:** R$ {retorno_maximo:.2f}")
             st.write(f"📉 **Retorno Mínimo:** R$ {retorno_minimo:.2f}")
     else:
