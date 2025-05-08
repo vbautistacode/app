@@ -498,6 +498,9 @@ with tab4:
     prob_vitoria_favorito = st.number_input("Insira a probabilidade histórica de vitória do favorito (%)",
                                             min_value=0.0, max_value=100.0, step=0.1, value=39.68) / 100
 
+    # ✅ Opção de ativar ou desativar a análise de desempenho
+    incluir_desempenho = st.checkbox("Incluir análise de desempenho?", value=True)
+
     # ✅ Distribuição ajustada das apostas
     if not df_cavalos_filtrado.empty:
         df_cavalos_filtrado["Valor Apostado"] = distribuir_apostas(df_cavalos_filtrado, bankroll, incluir_desempenho)["valor_apostado"]
@@ -519,7 +522,7 @@ with tab4:
 
     # ✅ Ajuste percentual baseado no desempenho
     ajuste_base = st.slider("Defina o ajuste percentual baseado no desempenho (%)", 0.1, 2.0, 0.2, 0.05)
-    ajuste_percentual = ajuste_base / max(desempenho_ajustado - variancia_desempenho, 0.01)
+    ajuste_percentual = ajuste_base / max(df_desempenho["Desempenho Médio Ajustado"].mean() - df_desempenho["Desvio Padrão"].mean(), 0.01)
 
     if "Dutching Bet" in df_cavalos_filtrado.columns:
         df_cavalos_filtrado["Adjusted Bet"] = round(df_cavalos_filtrado["Dutching Bet"] * ajuste_percentual, 2)
@@ -531,3 +534,4 @@ with tab4:
         st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Dutching Bet", "Adjusted Bet", "Gain Adjusted"]])
         st.write(f"💰 **Total de Aposta Ajustado:** R$ {total_adjusted:.2f}")
         st.write(f"💸 **Gain Esperado:** R$ {lucro_adjusted1:.2f}")
+        st.divider()
