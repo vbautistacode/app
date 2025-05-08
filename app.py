@@ -521,11 +521,15 @@ prob_vitoria_favorito = st.number_input("Insira a probabilidade histórica de vi
 num_favoritos = round(len(df_cavalos_filtrado) * 0.5)
 df_favoritos = df_cavalos_filtrado.nsmallest(num_favoritos, "Odds") if not df_cavalos_filtrado.empty else pd.DataFrame()
 
+# Debug: Exibir os dados dos favoritos antes da aposta
+st.write("🛠️ Debug - Dados dos favoritos antes da aposta:")
+st.write(df_favoritos)
+
 # Verificação de existência de dados antes de prosseguir com cálculos
 if not df_favoritos.empty:
     bankroll_favoritos = bankroll * 0.5
     soma_inverso_odds = df_favoritos["Odds"].apply(lambda x: (1 / x) * prob_vitoria_favorito).sum()
-    
+
     # Verificando se soma_inverso_odds não é zero para evitar erro na divisão
     if soma_inverso_odds > 0:
         df_favoritos["Valor Apostado"] = round(bankroll_favoritos * (1 / df_favoritos["Odds"]) / soma_inverso_odds, 2)
@@ -544,18 +548,23 @@ if not df_favoritos.empty:
 else:
     st.warning("⚠️ Nenhum favorito foi identificado, verifique os dados disponíveis.")
 
-# Ajuste percentual baseado no desempenho
-nomes_ajuste = st.multiselect("Selecione os cavalos para apostar:", df_cavalos_filtrado["Nome"].unique())
-ajuste_base = st.slider("Defina o ajuste percentual baseado no desempenho (%)", 0.1, 3.0, 1.0, 0.05)
+# Ajuste e filtragem de apostas
+df_cavalos_ajuste = df_cavalos_filtrado[df_cavalos_filtrado["Nome"].isin(nomes_ajuste)] if nomes_ajuste else df_cavalos_filtrado.copy()
 
-df_cavalos_ajuste = df_cavalos_filtrado[df_cavalos_filtrado["Nome"].isin(nomes_ajuste)] if nomes_ajuste else df_cavalos_filtrado
+# Debug: Exibir os dados antes da conversão de odds
+st.write("🔍 Debug - Antes da conversão das odds:")
+st.write(df_cavalos_ajuste)
 
-# Converter "Odds" para numérico e eliminar possíveis NaN
-df_cavalos_ajuste["Odds"] = pd.to_numeric(df_cavalos_ajuste["Odds"], errors="coerce")
-df_cavalos_ajuste.dropna(subset=["Odds"], inplace=True)
+if not df_cavalos_ajuste.empty:
+    df_cavalos_ajuste["Odds"] = pd.to_numeric(df_cavalos_ajuste["Odds"], errors="coerce")
+    df_cavalos_ajuste.dropna(subset=["Odds"], inplace=True)
+
+# Criar "Gain Adjusted" se não existir para evitar erro
+if "Gain Adjusted" not in df_cavalos_ajuste.columns:
+    df_cavalos_ajuste["Gain Adjusted"] = 0
 
 # Calcular retorno máximo e mínimo
-if not df_cavalos_ajuste.empty and "Gain Adjusted" in df_cavalos_ajuste.columns:
+if not df_cavalos_ajuste.empty:
     retorno_maximo = df_cavalos_ajuste.nlargest(3, "Odds")["Gain Adjusted"].sum()
     retorno_minimo = df_cavalos_ajuste.nsmallest(3, "Odds")["Gain Adjusted"].sum()
 
