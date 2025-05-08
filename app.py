@@ -484,11 +484,6 @@ with tab4:
     # Filtragem de cavalos
     nomes_selecionados = st.multiselect("Selecione os cavalos:", df_cavalos["Nome"].unique()) if not df_cavalos.empty else []
     df_cavalos_filtrado = df_cavalos[df_cavalos["Nome"].isin(nomes_selecionados)] if nomes_selecionados else df_cavalos
-
-    if df_cavalos_filtrado.empty:
-        st.warning("⚠️ Nenhum cavalo foi selecionado ou carregado.")
-    else:
-        incluir_desempenho = st.checkbox("Incluir análise de desempenho?", value=True)
         
         # Merge de desempenho apenas se necessário
         if incluir_desempenho and not df_desempenho.empty:
@@ -531,6 +526,11 @@ with tab4:
     
 # --- Aposta Top 3 ---
     st.write("##### | Aposta Top 3")
+
+    if df_cavalos_filtrado.empty:
+        st.warning("⚠️ Nenhum cavalo foi selecionado ou carregado.")
+    else:
+        incluir_desempenho = st.checkbox("Incluir análise de desempenho?", value=True)
     
     # ✅ Ajustar tamanho dos campos de entrada usando CSS
     st.markdown("""
