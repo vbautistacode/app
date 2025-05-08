@@ -632,14 +632,14 @@ with tab4:
         
         # ✅ Bloco 1 - Exibir informações gerais de aposta
         with col1:
-            st.write("📊 **Informações da Aposta**")
+            st.write("📊 **Informações da Aposta:**")
             st.write(f"💰 **Total de Aposta:** R$ {total_apostado:.2f}")
             st.write(f"💸 **Gain Esperado:** R$ {retorno_aposta:.2f}")
             st.write(f"✅ **Lucro Esperado:** R$ {lucro_aposta:.2f}")
         
         # ✅ Bloco 2 - Exibir cálculos de retorno máximo e mínimo
         with col2:
-            st.write("🔝 **Cálculo de Retorno**")
+            st.write("🔝 **Cálculo de Retorno:**")
             st.write(f"📈 **Retorno Máximo:** R$ {retorno_maximo:.2f}")
             st.write(f"📉 **Retorno Mínimo:** R$ {retorno_minimo:.2f}")
     else:
@@ -653,7 +653,7 @@ with tab4:
         st.write("##### | Apostas Balanceadas (Desempenho) |")
         
         # ✅ Incluir análise de desempenho antes de prosseguir com cálculos
-        incluir_desempenho = st.checkbox("Incluir análise de desempenho?", value=True, key="incluir_desempenho_check")
+        incluir_desempenho = st.checkbox("Incluir análise de desempenho?", value=False, key="incluir_desempenho_check")
     
         # ✅ Garantir que df_desempenho possui os dados necessários antes da aplicação
         if incluir_desempenho and not df_desempenho.empty:
