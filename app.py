@@ -469,7 +469,10 @@ with tab4:
     nomes_selecionados = st.multiselect("Selecione os cavalos:", df_cavalos["Nome"].unique())
     df_cavalos_filtrado = df_cavalos[df_cavalos["Nome"].isin(nomes_selecionados)] if nomes_selecionados else df_cavalos
 
-    # ✅ Garantir que df_desempenho tem dados antes do merge
+    # ✅ Opção de ativar ou desativar a análise de desempenho
+    incluir_desempenho = st.checkbox("Incluir análise de desempenho?", value=True)
+
+    # ✅ Verificar se df_desempenho tem dados antes do merge
     if incluir_desempenho and not df_desempenho.empty and "Desempenho Médio Ajustado" in df_desempenho.columns:
         df_cavalos_filtrado = df_cavalos_filtrado.merge(df_desempenho[["Nome da Equipe", "Desempenho Médio Ajustado"]],
                                                          left_on="Nome",
@@ -478,12 +481,6 @@ with tab4:
         df_cavalos_filtrado["Desempenho Médio Ajustado"].fillna(1, inplace=True)  # Define 1 como padrão se não houver correspondência
     else:
         df_cavalos_filtrado["Desempenho Médio Ajustado"] = 1  # 🔹 Valor padrão para evitar erro quando ajuste estiver desativado
-    
-    # ✅ Chamar distribuir_apostas apenas se a coluna existir ou usar um valor padrão
-    if "Desempenho Médio Ajustado" in df_cavalos_filtrado.columns:
-        df_cavalos_filtrado["Valor Apostado"] = distribuir_apostas(df_cavalos_filtrado, bankroll, incluir_desempenho)["valor_apostado"]
-    else:
-        st.error("Erro: 'Desempenho Médio Ajustado' não foi encontrado no DataFrame de cavalos.")
 
     # ✅ Cálculo das probabilidades e apostas Dutching
     if not df_cavalos_filtrado.empty and "Odds" in df_cavalos_filtrado.columns:
@@ -506,17 +503,13 @@ with tab4:
     # ✅ Exibir seção "Aposta Top 3"
     st.write("##### | Aposta Top 3")
 
-    # ✅ Verificar se "Odds" está presente no DataFrame antes de aplicar ajustes
-    if not df_cavalos.empty and "Odds" in df_cavalos.columns:
-        df_cavalos["Odd Ajustada"] = df_cavalos["Odds"].apply(lambda x: ajustar_odds([x], 0.05)[0])
-    else:
-        st.warning("⚠️ A coluna 'Odds' não está disponível. Certifique-se de que os dados foram carregados corretamente.")
+    # ✅ Aplicação da remoção de overround das odds
+    if not df_cavalos_filtrado.empty and "Odds" in df_cavalos_filtrado.columns:
+        df_cavalos_filtrado["Odd Ajustada"] = df_cavalos_filtrado["Odds"].apply(lambda x: ajustar_odds([x], 0.05)[0])
+
     # ✅ Entrada manual da probabilidade de vitória do favorito
     prob_vitoria_favorito = st.number_input("Insira a probabilidade histórica de vitória do favorito (%)",
                                             min_value=0.0, max_value=100.0, step=0.1, value=39.68) / 100
-
-    # ✅ Opção de ativar ou desativar a análise de desempenho
-    incluir_desempenho = st.checkbox("Incluir análise de desempenho?", value=True)
 
     # ✅ Garantir que a coluna existe antes de chamar distribuir_apostas()
     if "Desempenho Médio Ajustado" in df_cavalos_filtrado.columns:
