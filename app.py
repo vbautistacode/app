@@ -466,7 +466,7 @@ with tab4:
     df_cavalos_filtrado = df_cavalos[df_cavalos["Nome"].isin(nomes_selecionados)] if nomes_selecionados else df_cavalos
 
     # ✅ Aplicar análise de desempenho se ativado
-    df_cavalos_filtrado["Fator Ajuste"] = df_cavalos_filtrado["historico_vitoria"] / 100 if incluir_desempenho else 1
+    df_cavalos_filtrado["Fator Ajuste"] = df_cavalos_filtrado["df_desempenho"] / 100 if incluir_desempenho else 1
 
     # ✅ Distribuição ajustada das apostas
     df_cavalos_filtrado["Valor Apostado"] = distribuir_apostas(df_cavalos_filtrado, bankroll, incluir_desempenho)["valor_apostado"]
