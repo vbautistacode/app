@@ -533,7 +533,7 @@ if not df_favoritos.empty:
 
         # Cálculo do valor total apostado e do lucro esperado
         total_apostado = df_favoritos["Valor Apostado"].sum()
-        retorno_aposta = (df_favoritos["Valor Apostado"].sum() * df_favoritos["Odds"]).sum()
+        retorno_aposta = df_favoritos["Valor Apostado"] * df_favoritos["Odds"]
         lucro_aposta = (df_favoritos["Valor Apostado"] * df_favoritos["Odds"]).sum() - total_apostado
 
         st.write(f"💰 **Total de Aposta:** R$ {total_apostado:.2f}")
