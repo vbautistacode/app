@@ -600,3 +600,11 @@ with tab4:
         st.write(f"💰 **Total de Aposta Ajustado:** R$ {total_adjusted:.2f}")
         st.write(f"💸 **Gain Esperado:** R$ {lucro_adjusted1:.2f}")
         st.write(f"✅ **Lucro:** R$ {lucro1:.2f}")
+
+    # ✅ Calcular Retorno Máximo e Mínimo
+    retorno_maximo = df_cavalos_filtrado["Gain Adjusted"].max() if "Gain Adjusted" in df_cavalos_filtrado.columns else 0
+    retorno_minimo = df_cavalos_filtrado["Gain Adjusted"].min() if "Gain Adjusted" in df_cavalos_filtrado.columns else 0
+    
+    # ✅ Exibir os retornos para validar estratégia
+    st.write(f"📈 **Retorno Máximo:** R$ {retorno_maximo:.2f}")
+    st.write(f"📉 **Retorno Mínimo:** R$ {retorno_minimo:.2f}")
