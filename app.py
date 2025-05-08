@@ -90,7 +90,6 @@ st.session_state.setdefault("df_desempenho", pd.DataFrame(columns=["Nome da Equi
 st.session_state.setdefault("bankroll", 1000.0)  # Valor padrão do Bankroll
 st.session_state.setdefault("ajuste_percentual", 1.0)
 st.session_state.setdefault("fator_exclusao", 0.0)
-
 st.session_state.setdefault("horse_data", [])
 st.session_state.setdefault("team_data", [])
 st.session_state.setdefault("Nome", "Cavalo_Default")
@@ -616,6 +615,9 @@ if not df_cavalos_filtrado.empty:
 
     # ✅ Incluir análise de desempenho antes de prosseguir com cálculos
     incluir_desempenho = st.checkbox("Incluir análise de desempenho?", value=True, key="incluir_desempenho_check")
+    df_desempenho = pd.DataFrame(df_desempenho_lista)
+    st.write("🔍 Visualizando df_desempenho antes do merge:")
+    st.dataframe(df_desempenho)
 
     # ✅ Garantir que df_desempenho possui os dados necessários antes do merge
     if incluir_desempenho and not df_desempenho.empty:
