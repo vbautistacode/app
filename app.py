@@ -473,24 +473,64 @@ with tab4:
         st.write(f"🚀 **Retorno Esperado (bet position):** R$ {lucro1:.2f}")
         st.divider()
 
-# Opção de ativar ou desativar a análise de desempenho
-incluir_desempenho = st.checkbox("Incluir análise de desempenho?", value=True)
-# Executar a análise de desempenho somente se o checkbox estiver ativado
-df_desempenho = calcular_desempenho_equipes(st.session_state["team_data"]) if incluir_desempenho else pd.DataFrame(columns=["Nome da Equipe", "Desempenho Médio Ajustado"])
-# Ajustar integração com df_cavalos
-df_cavalos_filtrado = df_cavalos[df_cavalos["Nome"].isin(nomes_selecionados)] if nomes_selecionados else df_cavalos
-# Garantir que cada cavalo receba um ajuste baseado no desempenho, caso ativado
-df_cavalos_filtrado = df_cavalos_filtrado.merge(df_desempenho[["Nome da Equipe", "Desempenho Médio Ajustado"]], 
-                                                 left_on="Nome", 
-                                                 right_on="Nome da Equipe", 
-                                                 how="left")
+        # Opção de ativar ou desativar a análise de desempenho
+        incluir_desempenho = st.checkbox("Incluir análise de desempenho?", value=True)
+        # Executar a análise de desempenho somente se o checkbox estiver ativado
+        df_desempenho = calcular_desempenho_equipes(st.session_state["team_data"]) if incluir_desempenho else pd.DataFrame(columns=["Nome da Equipe", "Desempenho Médio Ajustado"])
+        # Ajustar integração com df_cavalos
+        df_cavalos_filtrado = df_cavalos[df_cavalos["Nome"].isin(nomes_selecionados)] if nomes_selecionados else df_cavalos
+        # Garantir que cada cavalo receba um ajuste baseado no desempenho, caso ativado
+        df_cavalos_filtrado = df_cavalos_filtrado.merge(df_desempenho[["Nome da Equipe", "Desempenho Médio Ajustado"]], 
+                                                         left_on="Nome", 
+                                                         right_on="Nome da Equipe", 
+                                                         how="left")
+        
+        df_cavalos_filtrado["Desempenho Médio Ajustado"].fillna(1, inplace=True)  # Valor padrão caso não haja equipe correspondente
+        df_cavalos_filtrado["Fator Ajuste"] = df_cavalos_filtrado["Desempenho Médio Ajustado"] / 100 if incluir_desempenho else 1        
+            
+        # Exibir melhor equipe caso haja dados
+            if not df_desempenho.empty:
+                melhor_equipe = df_desempenho.iloc[0]
+                st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
+                st.dataframe(df_desempenho)
+        
+            st.divider()
 
-df_cavalos_filtrado["Desempenho Médio Ajustado"].fillna(1, inplace=True)  # Valor padrão caso não haja equipe correspondente
-df_cavalos_filtrado["Fator Ajuste"] = df_cavalos_filtrado["Desempenho Médio Ajustado"] / 100 if incluir_desempenho else 1        
-# Exibir melhor equipe
-        st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
-        st.dataframe(df_desempenho.reset_index(drop=True))
-        st.divider()  # Adiciona uma linha separadora
+        # Aplicação da remoção de overround das odds
+        df_cavalos["Odd Ajustada"] = df_cavalos["Odds"].apply(lambda x: ajustar_odds([x], 0.05)[0])
+    
+        # Entrada manual da probabilidade de vitória do favorito
+        prob_vitoria_favorito = st.number_input("Insira a probabilidade histórica de vitória do favorito (%)", min_value=0.0, max_value=100.0, step=0.1, value=39.68) / 100
+    
+        # Seleção manual dos cavalos para inclusão na aposta
+        nomes_selecionados = st.multiselect("Selecione os cavalos para incluir na aposta:", df_cavalos["Nome"].unique())
+    
+        # Filtrar os dados com base na seleção
+        df_cavalos_filtrado = df_cavalos[df_cavalos["Nome"].isin(nomes_selecionados)] if nomes_selecionados else df_cavalos
+    
+        # Aplicar análise de desempenho se ativado
+        df_cavalos_filtrado["Fator Ajuste"] = df_cavalos_filtrado["historico_vitoria"] / 100 if incluir_desempenho else 1
+    
+        # Distribuição ajustada das apostas
+        df_cavalos_filtrado["Valor Apostado"] = distribuir_apostas(df_cavalos_filtrado, bankroll, incluir_desempenho)["valor_apostado"]
+    
+        # Cálculo de ganhos esperados
+        df_cavalos_filtrado["Gain Dutch"] = round(df_cavalos_filtrado["Odd Ajustada"] * df_cavalos_filtrado["Valor Apostado"], 2)
+        df_cavalos_filtrado["ROI-Dutch"] = round((df_cavalos_filtrado["Gain Dutch"] - df_cavalos_filtrado["Valor Apostado"]), 2)
+        df_cavalos_filtrado["ROI (%)"] = round((df_cavalos_filtrado["Gain Dutch"] / df_cavalos_filtrado["Valor Apostado"]) * 100, 2)
+    
+        # Exibir os resultados na interface
+        st.dataframe(df_cavalos_filtrado[["Nome", "Odd Ajustada", "Valor Apostado", "Gain Dutch", "ROI-Dutch", "ROI (%)"]])
+    
+        # Calcular totais
+        total_apostado = df_cavalos_filtrado["Valor Apostado"].sum()
+        lucro_esperado = df_cavalos_filtrado["Gain Dutch"].sum()
+    
+        # Exibir totais
+        st.write(f"💰 **Total de Aposta:** R$ {total_apostado:.2f}")
+        st.write(f"💸 **Gain Esperado:** R$ {lucro_esperado:.2f}")
+    
+        st.divider()
 
 #🔹Slide
         st.write("##### | Apostas Rebalanceadas com Desempenho")
