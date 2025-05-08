@@ -467,6 +467,7 @@ with tab3:
         
 # --- Aba 4: Resultados ---
 with tab4:
+st.write("#### | Dutching e Performance de Equipes |")
 # ✅ Exibir local e horário no cabeçalho da Aba 4
 # Divisão em duas colunas
     col1, col2 = st.columns(2)
@@ -474,8 +475,6 @@ with tab4:
         st.write(f"📍 **Local da Prova:** {st.session_state.get('local_atual', 'Não definido')}")
     with col2:
         st.write(f"⏰ **Horário da Prova:** {st.session_state.get('hora_prova', 'Não definido')}")
-
-    st.write("##### | Dutching e Performance de Equipes")
 
     # Verificação de dados de equipes e criação do DataFrame
     df_desempenho = pd.DataFrame(columns=["Nome da Equipe", "Desempenho Médio Ajustado"])
@@ -527,7 +526,7 @@ with tab4:
         st.divider()
         
     # Exibir dados de desempenho de equipes
-    st.write("##### | Analise de Desempenho")
+    st.write("#### | Analise de Desempenho |")
     st.dataframe(df_desempenho[["Nome da Equipe", "Desempenho Médio Ajustado"]])
 
     # ✅ Garantir que há dados antes de exibir o Top de Desempenho
@@ -545,7 +544,7 @@ with tab4:
     st.divider()
     
 # --- Aposta Top 3 ---
-    st.write("##### | Aposta Top 3")
+    st.write("#### | Aposta Top 3 |")
     
     # ✅ Definir probabilidade histórica de vitória do favorito
     prob_vitoria_favorito = st.number_input(
