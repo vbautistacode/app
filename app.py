@@ -457,6 +457,19 @@ with tab4:
         st.warning("⚠️ Nenhuma equipe cadastrada!")
         df_desempenho = pd.DataFrame(columns=["Nome da Equipe", "Desempenho Médio Ajustado"])
 
+    # ✅ Garantir que a variável bankroll esteja definida antes de usá-la
+    if "bankroll_input" in st.session_state:
+        bankroll = st.session_state["bankroll_input"]
+    else:
+        st.warning("⚠️ O valor do Bankroll não foi definido. Usando valor padrão.")
+        bankroll = 1000.0  # 🔹 Definir um valor padrão seguro para evitar erro
+    
+    # ✅ Chamar distribuir_apostas somente se houver dados
+    if not df_cavalos_filtrado.empty:
+        df_cavalos_filtrado["Valor Apostado"] = distribuir_apostas(df_cavalos_filtrado, bankroll, incluir_desempenho)["valor_apostado"]
+    else:
+        st.warning("⚠️ Nenhum cavalo foi selecionado ou carregado. Não há apostas para calcular.")
+
     # ✅ Garantir que há dados antes de calcular apostas
     if "horse_data" in st.session_state and st.session_state["horse_data"]:
         df_cavalos = pd.DataFrame(st.session_state["horse_data"])
