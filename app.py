@@ -611,44 +611,53 @@ with tab4:
     
     st.divider()
     
-# ✅ Verificar se existem dados de cavalos
+# ✅ Verificar se existem dados de cavalos antes de prosseguir
 if not df_cavalos_filtrado.empty:
-    
+
     # ✅ Incluir análise de desempenho antes de prosseguir com cálculos
     incluir_desempenho = st.checkbox("Incluir análise de desempenho?", value=True, key="incluir_desempenho_check")
-    
-    if incluir_desempenho and not df_desempenho.empty and "Nome da Equipe" in df_desempenho.columns:
-        df_cavalos_filtrado = df_cavalos_filtrado.merge(
-            df_desempenho, left_on="Nome", right_on="Nome da Equipe", how="left"
-        )
-    
-        if "Desempenho Médio Ajustado" in df_cavalos_filtrado.columns:
+
+    # ✅ Garantir que df_desempenho possui os dados necessários antes do merge
+    if incluir_desempenho and not df_desempenho.empty:
+        if "Nome da Equipe" in df_desempenho.columns and "Desempenho Médio Ajustado" in df_desempenho.columns:
+            
+            # ✅ Renomear coluna para evitar erro de junção
+            df_desempenho.rename(columns={"Nome da Equipe": "Nome"}, inplace=True)
+
+            # ✅ Realizar merge corretamente
+            df_cavalos_filtrado = df_cavalos_filtrado.merge(df_desempenho, on="Nome", how="left")
             df_cavalos_filtrado["Desempenho Médio Ajustado"].fillna(1, inplace=True)
+
         else:
-            st.warning("⚠️ A coluna 'Desempenho Médio Ajustado' não foi encontrada após o merge.")
+            st.warning("⚠️ O DataFrame de desempenho não tem as colunas esperadas. Verifique os dados antes do merge.")
     else:
-        st.warning("⚠️ O DataFrame de desempenho está vazio ou sem as colunas esperadas.")
-    
-    # ✅ Garantir que "Valor Apostado" seja criado antes do ajuste
+        df_cavalos_filtrado["Desempenho Médio Ajustado"] = 1  # Define valor padrão se não houver análise
+
+    # ✅ Exibir dados antes de seguir com cálculos
+    st.write("🔍 Visualizando df_cavalos_filtrado após merge:")
+    st.dataframe(df_cavalos_filtrado)
+
+    # ✅ Garantir que "Valor Apostado" seja criado corretamente antes de usar desempenho
     bankroll_favoritos = bankroll * percentual_bankroll_favoritos
+
     if df_cavalos_filtrado["Odds"].sum() > 0:
         df_cavalos_filtrado["Valor Apostado"] = round(
             (bankroll_favoritos / df_cavalos_filtrado["Odds"].sum()) * df_cavalos_filtrado["Odds"], 2
         )
     else:
-        st.warning("⚠️ As colunas necessárias ainda não estão disponíveis. Ajuste de apostas não aplicado.")
+        st.warning("⚠️ Erro: Soma das Odds é zero. Verifique os dados antes de calcular apostas.")
 
-    # ✅ Aplicar ajuste baseado no desempenho histórico SOMENTE após criação de Valor Apostado
+    # ✅ Aplicar ajuste baseado no desempenho histórico apenas se colunas existirem
     if "Valor Apostado" in df_cavalos_filtrado.columns and "Desempenho Médio Ajustado" in df_cavalos_filtrado.columns:
         df_cavalos_filtrado["Fator Desempenho"] = df_cavalos_filtrado["Desempenho Médio Ajustado"] / df_cavalos_filtrado["Desempenho Médio Ajustado"].max()
         df_cavalos_filtrado["Valor Apostado Ajustado"] = round(df_cavalos_filtrado["Valor Apostado"] * df_cavalos_filtrado["Fator Desempenho"], 2)
     else:
         st.warning("⚠️ As colunas necessárias ainda não estão disponíveis. Ajuste de apostas não aplicado.")
 
-        # ✅ Exibir tabela com ajustes aplicados
-        st.write("##### | Ajuste de Apostas Baseado no Desempenho Histórico")
-        st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Desempenho Médio Ajustado", "Valor Apostado", "Valor Apostado Ajustado"]])
+    # ✅ Exibir DataFrame atualizado para validar os cálculos
+    st.write("🔍 Resultado final:")
+    st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Desempenho Médio Ajustado", "Valor Apostado", "Valor Apostado Ajustado"]])
 
-        # ✅ Exibir totais ajustados
-        total_aposta_ajustada = df_cavalos_filtrado["Valor Apostado Ajustado"].sum()
-        st.write(f"📊 **Total de Aposta Ajustado:** R$ {total_aposta_ajustada:.2f}")
+    # ✅ Exibir totais ajustados
+    total_aposta_ajustada = df_cavalos_filtrado["Valor Apostado Ajustado"].sum()
+    st.write(f"📊 **Total de Aposta Ajustado:** R$ {total_aposta_ajustada:.2f}")
