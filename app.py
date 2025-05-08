@@ -19,7 +19,7 @@ pd.set_option('future.no_silent_downcasting', True)
 st.markdown("""
     <style>
         div[data-baseweb="input"] {
-            width: 111px !important;
+            width: 222px !important;
         }
         div[data-baseweb="select"] {
             width: 222px !important;
