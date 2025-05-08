@@ -546,7 +546,7 @@ else:
 
 # Conversão de odds e limpeza de dados
 if not df_favoritos.empty:
-    df_favoritos["Odds"] = pd.to_numeric(df_cavalos_ajuste["Odds"], errors="coerce")
+    df_favoritos["Odds"] = pd.to_numeric(df_favoritos["Odds"], errors="coerce")
     df_favoritos.dropna(subset=["Odds"], inplace=True)
 
 # Criar "Gain Adjusted" se não existir para evitar erro
