@@ -480,7 +480,7 @@ with tab4:
                                                          how="left")
         df_cavalos_filtrado["Desempenho Médio Ajustado"].fillna(1, inplace=True)  # Define 1 como padrão se não houver correspondência
     else:
-        df_cavalos_filtrado["Desempenho Médio Ajustado"] = 1  # 🔹 Valor padrão para evitar erro quando ajuste estiver desativado
+        df_cavalos_filtrado["Desempenho Médio Ajustado"] = 1  # 🔹 Garante a existência da coluna
 
     # ✅ Cálculo das probabilidades e apostas Dutching
     if not df_cavalos_filtrado.empty and "Odds" in df_cavalos_filtrado.columns:
@@ -520,17 +520,24 @@ with tab4:
     # ✅ Seção de ajuste de desempenho
     st.write("##### | Apostas Rebalanceadas com Desempenho")
 
+    # ✅ Seleção de cavalos para ajuste
+    nomes_ajuste = st.multiselect("Selecione os cavalos para ajustar:", df_cavalos_filtrado["Nome"].unique())
+
     # ✅ Ajuste percentual baseado no desempenho
     ajuste_base = st.slider("Defina o ajuste percentual baseado no desempenho (%)", 0.1, 2.0, 0.2, 0.05)
     ajuste_percentual = ajuste_base / max(df_desempenho["Desempenho Médio Ajustado"].mean() - df_desempenho["Desvio Padrão"].mean(), 0.01)
 
-    if "Dutching Bet" in df_cavalos_filtrado.columns:
-        df_cavalos_filtrado["Adjusted Bet"] = round(df_cavalos_filtrado["Dutching Bet"] * ajuste_percentual, 2)
-        df_cavalos_filtrado["Gain Adjusted"] = round(df_cavalos_filtrado["Adjusted Bet"] * df_cavalos_filtrado["Odds"], 2)
+    # ✅ Aplicação do ajuste apenas nos cavalos selecionados
+    df_cavalos_ajuste = df_cavalos_filtrado[df_cavalos_filtrado["Nome"].isin(nomes_ajuste)] if nomes_ajuste else df_cavalos_filtrado
 
-        total_adjusted = df_cavalos_filtrado["Adjusted Bet"].sum()
-        lucro_adjusted1 = df_cavalos_filtrado["Gain Adjusted"].sum()
+    if "Dutching Bet" in df_cavalos_ajuste.columns:
+        df_cavalos_ajuste["Adjusted Bet"] = round(df_cavalos_ajuste["Dutching Bet"] * ajuste_percentual, 2)
+        df_cavalos_ajuste["Gain Adjusted"] = round(df_cavalos_ajuste["Adjusted Bet"] * df_cavalos_ajuste["Odds"], 2)
 
-        st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Dutching Bet", "Adjusted Bet", "Gain Adjusted"]])
+        total_adjusted = df_cavalos_ajuste["Adjusted Bet"].sum()
+        lucro_adjusted1 = df_cavalos_ajuste["Gain Adjusted"].sum()
+
+        st.dataframe(df_cavalos_ajuste[["Nome", "Odds", "Dutching Bet", "Adjusted Bet", "Gain Adjusted"]])
         st.write(f"💰 **Total de Aposta Ajustado:** R$ {total_adjusted:.2f}")
         st.write(f"💸 **Gain Esperado:** R$ {lucro_adjusted1:.2f}")
+        st.divider()
