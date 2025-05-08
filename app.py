@@ -511,9 +511,14 @@ with tab4:
     # ✅ Exibir seção "Aposta Top 3"
     st.write("##### | Aposta Top 3")
 
-    # ✅ Aplicação da remoção de overround das odds
+    # ✅ Entrada manual para ajustar  overround das odds
     if not df_cavalos_filtrado.empty and "Odds" in df_cavalos_filtrado.columns:
-        df_cavalos_filtrado["Odd Ajustada"] = df_cavalos_filtrado["Odds"].apply(lambda x: ajustar_odds([x], 0.05)[0])
+        df_cavalos_filtrado["Odd Ajustada"] = [
+            st.number_input(f"Digite a Odd Ajustada para {nome}", min_value=1.01, max_value=100.0, value=odd)
+            for nome, odd in zip(df_cavalos_filtrado["Nome"], df_cavalos_filtrado["Odds"])
+        ]
+    else:
+        st.warning("⚠️ Nenhum cavalo disponível para ajuste manual.")
 
     # ✅ Entrada manual da probabilidade de vitória do favorito
     prob_vitoria_favorito = st.number_input("Insira a probabilidade histórica de vitória do favorito (%)",
@@ -529,7 +534,7 @@ with tab4:
     nomes_ajuste = st.multiselect("Selecione os cavalos para ajustar:", df_cavalos_filtrado["Nome"].unique())
 
     # ✅ Ajuste percentual baseado no desempenho
-    ajuste_base = st.slider("Defina o ajuste percentual baseado no desempenho (%)", 0.1, 2.0, 0.2, 0.05)
+    ajuste_base = st.slider("Defina o ajuste percentual baseado no desempenho (%)", 0.1, 3.0, 1.0, 0.05)
     if not df_desempenho.empty and "Desempenho Médio Ajustado" in df_desempenho.columns and "Desvio Padrão" in df_desempenho.columns:
         fator_desempenho = max(df_desempenho["Desempenho Médio Ajustado"].mean() - df_desempenho["Desvio Padrão"].mean(), 1.0)  # 🔹 Limita a variação mínima para evitar divisões muito pequenas
         ajuste_percentual = min(ajuste_base / fator_desempenho, 3)  # 🔹 Limita o ajuste para evitar valores extremos
