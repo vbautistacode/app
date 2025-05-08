@@ -505,8 +505,8 @@ with tab4:
     # ✅ Exibir seção "Desempenho"
     st.write("##### | Analise de Desempenho")
         
-        st.write("📊 Dados de Desempenho das Equipes:")
-        st.dataframe(df_desempenho)
+    st.write("📊 Dados de Desempenho das Equipes:")
+    st.dataframe(df_desempenho)
 
     # ✅ Exibir seção "Aposta Top 3"
     st.write("##### | Aposta Top 3")
