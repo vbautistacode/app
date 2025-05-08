@@ -502,10 +502,11 @@ with tab4:
     # ✅ Exibir seção "Aposta Top 3"
     st.write("##### | Aposta Top 3")
 
-    # ✅ Aplicação da remoção de overround das odds
-    if "Odds" in df_cavalos.columns:
+    # ✅ Verificar se "Odds" está presente no DataFrame antes de aplicar ajustes
+    if not df_cavalos.empty and "Odds" in df_cavalos.columns:
         df_cavalos["Odd Ajustada"] = df_cavalos["Odds"].apply(lambda x: ajustar_odds([x], 0.05)[0])
-
+    else:
+        st.warning("⚠️ A coluna 'Odds' não está disponível. Certifique-se de que os dados foram carregados corretamente.")
     # ✅ Entrada manual da probabilidade de vitória do favorito
     prob_vitoria_favorito = st.number_input("Insira a probabilidade histórica de vitória do favorito (%)",
                                             min_value=0.0, max_value=100.0, step=0.1, value=39.68) / 100
