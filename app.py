@@ -638,7 +638,7 @@ if not df_cavalos_filtrado.empty:
     # ✅ Garantir que "Valor Apostado" seja criado antes do ajuste
        if df_cavalos_filtrado["Odds"].sum() > 0:
             df_cavalos_filtrado["Valor Apostado"] = round(
-                (bankroll_favoritos / df_cavalos_filtrado["Odds"].sum()) * df_cavalos_filtrado["Odds"], 2
+            (bankroll_favoritos / df_cavalos_filtrado["Odds"].sum()) * df_cavalos_filtrado["Odds"], 2
             )
         else:
             st.warning("⚠️ Erro: Soma das Odds é zero. Verifique os dados antes de calcular apostas.")
