@@ -476,6 +476,10 @@ with tab4:
         df_cavalos_filtrado["Valor Apostado"] = distribuir_apostas(df_cavalos_filtrado, bankroll, incluir_desempenho)["valor_apostado"]
     else:
         st.warning("⚠️ Nenhum cavalo foi selecionado ou carregado. Não há apostas para calcular.")
+    # ✅ Verificar se há dados antes de criar df_cavalos_filtrado
+    if "horse_data" in st.session_state and st.session_state["horse_data"]:
+        df_cavalos = pd.DataFrame(st.session_state["horse_data"])
+    else:
         df_cavalos = pd.DataFrame(columns=["Nome", "Odds", "Dutching Bet", "Gain Dutch"])
     
     # ✅ Aplicação do filtro antes dos cálculos
