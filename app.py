@@ -543,7 +543,7 @@ with tab4:
         df_cavalos_ajuste["Gain Adjusted"] = round(df_cavalos_ajuste["Adjusted Bet"] * df_cavalos_ajuste["Odds"], 2)
         total_adjusted = df_cavalos_ajuste["Adjusted Bet"].sum()
         lucro_adjusted1 = df_cavalos_ajuste["Gain Adjusted"].sum()
-        lucro1 = (df_cavalos_ajuste["Adjusted Bet"].sum() - df_cavalos_ajuste["Gain Adjusted"].sum())
+        lucro1 = (df_cavalos_ajuste["Gain Adjusted"].sum() - df_cavalos_ajuste["Adjusted Bet"].sum())
 
         st.dataframe(df_cavalos_ajuste[["Nome", "Odds", "Dutching Bet", "Adjusted Bet", "Gain Adjusted"]])
         st.write(f"💰 **Total de Aposta Ajustado:** R$ {total_adjusted:.2f}")
