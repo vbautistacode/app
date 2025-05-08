@@ -524,7 +524,7 @@ with tab4:
         
     # Exibir dados de desempenho de equipes
     st.write("##### | Analise de Desempenho")
-    st.dataframe(df_desempenho)
+    st.dataframe(df_desempenho[["Nome da Equipe", "Desempenho Médio Ajustado"]])
 
     # ✅ Garantir que há dados antes de exibir o Top de Desempenho
     if not df_desempenho.empty and "Desempenho Médio Ajustado" in df_desempenho.columns:
