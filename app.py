@@ -495,10 +495,10 @@ with tab4:
     nomes_selecionados = st.multiselect("Selecione os cavalos:", df_cavalos["Nome"].unique()) if not df_cavalos.empty else []
     df_cavalos_filtrado = df_cavalos[df_cavalos["Nome"].isin(nomes_selecionados)] if nomes_selecionados else df_cavalos
 
-    if df_cavalos_filtrado.empty:
-        st.warning("⚠️ Nenhum cavalo foi selecionado ou carregado.")
-    else:
-        incluir_desempenho = st.checkbox("Incluir análise de desempenho?", value=True, key="incluir_desempenho_aba4")
+    #if df_cavalos_filtrado.empty:
+    #    st.warning("⚠️ Nenhum cavalo foi selecionado ou carregado.")
+    #else:
+    #    incluir_desempenho = st.checkbox("Incluir análise de desempenho?", value=True, key="incluir_desempenho_aba4")
     
         # Merge de desempenho apenas se necessário
         if incluir_desempenho and not df_desempenho.empty:
