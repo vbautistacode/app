@@ -521,20 +521,32 @@ prob_vitoria_favorito = st.number_input("Insira a probabilidade histórica de vi
 num_favoritos = round(len(df_cavalos_filtrado) * 0.5)
 df_favoritos = df_cavalos_filtrado.nsmallest(num_favoritos, "Odds") if not df_cavalos_filtrado.empty else pd.DataFrame()
 
-# Distribuição do bankroll nos favoritos
+# Debug: Exibir os dados dos favoritos antes da aposta
+st.write("🛠️ Debug - Dados dos favoritos antes da aposta:")
+st.write(df_favoritos)
+
+# Verificação de existência de dados antes de prosseguir com cálculos
 if not df_favoritos.empty:
     bankroll_favoritos = bankroll * 0.5
     soma_inverso_odds = df_favoritos["Odds"].apply(lambda x: (1 / x) * prob_vitoria_favorito).sum()
-    df_favoritos["Valor Apostado"] = round(bankroll_favoritos * (1 / df_favoritos["Odds"]) / soma_inverso_odds, 2)
+    
+    # Verificando se soma_inverso_odds não é zero para evitar erro na divisão
+    if soma_inverso_odds > 0:
+        df_favoritos["Valor Apostado"] = round(bankroll_favoritos * (1 / df_favoritos["Odds"]) / soma_inverso_odds, 2)
 
-    st.dataframe(df_favoritos[["Nome", "Odds", "Valor Apostado"]])
+        # Exibir dataframe atualizado com valores apostados
+        st.dataframe(df_favoritos[["Nome", "Odds", "Valor Apostado"]])
 
-    # Cálculo do valor total apostado e do lucro esperado
-    total_apostado = df_favoritos["Valor Apostado"].sum()
-    lucro_aposta = (df_favoritos["Valor Apostado"] * df_favoritos["Odds"]).sum() - total_apostado
+        # Cálculo do valor total apostado e do lucro esperado
+        total_apostado = df_favoritos["Valor Apostado"].sum()
+        lucro_aposta = (df_favoritos["Valor Apostado"] * df_favoritos["Odds"]).sum() - total_apostado
 
-    st.write(f"💰 **Total de Aposta:** R$ {total_apostado:.2f}")
-    st.write(f"✅ **Lucro Esperado:** R$ {lucro_aposta:.2f}")
+        st.write(f"💰 **Total de Aposta:** R$ {total_apostado:.2f}")
+        st.write(f"✅ **Lucro Esperado:** R$ {lucro_aposta:.2f}")
+    else:
+        st.warning("⚠️ Erro: soma das probabilidades inversas é zero, verifique os dados das odds.")
+else:
+    st.warning("⚠️ Nenhum favorito foi identificado, verifique os dados disponíveis.")
 
 # Ajuste percentual baseado no desempenho
 nomes_ajuste = st.multiselect("Selecione os cavalos para apostar:", df_cavalos_filtrado["Nome"].unique())
