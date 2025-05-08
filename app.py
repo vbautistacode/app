@@ -598,8 +598,8 @@ with tab4:
     if not df_favoritos.empty and "Valor Apostado" in df_favoritos.columns:
         df_favoritos["Gain Adjusted"] = df_favoritos["Valor Apostado"] * df_favoritos["Odds"]
     
-        retorno_maximo = df_favoritos.nlargest(3, "Odds")["Gain Adjusted"].sum()
-        retorno_minimo = df_favoritos.nsmallest(3, "Odds")["Gain Adjusted"].sum()
+        retorno_minimo = df_favoritos.nlargest(3, "Odds")["Gain Adjusted"].sum()
+        retorno_maximo = df_favoritos.nsmallest(3, "Odds")["Gain Adjusted"].sum()
     
         st.write(f"📈 **Retorno Máximo:** R$ {retorno_maximo:.2f}")
         st.write(f"📉 **Retorno Mínimo:** R$ {retorno_minimo:.2f}")
