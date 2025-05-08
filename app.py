@@ -550,7 +550,7 @@ if not df_favoritos.empty:
     df_favoritos.dropna(subset=["Odds"], inplace=True)
 
 # Calcular retorno máximo e mínimo
-if not df_cavalos_ajuste.empty:
+if not df_favoritos.empty:
     retorno_maximo = df_favoritos["Valor Apostado"].nlargest(3).sum()
     retorno_minimo = df_favoritos["Valor Apostado"].nsmallest(3).sum()
 
