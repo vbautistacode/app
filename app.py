@@ -493,7 +493,7 @@ with tab4:
         # ✅ Calcular totais e exibir resultados
         total_dutching = df_cavalos_filtrado["Dutching Bet"].sum()
         lucro_total = df_cavalos_filtrado["Gain Dutch"].iloc[0]
-        lucro = df_cavalos_filtrado["Gain Dutch"] - df_cavalos_filtrado["Dutching Bet"]
+        lucro = (df_cavalos_filtrado["Gain Dutch"] - df_cavalos_filtrado["Dutching Bet"]).sum()
 
         st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Probabilidade", "Dutching Bet", "Gain Dutch", "ROI-Dutch", "ROI (%)"]].reset_index(drop=True))
 
