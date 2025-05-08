@@ -607,27 +607,39 @@ with tab4:
         st.warning("⚠️ Não há dados suficientes para calcular retorno máximo e mínimo.")
     
     st.divider()
+    
+    # ✅ Verificar se existem dados de cavalos
+if not df_cavalos_filtrado.empty:
+    
+    # ✅ Incluir análise de desempenho antes de prosseguir com cálculos
+    incluir_desempenho = st.checkbox("Incluir análise de desempenho?", value=True, key="incluir_desempenho_check")
+    
+    if incluir_desempenho and not df_desempenho.empty:
+        df_cavalos_filtrado = df_cavalos_filtrado.merge(
+            df_desempenho, left_on="Nome", right_on="Nome da Equipe", how="left"
+        )
+        df_cavalos_filtrado["Desempenho Médio Ajustado"].fillna(1, inplace=True)  # Define valores padrão
+    
+    else:
+        df_cavalos_filtrado["Desempenho Médio Ajustado"] = 1  # Define 1 como padrão se não houver análise
 
-    # ✅ Verificar se 'Desempenho Médio Ajustado' foi criado corretamente
-    if incluir_desempenho and "Desempenho Médio Ajustado" not in df_cavalos_filtrado.columns:
-        st.warning("⚠️ A análise de desempenho não foi aplicada corretamente. Verifique a integração do desempenho.")
-    
-    # ✅ Verificar se 'Valor Apostado' foi definido antes do cálculo
-    if "Valor Apostado" not in df_cavalos_filtrado.columns:
-        st.warning("⚠️ O cálculo de apostas ainda não foi feito. Certifique-se de calcular antes de aplicar ajustes.")
-    
-    # ✅ Ajuste de apostas baseado no desempenho histórico (se ativado)
-    if incluir_desempenho and not df_cavalos_filtrado.empty and "Desempenho Médio Ajustado" in df_cavalos_filtrado.columns and "Valor Apostado" in df_cavalos_filtrado.columns:
+    # ✅ Garantir que "Valor Apostado" seja criado antes do ajuste
+    bankroll_favoritos = bankroll * percentual_bankroll_favoritos
+    df_cavalos_filtrado["Valor Apostado"] = round(
+        (bankroll_favoritos / df_cavalos_filtrado["Odds"].sum()) * df_cavalos_filtrado["Odds"], 2
+    )
+
+    # ✅ Ajuste baseado no desempenho histórico (caso a coluna esteja presente)
+    if "Valor Apostado" in df_cavalos_filtrado.columns and "Desempenho Médio Ajustado" in df_cavalos_filtrado.columns:
         df_cavalos_filtrado["Fator Desempenho"] = df_cavalos_filtrado["Desempenho Médio Ajustado"] / df_cavalos_filtrado["Desempenho Médio Ajustado"].max()
         df_cavalos_filtrado["Valor Apostado Ajustado"] = round(df_cavalos_filtrado["Valor Apostado"] * df_cavalos_filtrado["Fator Desempenho"], 2)
-    
+
         # ✅ Exibir tabela com ajustes aplicados
         st.write("##### | Ajuste de Apostas Baseado no Desempenho Histórico")
         st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Desempenho Médio Ajustado", "Valor Apostado", "Valor Apostado Ajustado"]])
-    
+
         # ✅ Exibir totais ajustados
         total_aposta_ajustada = df_cavalos_filtrado["Valor Apostado Ajustado"].sum()
         st.write(f"📊 **Total de Aposta Ajustado:** R$ {total_aposta_ajustada:.2f}")
-    
     else:
         st.warning("⚠️ Desempenho Médio Ajustado não foi encontrado. Ajuste de apostas não aplicado.")
