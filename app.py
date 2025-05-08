@@ -19,7 +19,7 @@ pd.set_option('future.no_silent_downcasting', True)
 st.markdown("""
     <style>
         div[data-baseweb="input"] {
-            width: 75px !important;
+            width: 125px !important;
         }
         div[data-baseweb="select"] {
             width: 200px !important;
@@ -250,7 +250,6 @@ with tab2:
             Nome = st.text_input("Nome do Cavalo", cavalo_dados["Nome"] if cavalo_dados else "")
             odds = st.number_input("Odds (Probabilidades)", min_value=0.01, step=0.01, value=cavalo_dados["Odds"] if cavalo_dados else 0.01)
         with col2:
-            # idade = st.number_input("Idade", min_value=0, max_value=30, step=1, value=cavalo_dados["Idade"] if cavalo_dados else 0)
             runs = st.number_input("Runs (Corridas)", min_value=0, step=1, value=cavalo_dados["Runs"] if cavalo_dados else 0)
             wins = st.number_input("Wins (Vitórias)", min_value=0, step=1, value=cavalo_dados["Wins"] if cavalo_dados else 0)
             seconds = st.number_input("2nds (Segundos Lugares)", min_value=0, step=1, value=cavalo_dados["2nds"] if cavalo_dados else 0)
