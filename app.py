@@ -464,7 +464,7 @@ with tab4:
         st.warning("⚠️ O valor do Bankroll não foi definido. Usando valor padrão.")
         bankroll = 1000.0  # 🔹 Definir um valor padrão seguro para evitar erro
     
-    ✅ Chamar distribuir_apostas somente se houver dados
+    # ✅ Chamar distribuir_apostas somente se houver dados
     if not df_cavalos_filtrado.empty:
         df_cavalos_filtrado["Valor Apostado"] = distribuir_apostas(df_cavalos_filtrado, bankroll, incluir_desempenho)["valor_apostado"]
     else:
