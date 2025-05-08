@@ -565,17 +565,22 @@ with tab4:
 # --- Aposta Top 3 ---
     st.write("#### 🏆 | Aposta Top 3 |")
     
-    # ✅ Definir probabilidade histórica de vitória do favorito
-    prob_vitoria_favorito = st.number_input(
-        "Defina a probabilidade histórica de vitória do favorito (%)",
-        min_value=0.0, max_value=100.0, step=0.1, value=39.68
-    ) / 100
+    # ✅ Criar duas colunas para exibir os inputs lado a lado
+    col1, col2 = st.columns(2)
     
-    # ✅ Entrada manual para definir percentual do bankroll nos favoritos
-    percentual_bankroll_favoritos = st.number_input(
-        "Defina o percentual do bankroll para favoritos (%)",
-        min_value=0.0, max_value=100.0, step=1.0, value=50.0
-    ) / 100
+    # ✅ Entrada para definir probabilidade histórica de vitória
+    with col1:
+        prob_vitoria_favorito = st.number_input(
+            "📊 Probabilidade Histórica de Vitória (%)",
+            min_value=0.0, max_value=100.0, step=0.1, value=39.68
+        ) / 100
+    
+    # ✅ Entrada para definir percentual do bankroll nos favoritos
+    with col2:
+        percentual_bankroll_favoritos = st.number_input(
+            "💰 Percentual do Bankroll para Favoritos (%)",
+            min_value=0.0, max_value=100.0, step=1.0, value=50.0
+        ) / 100
     
     # ✅ Entrada manual para seleção dos favoritos, ordenando por desempenho se ativado
     incluir_desempenho = st.checkbox("Incluir análise de desempenho?", value=True, key="incluir_desempenho_top3")
@@ -604,8 +609,7 @@ with tab4:
         total_apostado = df_favoritos["Valor Apostado"].sum()
         retorno_aposta = (df_favoritos["Valor Apostado"] * df_favoritos["Odds"]).sum()
         lucro_aposta = retorno_aposta - total_apostado
-    
-        
+            
     else:
         st.warning("⚠️ Nenhum favorito foi identificado, verifique os dados disponíveis.")
     
