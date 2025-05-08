@@ -526,22 +526,37 @@ with tab4:
         
     # ✅ Exibir análise de desempenho de equipes
     st.write("#### 📊 | Análise de Desempenho |")
-
+    
     # ✅ Garantir que há dados antes de exibir os desempenhos individuais
     if not df_desempenho.empty and "Desempenho Médio Ajustado" in df_desempenho.columns:
         
-        # ✅ Exibir desempenho de cada equipe separadamente
-        st.write("🏇 **Desempenho das Equipes**")
-        for index, row in df_desempenho.iterrows():
-            st.write(f"🔹 **{row['Nome da Equipe']}** → Desempenho: {row['Desempenho Médio Ajustado']:.2f}")
-    
         # ✅ Ordenar do melhor para o pior e selecionar os 3 primeiros
         top_desempenho = df_desempenho.nlargest(3, "Desempenho Médio Ajustado")
     
-        # ✅ Exibir o ranking dos melhores desempenhos
-        st.write("\n🏆 **Top 3 Melhores Desempenhos** 🏆")
-        for index, row in top_desempenho.iterrows():
-            st.write(f"🥇 **{row['Nome da Equipe']}** → Desempenho: {row['Desempenho Médio Ajustado']:.2f}")
+        # ✅ Exibir o Top 3 lado a lado
+        st.write("🏆 **Top 3 Melhores Desempenhos** 🏆")
+        col1, col2, col3 = st.columns(3)  # Criando três colunas para exibir os melhores
+        with col1:
+            st.write(f"🥇 **{top_desempenho.iloc[0]['Nome da Equipe']}** → {top_desempenho.iloc[0]['Desempenho Médio Ajustado']:.2f}")
+        with col2:
+            st.write(f"🥈 **{top_desempenho.iloc[1]['Nome da Equipe']}** → {top_desempenho.iloc[1]['Desempenho Médio Ajustado']:.2f}")
+        with col3:
+            st.write(f"🥉 **{top_desempenho.iloc[2]['Nome da Equipe']}** → {top_desempenho.iloc[2]['Desempenho Médio Ajustado']:.2f}")
+    
+        # ✅ Filtrar as equipes restantes
+        equipes_restantes = df_desempenho[~df_desempenho["Nome da Equipe"].isin(top_desempenho["Nome da Equipe"])]
+    
+        # ✅ Exibir o restante das equipes em duas colunas
+        st.write("\n🏇 **Desempenho das Outras Equipes**")
+        col_a, col_b = st.columns(2)
+        for index, row in equipes_restantes.iterrows():
+            if index % 2 == 0:  # Alterna entre as colunas
+                with col_a:
+                    st.write(f"🔹 **{row['Nome da Equipe']}** → Desempenho: {row['Desempenho Médio Ajustado']:.2f}")
+            else:
+                with col_b:
+                    st.write(f"🔹 **{row['Nome da Equipe']}** → Desempenho: {row['Desempenho Médio Ajustado']:.2f}")
+    
     else:
         st.warning("⚠️ Dados insuficientes para calcular o desempenho das equipes.")
         
