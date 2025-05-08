@@ -473,10 +473,20 @@ with tab4:
         st.write(f"🚀 **Retorno Esperado (bet position):** R$ {lucro1:.2f}")
         st.divider()
 
-# Ajustar aposta por `melhor_equipe`
-    if not df_desempenho.empty:
-        melhor_equipe = df_desempenho.iloc[0]
-        
+# Opção de ativar ou desativar a análise de desempenho
+incluir_desempenho = st.checkbox("Incluir análise de desempenho?", value=True)
+# Executar a análise de desempenho somente se o checkbox estiver ativado
+df_desempenho = calcular_desempenho_equipes(st.session_state["team_data"]) if incluir_desempenho else pd.DataFrame(columns=["Nome da Equipe", "Desempenho Médio Ajustado"])
+# Ajustar integração com df_cavalos
+df_cavalos_filtrado = df_cavalos[df_cavalos["Nome"].isin(nomes_selecionados)] if nomes_selecionados else df_cavalos
+# Garantir que cada cavalo receba um ajuste baseado no desempenho, caso ativado
+df_cavalos_filtrado = df_cavalos_filtrado.merge(df_desempenho[["Nome da Equipe", "Desempenho Médio Ajustado"]], 
+                                                 left_on="Nome", 
+                                                 right_on="Nome da Equipe", 
+                                                 how="left")
+
+df_cavalos_filtrado["Desempenho Médio Ajustado"].fillna(1, inplace=True)  # Valor padrão caso não haja equipe correspondente
+df_cavalos_filtrado["Fator Ajuste"] = df_cavalos_filtrado["Desempenho Médio Ajustado"] / 100 if incluir_desempenho else 1        
 # Exibir melhor equipe
         st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
         st.dataframe(df_desempenho.reset_index(drop=True))
