@@ -617,16 +617,18 @@ if not df_cavalos_filtrado.empty:
     # ✅ Incluir análise de desempenho antes de prosseguir com cálculos
     incluir_desempenho = st.checkbox("Incluir análise de desempenho?", value=True, key="incluir_desempenho_check")
     
-    if incluir_desempenho and not df_desempenho.empty:
-        if "Nome da Equipe" in df_desempenho.columns and "Desempenho Médio Ajustado" in df_desempenho.columns:
-            df_cavalos_filtrado = df_cavalos_filtrado.merge(
-                df_desempenho, left_on="Nome", right_on="Nome da Equipe", how="left"
-            )
-            df_cavalos_filtrado["Desempenho Médio Ajustado"].fillna(1, inplace=True)  # Define valores padrão
-
+    if incluir_desempenho and not df_desempenho.empty and "Nome da Equipe" in df_desempenho.columns:
+        df_cavalos_filtrado = df_cavalos_filtrado.merge(
+            df_desempenho, left_on="Nome", right_on="Nome da Equipe", how="left"
+        )
+    
+        if "Desempenho Médio Ajustado" in df_cavalos_filtrado.columns:
+            df_cavalos_filtrado["Desempenho Médio Ajustado"].fillna(1, inplace=True)
         else:
-            st.warning("⚠️ O DataFrame de desempenho não tem as colunas esperadas. Verifique os dados.")
-
+            st.warning("⚠️ A coluna 'Desempenho Médio Ajustado' não foi encontrada após o merge.")
+    else:
+    st.warning("⚠️ O DataFrame de desempenho está vazio ou sem as colunas esperadas.")
+    
     # ✅ Garantir que "Valor Apostado" seja criado antes do ajuste
     bankroll_favoritos = bankroll * percentual_bankroll_favoritos
     if df_cavalos_filtrado["Odds"].sum() > 0:
