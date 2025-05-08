@@ -634,7 +634,7 @@ if not df_cavalos_filtrado.empty:
             (bankroll_favoritos / df_cavalos_filtrado["Odds"].sum()) * df_cavalos_filtrado["Odds"], 2
         )
     else:
-        st.warning("
+        st.warning("⚠️ As colunas necessárias ainda não estão disponíveis. Ajuste de apostas não aplicado.")
 
     # ✅ Aplicar ajuste baseado no desempenho histórico SOMENTE após criação de Valor Apostado
     if "Valor Apostado" in df_cavalos_filtrado.columns and "Desempenho Médio Ajustado" in df_cavalos_filtrado.columns:
