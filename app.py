@@ -256,24 +256,24 @@ with tab2:
             thirds = st.number_input("3rds (Terceiros Lugares)", min_value=0, step=1, value=cavalo_dados["3rds"] if cavalo_dados else 0)
             
 # ✅ Botão para salvar dados do cavalo
-        if st.button("Salvar Dados do Cavalo"):
-            novo_cavalo = {
-                "Local": local_atual,
-                "Nome": Nome,
-                "Runs": runs,
-                "Wins": wins,
-                "2nds": seconds,
-                "3rds": thirds,
-                "Odds": odds,
-            }
-            if cavalo_selecionado == "Adicionar Novo":
-                st.session_state["horse_data"].append(novo_cavalo)
-                st.success(f"Novo cavalo '{Nome}' adicionado com sucesso no local '{local_atual}'!")
-            else:
-                for horse in st.session_state["horse_data"]:
-                    if horse["Nome"] == cavalo_selecionado:
-                        horse.update(novo_cavalo)
-                        st.success(f"Alterações no cavalo '{Nome}' salvas com sucesso!")
+            if st.button("Salvar Dados do Cavalo"):
+                novo_cavalo = {
+                    "Local": local_atual,
+                    "Nome": Nome,
+                    "Runs": runs,
+                    "Wins": wins,
+                    "2nds": seconds,
+                    "3rds": thirds,
+                    "Odds": odds,
+                }
+                if cavalo_selecionado == "Adicionar Novo":
+                    st.session_state["horse_data"].append(novo_cavalo)
+                    st.success(f"Novo cavalo '{Nome}' adicionado com sucesso no local '{local_atual}'!")
+                else:
+                    for horse in st.session_state["horse_data"]:
+                        if horse["Nome"] == cavalo_selecionado:
+                            horse.update(novo_cavalo)
+                            st.success(f"Alterações no cavalo '{Nome}' salvas com sucesso!")
                         
 # ✅ Exibição de cavalos cadastrados
     if st.session_state["horse_data"]:
@@ -358,8 +358,7 @@ with tab3:
         col1, col2 = st.columns(2)
         
 # Campos na primeira coluna
-        with col1:
-            
+        with col1: 
 # Extrair os nomes dos cavalos para usar como opções no selectbox
             nomes_cavalos = [horse["Nome"] for horse in st.session_state["horse_data"]] if "horse_data" in st.session_state else []
             nome_equipe = st.selectbox("Nome do Cavalo Associado", nomes_cavalos, key="select_horse_team")  # Vincula Nome do Cavalo
