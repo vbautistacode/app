@@ -614,7 +614,7 @@ with tab4:
     
     # ✅ Verificar se 'Valor Apostado' foi definido antes do cálculo
     if "Valor Apostado" not in df_cavalos_filtrado.columns:
-    st.warning("⚠️ O cálculo de apostas ainda não foi feito. Certifique-se de calcular antes de aplicar ajustes.")
+        st.warning("⚠️ O cálculo de apostas ainda não foi feito. Certifique-se de calcular antes de aplicar ajustes.")
     
     # ✅ Ajuste de apostas baseado no desempenho histórico (se ativado)
     if incluir_desempenho and not df_cavalos_filtrado.empty and "Desempenho Médio Ajustado" in df_cavalos_filtrado.columns and "Valor Apostado" in df_cavalos_filtrado.columns:
