@@ -528,18 +528,39 @@ with tab4:
     # ✅ Exibir seção "Aposta Top 3"
     st.write("##### | Aposta Top 3")
 
-    # ✅ Entrada manual para definir o percentual de redução do Overround
-    ajuste_percentual = st.number_input("Digite o percentual de redução do Overround (%)", min_value=0.1, max_value=2.0, step=0.05, value=0.2)
+    # ✅ Entrada manual para definir o percentual de ajuste do Overround
+    ajuste_percentual = st.number_input("Digite o percentual de redução do Overround (%)", min_value=0.5, max_value=10.0, step=0.5, value=2.0)
+
     # ✅ Aplicação do ajuste nas odds com o percentual manual
-    if not df_cavalos_filtrado.empty and "Odds" in df_cavalos_filtrado.columns:
-        df_cavalos_filtrado["Odd Ajustada"] = df_cavalos_filtrado["Odds"] * (1 - ajuste_percentual / 100)
-        st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Odd Ajustada"]])  # 🔹 Exibe as odds para verificar se o ajuste está funcionando
+    if not df_cavalos.empty and "Odds" in df_cavalos.columns:
+        df_cavalos["Odd Ajustada"] = df_cavalos["Odds"] * (1 - ajuste_percentual / 100)
+        st.dataframe(df_cavalos[["Nome", "Odds", "Odd Ajustada"]])  # 🔹 Exibe as odds ajustadas
     else:
         st.warning("⚠️ Nenhum cavalo disponível para ajuste manual.")
+        
+    # ✅ Selecionar automaticamente os favoritos de acordo com o tamanho do páreo
+    num_cavalos = len(df_cavalos_filtrado)
+    percentual_favoritos = 0.5
+    num_favoritos = max(3, round(num_cavalos * percentual_favoritos))  # 🔹 Ajuste dinâmico do número de favoritos
+    df_favoritos = df_cavalos_filtrado.nsmallest(num_favoritos, "Odds") if not df_cavalos_filtrado.empty else None
 
-    # ✅ Entrada manual da probabilidade de vitória do favorito
+    # ✅ Definir a probabilidade histórica do favorito e usá-la para ponderação das apostas
     prob_vitoria_favorito = st.number_input("Insira a probabilidade histórica de vitória do favorito (%)",
                                             min_value=0.0, max_value=100.0, step=0.1, value=39.68) / 100
+    # ✅ Distribuição proporcional do bankroll entre favoritos
+    if df_favoritos is not None and not df_favoritos.empty:
+        bankroll_favoritos = bankroll * percentual_favoritos
+        soma_inverso_odds = df_favoritos["Odds"].apply(lambda x: (1 / x) * prob_vitoria_favorito).sum()
+
+        df_favoritos["Valor Apostado"] = round(bankroll_favoritos * (1 / df_favoritos["Odds"]) / soma_inverso_odds, 2)
+        df_cavalos_filtrado = df_cavalos_filtrado.merge(df_favoritos[["Nome", "Valor Apostado"]], on="Nome", how="left")
+
+        st.dataframe(df_favoritos[["Nome", "Odds", "Valor Apostado"]])  # 🔹 Exibe os favoritos e suas apostas ajustadas
+        st.write(f"📊 **Total de Aposta nos Favoritos:** R$ {df_favoritos['Valor Apostado'].sum():.2f}")
+
+    # ✅ Calcular Expected Value (EV) e validar apostas
+    df_cavalos_filtrado["EV"] = (df_cavalos_filtrado["Probabilidade Estimada"] * df_cavalos_filtrado["Odd Ajustada"]) - 1
+    df_cavalos_filtrado["Valor Apostado"] *= df_cavalos_filtrado["EV"] > 0  # 🔹 Apostar apenas em EV positivo
 
     # ✅ Verificar se há dados antes de chamar distribuir_apostas()
     if not df_cavalos_filtrado.empty:
