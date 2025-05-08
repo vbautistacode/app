@@ -484,14 +484,19 @@ with tab4:
     # Filtragem de cavalos
     nomes_selecionados = st.multiselect("Selecione os cavalos:", df_cavalos["Nome"].unique()) if not df_cavalos.empty else []
     df_cavalos_filtrado = df_cavalos[df_cavalos["Nome"].isin(nomes_selecionados)] if nomes_selecionados else df_cavalos
-        
-    # Merge de desempenho apenas se necessário
-    if incluir_desempenho and not df_desempenho.empty:
-        df_cavalos_filtrado = df_cavalos_filtrado.merge(df_desempenho, left_on="Nome", right_on="Nome da Equipe", how="left")
-        df_cavalos_filtrado["Desempenho Médio Ajustado"].fillna(1, inplace=True)
+
+    if df_cavalos_filtrado.empty:
+        st.warning("⚠️ Nenhum cavalo foi selecionado ou carregado.")
     else:
-        df_cavalos_filtrado["Desempenho Médio Ajustado"] = 1
+        incluir_desempenho = st.checkbox("Incluir análise de desempenho?", value=True)
     
+        # Merge de desempenho apenas se necessário
+        if incluir_desempenho and not df_desempenho.empty:
+            df_cavalos_filtrado = df_cavalos_filtrado.merge(df_desempenho, left_on="Nome", right_on="Nome da Equipe", how="left")
+            df_cavalos_filtrado["Desempenho Médio Ajustado"].fillna(1, inplace=True)
+        else:
+            df_cavalos_filtrado["Desempenho Médio Ajustado"] = 1
+        
         # Calcular apostas Dutching e probabilidades
         df_cavalos_filtrado["Probabilidade"] = (1 / df_cavalos_filtrado["Odds"]).round(2)
         df_cavalos_filtrado["Dutching Bet"] = calculate_dutching(df_cavalos_filtrado["Odds"], bankroll, np.ones(len(df_cavalos_filtrado)))
@@ -526,11 +531,6 @@ with tab4:
     
 # --- Aposta Top 3 ---
     st.write("##### | Aposta Top 3")
-
-    if df_cavalos_filtrado.empty:
-        st.warning("⚠️ Nenhum cavalo foi selecionado ou carregado.")
-    else:
-        incluir_desempenho = st.checkbox("Incluir análise de desempenho?", value=True)
     
     # ✅ Ajustar tamanho dos campos de entrada usando CSS
     st.markdown("""
