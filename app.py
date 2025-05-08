@@ -450,94 +450,85 @@ with tab3:
 with tab4:
     st.write("##### | Dutching e Performance de Equipes")
 
-    # ✅ Garantir que há dados antes de calcular o desempenho
-    if "team_data" in st.session_state and st.session_state["team_data"]:
+    # Verificação de dados de equipes e criação do DataFrame
+    df_desempenho = pd.DataFrame(columns=["Nome da Equipe", "Desempenho Médio Ajustado"])
+    if st.session_state.get("team_data"):
         df_desempenho = calcular_desempenho_equipes(st.session_state["team_data"])
     else:
         st.warning("⚠️ Nenhuma equipe cadastrada!")
-        df_desempenho = pd.DataFrame(columns=["Nome da Equipe", "Desempenho Médio Ajustado"])
 
-    # ✅ Garantir que há dados antes de calcular apostas
-    if "horse_data" in st.session_state and st.session_state["horse_data"]:
+    # Verificação de dados de cavalos e criação do DataFrame
+    df_cavalos = pd.DataFrame(columns=["Nome", "Odds", "Dutching Bet", "Gain Dutch"])
+    if st.session_state.get("horse_data"):
         df_cavalos = pd.DataFrame(st.session_state["horse_data"])
         bankroll = st.number_input("Digite o valor do Bankroll:", min_value=100.0, max_value=100000.0, step=10.0, value=1000.0, key="bankroll_input")
     else:
         st.warning("⚠️ Nenhum dado de cavalos disponível.")
-        df_cavalos = pd.DataFrame(columns=["Nome", "Odds", "Dutching Bet", "Gain Dutch"])  # 🔹 Criar um DataFrame vazio para evitar erro
 
-    # ✅ Garantir que a variável bankroll esteja definida antes de usá-la
-    if "bankroll_input" in st.session_state:
-        bankroll = st.session_state["bankroll_input"]
-    else:
-        st.warning("⚠️ O valor do Bankroll não foi definido. Usando valor padrão.")
-        bankroll = 1000.0  # 🔹 Definir um valor padrão seguro para evitar erro
+    # Definição do bankroll, evitando verificações repetidas
+    bankroll = st.session_state.get("bankroll_input", 1000.0)
 
-    # ✅ Aplicação do filtro antes dos cálculos
-    if not df_cavalos.empty:
-        nomes_selecionados = st.multiselect("Selecione os cavalos:", df_cavalos["Nome"].unique())
-        df_cavalos_filtrado = df_cavalos[df_cavalos["Nome"].isin(nomes_selecionados)] if nomes_selecionados else df_cavalos
-    else:
-        df_cavalos_filtrado = pd.DataFrame(columns=df_cavalos.columns)  # 🔹 Criar um DataFrame vazio
+    # Filtragem de cavalos
+    nomes_selecionados = st.multiselect("Selecione os cavalos:", df_cavalos["Nome"].unique()) if not df_cavalos.empty else []
+    df_cavalos_filtrado = df_cavalos[df_cavalos["Nome"].isin(nomes_selecionados)] if nomes_selecionados else df_cavalos
 
-    # ✅ Exibir alerta ao invés de erro
     if df_cavalos_filtrado.empty:
-        st.warning("⚠️ Nenhum cavalo foi selecionado ou carregado. Adicione dados para calcular as apostas.")
+        st.warning("⚠️ Nenhum cavalo foi selecionado ou carregado.")
     else:
-        # ✅ Opção de ativar ou desativar a análise de desempenho
         incluir_desempenho = st.checkbox("Incluir análise de desempenho?", value=True)
-
-        # ✅ Verificar se df_desempenho tem dados antes do merge
-        if incluir_desempenho and not df_desempenho.empty and "Desempenho Médio Ajustado" in df_desempenho.columns:
-            df_cavalos_filtrado = df_cavalos_filtrado.merge(df_desempenho[["Nome da Equipe", "Desempenho Médio Ajustado"]],
-                                                             left_on="Nome",
-                                                             right_on="Nome da Equipe",
-                                                             how="left")
-            df_cavalos_filtrado["Desempenho Médio Ajustado"].fillna(1, inplace=True)  # Define 1 como padrão se não houver correspondência
+        
+        # Merge de desempenho apenas se necessário
+        if incluir_desempenho and not df_desempenho.empty:
+            df_cavalos_filtrado = df_cavalos_filtrado.merge(df_desempenho, left_on="Nome", right_on="Nome da Equipe", how="left")
+            df_cavalos_filtrado["Desempenho Médio Ajustado"].fillna(1, inplace=True)
         else:
-            df_cavalos_filtrado["Desempenho Médio Ajustado"] = 1  # 🔹 Garante a existência da coluna
+            df_cavalos_filtrado["Desempenho Médio Ajustado"] = 1
+        
+        # Calcular apostas Dutching e probabilidades
+        df_cavalos_filtrado["Probabilidade"] = (1 / df_cavalos_filtrado["Odds"]).round(2)
+        df_cavalos_filtrado["Dutching Bet"] = calculate_dutching(df_cavalos_filtrado["Odds"], bankroll, np.ones(len(df_cavalos_filtrado)))
+        df_cavalos_filtrado["Gain Dutch"] = round(df_cavalos_filtrado["Odds"] * df_cavalos_filtrado["Dutching Bet"], 2)
+        df_cavalos_filtrado["ROI (%)"] = round((df_cavalos_filtrado["Gain Dutch"] / df_cavalos_filtrado["Dutching Bet"]) * 100, 2)
 
-    # ✅ Exibir seção "Aposta Top 3"
+        st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Probabilidade", "Dutching Bet", "Gain Dutch", "ROI (%)"]])
+
+        st.write(f"💰 **Total de Aposta:** R$ {df_cavalos_filtrado['Dutching Bet'].sum():.2f}")
+        st.write(f"💸 **Gain Esperado:** R$ {df_cavalos_filtrado['Gain Dutch'].sum():.2f}")
+        st.write(f"✅ **Lucro:** R$ {(df_cavalos_filtrado['Gain Dutch'] - df_cavalos_filtrado['Dutching Bet']).sum():.2f}")
+    
+    # Exibir dados de desempenho de equipes
+    st.write("##### | Analise de Desempenho")
+    st.dataframe(df_desempenho)
+
+    # --- Aposta Top 3 ---
     st.write("##### | Aposta Top 3")
-
-    # ✅ Entrada manual para definir o percentual de ajuste do Overround
     ajuste_percentual = st.number_input("Digite o percentual de redução do Overround (%)", min_value=0.5, max_value=10.0, step=0.5, value=2.0)
-
-    # ✅ Aplicação do ajuste nas odds com o percentual manual
-    if not df_cavalos.empty and "Odds" in df_cavalos.columns:
+    
+    if not df_cavalos.empty:
         df_cavalos["Odd Ajustada"] = df_cavalos["Odds"] * (1 - ajuste_percentual / 100)
-        st.dataframe(df_cavalos[["Nome", "Odds", "Odd Ajustada"]])  # 🔹 Exibe as odds ajustadas
-    else:
-        st.warning("⚠️ Nenhum cavalo disponível para ajuste manual.")
+        st.dataframe(df_cavalos[["Nome", "Odds", "Odd Ajustada"]])
 
-    # ✅ Selecionar automaticamente os favoritos de acordo com o tamanho do páreo
-    num_cavalos = len(df_cavalos_filtrado)
-    percentual_favoritos = 0.5
-    num_favoritos = max(3, round(num_cavalos * percentual_favoritos))  # 🔹 Ajuste dinâmico do número de favoritos
-    df_favoritos = df_cavalos_filtrado.nsmallest(num_favoritos, "Odds") if not df_cavalos_filtrado.empty else None
+    prob_vitoria_favorito = st.number_input("Insira a probabilidade histórica de vitória do favorito (%)", min_value=0.0, max_value=100.0, step=0.1, value=39.68) / 100
+    
+    num_favoritos = max(3, round(len(df_cavalos_filtrado) * 0.5))
+    df_favoritos = df_cavalos_filtrado.nsmallest(num_favoritos, "Odds") if not df_cavalos_filtrado.empty else pd.DataFrame()
 
-    # ✅ Definir a probabilidade histórica do favorito e usá-la para ponderação das apostas
-    prob_vitoria_favorito = st.number_input("Insira a probabilidade histórica de vitória do favorito (%)",
-                                            min_value=0.0, max_value=100.0, step=0.1, value=39.68) / 100
-
-    # ✅ Distribuição proporcional do bankroll entre favoritos
-    if df_favoritos is not None and not df_favoritos.empty:
-        bankroll_favoritos = bankroll * percentual_favoritos
+    if not df_favoritos.empty:
+        bankroll_favoritos = bankroll * 0.5
         soma_inverso_odds = df_favoritos["Odds"].apply(lambda x: (1 / x) * prob_vitoria_favorito).sum()
-
         df_favoritos["Valor Apostado"] = round(bankroll_favoritos * (1 / df_favoritos["Odds"]) / soma_inverso_odds, 2)
-        df_cavalos_filtrado = df_cavalos_filtrado.merge(df_favoritos[["Nome", "Valor Apostado"]], on="Nome", how="left")
+        st.dataframe(df_favoritos[["Nome", "Odds", "Valor Apostado"]])
+    
+    nomes_ajuste = st.multiselect("Selecione os cavalos para apostar:", df_cavalos_filtrado["Nome"].unique())
+    ajuste_base = st.slider("Defina o ajuste percentual baseado no desempenho (%)", 0.1, 3.0, 1.0, 0.05)
 
-    # ✅ Calcular Expected Value (EV) e validar apostas
-    df_cavalos_filtrado["EV"] = (df_cavalos_filtrado["Probabilidade"] * df_cavalos_filtrado["Odd Ajustada"]) - 1
-    df_cavalos_filtrado["Valor Apostado"] *= df_cavalos_filtrado["EV"] > 0  # 🔹 Apostar apenas em EV positivo
+    df_cavalos_ajuste = df_cavalos_filtrado[df_cavalos_filtrado["Nome"].isin(nomes_ajuste)] if nomes_ajuste else df_cavalos_filtrado
 
-    # ✅ Calcular Retorno Máximo e Mínimo
-    if "Gain Adjusted" in df_cavalos_filtrado.columns:
-        retorno_maximo = df_cavalos_filtrado["Gain Adjusted"].max()
-        retorno_minimo = df_cavalos_filtrado["Gain Adjusted"].min()
-    else:
-        retorno_maximo, retorno_minimo = 0, 0
+    if "Dutching Bet" in df_cavalos_ajuste.columns:
+        df_cavalos_ajuste["Adjusted Bet"] = round(df_cavalos_ajuste["Dutching Bet"] * ajuste_base, 2)
+        df_cavalos_ajuste["Gain Adjusted"] = round(df_cavalos_ajuste["Adjusted Bet"] * df_cavalos_ajuste["Odds"], 2)
 
-    # ✅ Exibir os retornos para validar estratégia
-    st.write(f"📈 **Retorno Máximo:** R$ {retorno_maximo:.2f}")
-    st.write(f"📉 **Retorno Mínimo:** R$ {retorno_minimo:.2f}")
+        st.dataframe(df_cavalos_ajuste[["Nome", "Odds", "Dutching Bet", "Adjusted Bet", "Gain Adjusted"]])
+    
+    st.write(f"📈 **Retorno Máximo:** R$ {df_cavalos_ajuste['Gain Adjusted'].max():.2f}")
+    st.write(f"📉 **Retorno Mínimo:** R$ {df_cavalos_ajuste['Gain Adjusted'].min():.2f}")
