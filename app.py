@@ -511,10 +511,10 @@ with tab4:
     # ✅ Exibir seção "Aposta Top 3"
     st.write("##### | Aposta Top 3")
 
-    # ✅ Entrada manual para ajustar  overround das odds
+    # ✅ Entrada manual para ajustar overround das odds
     if not df_cavalos_filtrado.empty and "Odds" in df_cavalos_filtrado.columns:
         df_cavalos_filtrado["Odd Ajustada"] = [
-            st.number_input(f"Digite a Odd Ajustada para {nome}", min_value=1.01, max_value=100.0, value=odd)
+            ajuste_percentual = st.number_input("Digite o percentual de ajuste de desempenho (%)", min_value=0.1, max_value=2.0, step=0.05, value=0.2)
             for nome, odd in zip(df_cavalos_filtrado["Nome"], df_cavalos_filtrado["Odds"])
         ]
     else:
