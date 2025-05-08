@@ -483,10 +483,6 @@ with tab4:
             df_cavalos_filtrado["Desempenho Médio Ajustado"].fillna(1, inplace=True)
         else:
             df_cavalos_filtrado["Desempenho Médio Ajustado"] = 1
-
-        # Cálculo do EV com probabilidade estimada
-        df_cavalos_filtrado["Probabilidade Estimada"] = prob_vitoria_favorito
-        df_cavalos_filtrado["EV"] = (df_cavalos_filtrado["Probabilidade Estimada"] * df_cavalos_filtrado["Odds"]) - 1
         
         # Filtragem: Apostar apenas em cavalos com EV positivo
         df_cavalos_filtrado = df_cavalos_filtrado[df_cavalos_filtrado["EV"] > 0]
@@ -520,6 +516,10 @@ with tab4:
         st.dataframe(df_cavalos[["Nome", "Odds", "Odd Ajustada"]])
 
     prob_vitoria_favorito = st.number_input("Insira a probabilidade histórica de vitória do favorito (%)", min_value=0.0, max_value=100.0, step=0.1, value=39.68) / 100
+
+    # Cálculo do EV com probabilidade estimada
+        df_cavalos_filtrado["Probabilidade Estimada"] = prob_vitoria_favorito
+        df_cavalos_filtrado["EV"] = (df_cavalos_filtrado["Probabilidade Estimada"] * df_cavalos_filtrado["Odds"]) - 1
     
     num_favoritos = max(3, round(len(df_cavalos_filtrado) * 0.5))
     df_favoritos = df_cavalos_filtrado.nsmallest(num_favoritos, "Odds") if not df_cavalos_filtrado.empty else pd.DataFrame()
