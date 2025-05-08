@@ -534,7 +534,7 @@ with tab4:
         top_desempenho = df_desempenho.nlargest(3, "Desempenho Médio Ajustado")
     
         # ✅ Exibir o Top 3 lado a lado
-        st.markdown("<h2 style='text-align: center; font-size: 28px;'>🏆 Top 3 Melhores Desempenhos 🏆</h2>", unsafe_allow_html=True)
+        st.markdown("<h2 style='text-align: center; font-size: 12px;'>🏆 Top 3 Melhores Desempenhos 🏆</h2>", unsafe_allow_html=True)
         col1, col2, col3 = st.columns(3)  # Criando três colunas para exibir os melhores
         with col1:
             st.write(f"🥇 **{top_desempenho.iloc[0]['Nome da Equipe']}** → {top_desempenho.iloc[0]['Desempenho Médio Ajustado']:.2f}")
