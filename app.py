@@ -533,9 +533,11 @@ if not df_favoritos.empty:
 
         # Cálculo do valor total apostado e do lucro esperado
         total_apostado = df_favoritos["Valor Apostado"].sum()
+        retorno_aposta = (df_favoritos["Valor Apostado"].sum() * df_favoritos["Odds"]).sum()
         lucro_aposta = (df_favoritos["Valor Apostado"] * df_favoritos["Odds"]).sum() - total_apostado
 
         st.write(f"💰 **Total de Aposta:** R$ {total_apostado:.2f}")
+        st.write(f"💸 **Gain Esperado:** R$ {retorno_aposta:.2f}")
         st.write(f"✅ **Lucro Esperado:** R$ {lucro_aposta:.2f}")
     else:
         st.warning("⚠️ Erro: soma das probabilidades inversas é zero, verifique os dados das odds.")
