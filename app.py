@@ -627,7 +627,7 @@ if not df_cavalos_filtrado.empty:
         else:
             st.warning("⚠️ A coluna 'Desempenho Médio Ajustado' não foi encontrada após o merge.")
     else:
-    st.warning("⚠️ O DataFrame de desempenho está vazio ou sem as colunas esperadas.")
+        st.warning("⚠️ O DataFrame de desempenho está vazio ou sem as colunas esperadas.")
     
     # ✅ Garantir que "Valor Apostado" seja criado antes do ajuste
     bankroll_favoritos = bankroll * percentual_bankroll_favoritos
