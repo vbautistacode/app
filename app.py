@@ -539,7 +539,7 @@ with tab4:
                 width: 75px !important;
             }
             div[data-baseweb="select"] {
-                width: 75px !important;
+                width: 125px !important;
             }
         </style>
     """, unsafe_allow_html=True)
