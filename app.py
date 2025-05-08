@@ -549,14 +549,10 @@ if not df_favoritos.empty:
     df_favoritos["Odds"] = pd.to_numeric(df_favoritos["Odds"], errors="coerce")
     df_favoritos.dropna(subset=["Odds"], inplace=True)
 
-# Criar "Gain Adjusted" se não existir para evitar erro
-if not df_cavalos_ajuste.empty and "Gain Adjusted" not in df_cavalos_ajuste.columns:
-    df_cavalos_ajuste["Gain Adjusted"] = 0
-
 # Calcular retorno máximo e mínimo
 if not df_cavalos_ajuste.empty:
-    retorno_maximo = df_cavalos_ajuste["Gain Adjusted"].nlargest(3).sum()
-    retorno_minimo = df_cavalos_ajuste["Gain Adjusted"].nsmallest(3).sum()
+    retorno_maximo = df_favoritos["Valor Apostado"].nlargest(3).sum()
+    retorno_minimo = df_favoritos["Valor Apostado"].nsmallest(3).sum()
 
     st.write(f"📈 **Retorno Máximo:** R$ {retorno_maximo:.2f}")
     st.write(f"📉 **Retorno Mínimo:** R$ {retorno_minimo:.2f}")
