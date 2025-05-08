@@ -636,12 +636,12 @@ if not df_cavalos_filtrado.empty:
         df_cavalos_filtrado["Desempenho Médio Ajustado"] = 1  # Define valor padrão se não houver análise
 
     # ✅ Garantir que "Valor Apostado" seja criado antes do ajuste
-   if df_cavalos_filtrado["Odds"].sum() > 0:
-        df_cavalos_filtrado["Valor Apostado"] = round(
-            (bankroll_favoritos / df_cavalos_filtrado["Odds"].sum()) * df_cavalos_filtrado["Odds"], 2
-        )
-    else:
-        st.warning("⚠️ Erro: Soma das Odds é zero. Verifique os dados antes de calcular apostas.")
+       if df_cavalos_filtrado["Odds"].sum() > 0:
+            df_cavalos_filtrado["Valor Apostado"] = round(
+                (bankroll_favoritos / df_cavalos_filtrado["Odds"].sum()) * df_cavalos_filtrado["Odds"], 2
+            )
+        else:
+            st.warning("⚠️ Erro: Soma das Odds é zero. Verifique os dados antes de calcular apostas.")
 
     # ✅ Ajuste baseado no desempenho histórico (caso a coluna esteja presente)
     if "Valor Apostado" in df_cavalos_filtrado.columns and "Desempenho Médio Ajustado" in df_cavalos_filtrado.columns:
