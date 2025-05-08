@@ -505,60 +505,64 @@ with tab4:
     st.divider()
     
     # --- Aposta Top 3 ---
-    st.write("##### | Aposta Top 3")
-    ajuste_percentual = st.number_input("Digite o percentual de redução do Overround (%)", min_value=0.5, max_value=10.0, step=0.5, value=2.0)
-    
-    if not df_cavalos.empty:
-        df_cavalos["Odd Ajustada"] = df_cavalos["Odds"] * (1 - ajuste_percentual / 100)
-        st.dataframe(df_cavalos[["Nome", "Odds", "Odd Ajustada"]])
+st.write("##### | Aposta Top 3")
 
-    prob_vitoria_favorito = st.number_input("Insira a probabilidade histórica de vitória do favorito (%)", min_value=0.0, max_value=100.0, step=0.1, value=39.68) / 100
+# Ajuste do Overround nas odds
+ajuste_percentual = st.number_input("Digite o percentual de redução do Overround (%)", min_value=0.5, max_value=10.0, step=0.5, value=2.0)
 
-    num_favoritos = max(3, round(len(df_cavalos_filtrado) * 0.5))
-    df_favoritos = df_cavalos_filtrado.nsmallest(num_favoritos, "Odds") if not df_cavalos_filtrado.empty else pd.DataFrame()
+if not df_cavalos.empty:
+    df_cavalos["Odd Ajustada"] = df_cavalos["Odds"] * (1 - ajuste_percentual / 100)
+    st.dataframe(df_cavalos[["Nome", "Odds", "Odd Ajustada"]])
 
-    if not df_favoritos.empty:
-        bankroll_favoritos = bankroll * 0.5
-        soma_inverso_odds = df_favoritos["Odds"].apply(lambda x: (1 / x) * prob_vitoria_favorito).sum()
-        df_favoritos["Valor Apostado"] = round(bankroll_favoritos * (1 / df_favoritos["Odds"]) / soma_inverso_odds, 2)
+# Definir probabilidade histórica de vitória do favorito
+prob_vitoria_favorito = st.number_input("Insira a probabilidade histórica de vitória do favorito (%)", min_value=0.0, max_value=100.0, step=0.1, value=39.68) / 100
 
-    # Exibir dataframe atualizado com valores apostados
-        st.dataframe(df_favoritos[["Nome", "Odds", "Valor Apostado"]])
-        
-    # Calcular e exibir valor total apostado e lucro
-        total_apostado = df_favoritos["Valor Apostado"].sum()
-        lucro_aposta = (df_favoritos["Valor Apostado"] * df_favoritos["Odds"]).sum() - total_apostado
+# Seleção dos favoritos (50% dos cavalos do páreo)
+num_favoritos = max(3, round(len(df_cavalos_filtrado) * 0.5))
+df_favoritos = df_cavalos_filtrado.nsmallest(num_favoritos, "Odds") if not df_cavalos_filtrado.empty else pd.DataFrame()
 
-        st.write(f"💰 **Total de Aposta:** R$ {total_apostado:.2f}")
-        st.write(f"✅ **Lucro Esperado:** R$ {lucro_aposta:.2f}")
-    
-    nomes_ajuste = st.multiselect("Selecione os cavalos para apostar:", df_cavalos_filtrado["Nome"].unique())
-    ajuste_base = st.slider("Defina o ajuste percentual baseado no desempenho (%)", 0.1, 3.0, 1.0, 0.05)
+# Distribuição do bankroll nos favoritos
+if not df_favoritos.empty:
+    bankroll_favoritos = bankroll * 0.5
+    soma_inverso_odds = df_favoritos["Odds"].apply(lambda x: (1 / x) * prob_vitoria_favorito).sum()
+    df_favoritos["Valor Apostado"] = round(bankroll_favoritos * (1 / df_favoritos["Odds"]) / soma_inverso_odds, 2)
 
-    df_cavalos_ajuste = df_cavalos_filtrado[df_cavalos_filtrado["Nome"].isin(nomes_ajuste)] if nomes_ajuste else df_cavalos_filtrado
+    st.dataframe(df_favoritos[["Nome", "Odds", "Valor Apostado"]])
 
-    # ✅ Converter "Odds" para numérico e eliminar possíveis NaN
-    df_cavalos_ajuste["Odds"] = pd.to_numeric(df_cavalos_ajuste["Odds"], errors="coerce")
-    df_cavalos_ajuste.dropna(subset=["Odds"], inplace=True)
+    # Cálculo do valor total apostado e do lucro esperado
+    total_apostado = df_favoritos["Valor Apostado"].sum()
+    lucro_aposta = (df_favoritos["Valor Apostado"] * df_favoritos["Odds"]).sum() - total_apostado
 
-    # ✅ Garantir que "Gain Adjusted" existe antes de calcular os retornos
-    if not df_cavalos_ajuste.empty and "Gain Adjusted" in df_cavalos_ajuste.columns:
-        retorno_maximo = df_cavalos_ajuste.nlargest(3, "Odds")["Gain Adjusted"].sum()
-        retorno_minimo = df_cavalos_ajuste.nsmallest(3, "Odds")["Gain Adjusted"].sum()
-    
-        # ✅ Exibir os retornos ajustados para validar a estratégia
-        st.write(f"📈 **Retorno Máximo:** R$ {retorno_maximo:.2f}")
-        st.write(f"📉 **Retorno Mínimo:** R$ {retorno_minimo:.2f}")
-    else:
-        st.warning("⚠️ Não há dados suficientes para calcular retorno máximo e mínimo.")
-    
-        # ✅ Cálculo do EV com probabilidade estimada
-        df_cavalos_filtrado["Probabilidade Estimada"] = prob_vitoria_favorito
-        df_cavalos_filtrado["EV"] = (df_cavalos_filtrado["Probabilidade Estimada"] * df_cavalos_filtrado["Odds"]) - 1
-        
-        # ✅ Exibir status de aposta com base no EV
-        df_cavalos_filtrado["Status Aposta"] = df_cavalos_filtrado["EV"].apply(lambda x: "Odd Favorável" if x > 1 else "Não Apostar")
-        
-        # ✅ Exibir o resultado na interface
-        for index, row in df_cavalos_filtrado.iterrows():
-            st.write(f"🐎 **{row['Nome']}** | EV: {row['EV']:.2f} → {row['Status Aposta']}")
+    st.write(f"💰 **Total de Aposta:** R$ {total_apostado:.2f}")
+    st.write(f"✅ **Lucro Esperado:** R$ {lucro_aposta:.2f}")
+
+# Ajuste percentual baseado no desempenho
+nomes_ajuste = st.multiselect("Selecione os cavalos para apostar:", df_cavalos_filtrado["Nome"].unique())
+ajuste_base = st.slider("Defina o ajuste percentual baseado no desempenho (%)", 0.1, 3.0, 1.0, 0.05)
+
+df_cavalos_ajuste = df_cavalos_filtrado[df_cavalos_filtrado["Nome"].isin(nomes_ajuste)] if nomes_ajuste else df_cavalos_filtrado
+
+# Converter "Odds" para numérico e eliminar possíveis NaN
+df_cavalos_ajuste["Odds"] = pd.to_numeric(df_cavalos_ajuste["Odds"], errors="coerce")
+df_cavalos_ajuste.dropna(subset=["Odds"], inplace=True)
+
+# Calcular retorno máximo e mínimo
+if not df_cavalos_ajuste.empty and "Gain Adjusted" in df_cavalos_ajuste.columns:
+    retorno_maximo = df_cavalos_ajuste.nlargest(3, "Odds")["Gain Adjusted"].sum()
+    retorno_minimo = df_cavalos_ajuste.nsmallest(3, "Odds")["Gain Adjusted"].sum()
+
+    st.write(f"📈 **Retorno Máximo:** R$ {retorno_maximo:.2f}")
+    st.write(f"📉 **Retorno Mínimo:** R$ {retorno_minimo:.2f}")
+else:
+    st.warning("⚠️ Não há dados suficientes para calcular retorno máximo e mínimo.")
+
+# Cálculo do EV com probabilidade estimada
+df_cavalos_filtrado["Probabilidade Estimada"] = prob_vitoria_favorito
+df_cavalos_filtrado["EV"] = (df_cavalos_filtrado["Probabilidade Estimada"] * df_cavalos_filtrado["Odds"]) - 1
+
+# Exibir status de aposta com base no EV
+df_cavalos_filtrado["Status Aposta"] = df_cavalos_filtrado["EV"].apply(lambda x: "Odd Favorável" if x > 0 else "Não Apostar")
+
+# Exibir o resultado na interface
+for index, row in df_cavalos_filtrado.iterrows():
+    st.write(f"🐎 **{row['Nome']}** | EV: {row['EV']:.2f} → {row['Status Aposta']}")
