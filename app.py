@@ -15,6 +15,18 @@ import os
 # Configurar Pandas para aceitar futuras mudanças no tratamento de objetos
 pd.set_option('future.no_silent_downcasting', True)
 
+# ✅ Ajustar tamanho dos campos de entrada usando CSS
+    st.markdown("""
+        <style>
+            div[data-baseweb="input"] {
+                width: 75px !important;
+            }
+            div[data-baseweb="select"] {
+                width: 200px !important;
+            }
+        </style>
+    """, unsafe_allow_html=True)
+
 # --- Configuração do GitHub ---
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 REPO_OWNER = "vbautistacode"
@@ -531,18 +543,6 @@ with tab4:
     
 # --- Aposta Top 3 ---
     st.write("##### | Aposta Top 3")
-    
-    # ✅ Ajustar tamanho dos campos de entrada usando CSS
-    st.markdown("""
-        <style>
-            div[data-baseweb="input"] {
-                width: 75px !important;
-            }
-            div[data-baseweb="select"] {
-                width: 125px !important;
-            }
-        </style>
-    """, unsafe_allow_html=True)
 
 # ✅ Definir probabilidade histórica de vitória do favorito
     prob_vitoria_favorito = st.number_input("Defina a probabilidade histórica de vitória do favorito (%)", min_value=0.0, max_value=100.0, step=0.1, value=39.68) / 100
