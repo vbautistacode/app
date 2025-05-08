@@ -521,10 +521,6 @@ prob_vitoria_favorito = st.number_input("Insira a probabilidade histórica de vi
 num_favoritos = round(len(df_cavalos_filtrado) * 0.5)
 df_favoritos = df_cavalos_filtrado.nsmallest(num_favoritos, "Odds") if not df_cavalos_filtrado.empty else pd.DataFrame()
 
-# Debug: Exibir os dados dos favoritos antes da aposta
-st.write("🛠️ Debug - Dados dos favoritos antes da aposta:")
-st.write(df_favoritos)
-
 # Verificação de existência de dados antes de prosseguir com cálculos
 if not df_favoritos.empty:
     bankroll_favoritos = bankroll * 0.5
