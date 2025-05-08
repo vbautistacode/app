@@ -22,7 +22,7 @@ st.markdown("""
             width: 150px !important;
         }
         div[data-baseweb="select"] {
-            width: 150px !important;
+            width: 200px !important;
         }
     </style>
 """, unsafe_allow_html=True)
