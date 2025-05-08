@@ -502,6 +502,12 @@ with tab4:
         st.write(f"✅ **Lucro:** R$ {lucro:.2f}")
         st.divider()
 
+    # ✅ Exibir seção "Desempenho"
+    st.write("##### | Analise de Desempenho")
+        
+        st.write("📊 Dados de Desempenho das Equipes:")
+        st.dataframe(df_desempenho)
+
     # ✅ Exibir seção "Aposta Top 3"
     st.write("##### | Aposta Top 3")
 
