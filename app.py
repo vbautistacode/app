@@ -680,7 +680,7 @@ with tab4:
     
         if df_cavalos_filtrado["Odds"].sum() > 0:
             df_cavalos_filtrado["Valor Apostado"] = round(
-                (bankroll_favoritos / df_cavalos_filtrado["Odds"].sum()) * df_cavalos_filtrado["Odds"], 2
+                (bankroll_favoritos / df_cavalos_filtrado["Odds"].sum()) * df_favoritos["Odds"], 2
             )
         else:
             st.warning("⚠️ Erro: Soma das Odds é zero. Verifique os dados antes de calcular apostas.")
@@ -689,7 +689,7 @@ with tab4:
         df_cavalos_filtrado = calcular_aposta_ajustada(df_cavalos_filtrado, bankroll_favoritos)
         
         # ✅ Exibir DataFrame atualizado
-        st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Desempenho Médio Ajustado", "Valor Apostado Ajustado"]])
+        st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Valor Apostado Ajustado"]])
         
         # ✅ Exibir totais ajustados
         total_aposta_ajustada = df_cavalos_filtrado["Valor Apostado Ajustado"].sum()
