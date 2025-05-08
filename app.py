@@ -510,14 +510,14 @@ st.write("##### | Aposta Top 3")
 # Definir probabilidade histórica de vitória do favorito
 prob_vitoria_favorito = st.number_input("Insira a probabilidade histórica de vitória do favorito (%)", min_value=0.0, max_value=100.0, step=0.1, value=39.68) / 100
 
+# Entrada manual para definir percentual do bankroll nos favoritos
+percentual_bankroll_favoritos = st.number_input("Defina o percentual do bankroll para favoritos (%)", min_value=0.0, max_value=100.0, step=1.0, value=50.0) / 100
+
 # Entrada manual para seleção dos favoritos
 nomes_favoritos = st.multiselect("Selecione manualmente os cavalos favoritos:", df_cavalos_filtrado["Nome"].unique())
 
 # Filtrar os favoritos com base na seleção manual
 df_favoritos = df_cavalos_filtrado[df_cavalos_filtrado["Nome"].isin(nomes_favoritos)] if nomes_favoritos else pd.DataFrame()
-
-# Entrada manual para definir percentual do bankroll nos favoritos
-percentual_bankroll_favoritos = st.number_input("Defina o percentual do bankroll para favoritos (%)", min_value=0.0, max_value=100.0, step=1.0, value=50.0) / 100
 
 # Verificação de existência de dados antes de prosseguir com cálculos
 if not df_favoritos.empty:
