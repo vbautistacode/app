@@ -498,7 +498,7 @@ with tab4:
     if df_cavalos_filtrado.empty:
         st.warning("⚠️ Nenhum cavalo foi selecionado ou carregado.")
     else:
-        incluir_desempenho = st.checkbox("Incluir análise de desempenho?", value=True)
+        incluir_desempenho = st.checkbox("Incluir análise de desempenho?", value=True, key="incluir_desempenho_aba4")
     
         # Merge de desempenho apenas se necessário
         if incluir_desempenho and not df_desempenho.empty:
@@ -556,7 +556,7 @@ with tab4:
     ) / 100
     
     # ✅ Entrada manual para seleção dos favoritos, ordenando por desempenho se ativado
-    incluir_desempenho = st.checkbox("Incluir análise de desempenho?", value=True)
+    incluir_desempenho = st.checkbox("Incluir análise de desempenho?", value=True, key="incluir_desempenho_top3")
     if incluir_desempenho:
         df_cavalos_filtrado = df_cavalos_filtrado.sort_values("Desempenho Médio Ajustado", ascending=False)
     
