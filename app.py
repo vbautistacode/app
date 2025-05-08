@@ -483,6 +483,13 @@ with tab4:
             df_cavalos_filtrado["Desempenho Médio Ajustado"].fillna(1, inplace=True)
         else:
             df_cavalos_filtrado["Desempenho Médio Ajustado"] = 1
+
+        # Cálculo do EV com probabilidade estimada
+        df_cavalos_filtrado["Probabilidade Estimada"] = prob_vitoria_favorito
+        df_cavalos_filtrado["EV"] = (df_cavalos_filtrado["Probabilidade Estimada"] * df_cavalos_filtrado["Odds"]) - 1
+        
+        # Filtragem: Apostar apenas em cavalos com EV positivo
+        df_cavalos_filtrado = df_cavalos_filtrado[df_cavalos_filtrado["EV"] > 0]
         
         # Calcular apostas Dutching e probabilidades
         df_cavalos_filtrado["Probabilidade"] = (1 / df_cavalos_filtrado["Odds"]).round(2)
@@ -495,11 +502,15 @@ with tab4:
         st.write(f"💰 **Total de Aposta:** R$ {df_cavalos_filtrado['Dutching Bet'].sum():.2f}")
         st.write(f"💸 **Gain Esperado:** R$ {df_cavalos_filtrado['Gain Dutch'].sum():.2f}")
         st.write(f"✅ **Lucro:** R$ {(df_cavalos_filtrado['Gain Dutch'] - df_cavalos_filtrado['Dutching Bet']).sum():.2f}")
-    
+
+    st.divider()
+        
     # Exibir dados de desempenho de equipes
     st.write("##### | Analise de Desempenho")
     st.dataframe(df_desempenho)
 
+    st.divider()
+    
     # --- Aposta Top 3 ---
     st.write("##### | Aposta Top 3")
     ajuste_percentual = st.number_input("Digite o percentual de redução do Overround (%)", min_value=0.5, max_value=10.0, step=0.5, value=2.0)
@@ -517,7 +528,15 @@ with tab4:
         bankroll_favoritos = bankroll * 0.5
         soma_inverso_odds = df_favoritos["Odds"].apply(lambda x: (1 / x) * prob_vitoria_favorito).sum()
         df_favoritos["Valor Apostado"] = round(bankroll_favoritos * (1 / df_favoritos["Odds"]) / soma_inverso_odds, 2)
+
+    # Exibir dataframe atualizado com valores apostados
         st.dataframe(df_favoritos[["Nome", "Odds", "Valor Apostado"]])
+    # Calcular e exibir valor total apostado e lucro
+        total_apostado = df_favoritos["Valor Apostado"].sum()
+        lucro_aposta = (df_favoritos["Valor Apostado"] * df_favoritos["Odds"]).sum() - total_apostado
+
+        st.write(f"💰 **Total de Aposta:** R$ {total_apostado:.2f}")
+        st.write(f"✅ **Lucro Esperado:** R$ {lucro_aposta:.2f}")
     
     nomes_ajuste = st.multiselect("Selecione os cavalos para apostar:", df_cavalos_filtrado["Nome"].unique())
     ajuste_base = st.slider("Defina o ajuste percentual baseado no desempenho (%)", 0.1, 3.0, 1.0, 0.05)
