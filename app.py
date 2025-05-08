@@ -222,7 +222,8 @@ with tab2:
 # ✅ Verifica se 'horse_data' já foi inicializado
     if "horse_data" not in st.session_state:
         st.session_state["horse_data"] = []
-    if "local_atual" in st.session_state and st.session_state["local_atual"]:
+    if "local_atual" not in st.session_state: 
+        st.session_state["local_atual"] = None
         
 # ✅ Inicializa a variável de controle de registro
     if "horse_data_started" not in st.session_state:
