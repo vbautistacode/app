@@ -515,6 +515,18 @@ with tab4:
     st.write("##### | Analise de Desempenho")
     st.dataframe(df_desempenho)
 
+    # ✅ Garantir que há dados antes de exibir o Top de Desempenho
+    if not df_desempenho.empty and "Desempenho Médio Ajustado" in df_desempenho.columns:
+        # Ordenar do melhor para o pior e selecionar os 3 primeiros
+        top_desempenho = df_desempenho.nlargest(3, "Desempenho Médio Ajustado")
+    
+        # ✅ Exibir o ranking dos melhores desempenhos
+        st.write("🏆 **Top 3 Melhores Desempenhos** 🏆")
+        for index, row in top_desempenho.iterrows():
+            st.write(f"🔹 **{row['Nome da Equipe']}** → Desempenho: {row['Desempenho Médio Ajustado']:.2f}")
+    else:
+        st.warning("⚠️ Dados insuficientes para calcular o Top de Desempenho.")
+        
     st.divider()
     
 # --- Aposta Top 3 ---
