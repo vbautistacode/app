@@ -495,7 +495,7 @@ with tab4:
             st.dataframe(df_desempenho)    
         st.divider()
 
-    st.write("##### | Aposta Top 3")
+        st.write("##### | Aposta Top 3")
     
 # Aplicação da remoção de overround das odds
         df_cavalos["Odd Ajustada"] = df_cavalos["Odds"].apply(lambda x: ajustar_odds([x], 0.05)[0])
