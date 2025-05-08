@@ -96,11 +96,11 @@ st.session_state.setdefault("Nome", "Cavalo_Default")
 
 # --- Funções de cálculo ---
 
-# 🔹 Ajuste de odds removendo overround
+# Ajuste de odds removendo overround
 def ajustar_odds(odds, overround_pct):
     return [odd / (1 + overround_pct) for odd in odds]
 
-# 🔹 Cálculo da distribuição de apostas ajustadas considerando probabilidade real do favorito
+# Cálculo da distribuição de apostas ajustadas considerando probabilidade real do favorito
 def distribuir_apostas(df, total_aposta, incluir_desempenho):
     if incluir_desempenho:
         fator_ajuste = df["historico_vitoria"] / 100
@@ -110,8 +110,8 @@ def distribuir_apostas(df, total_aposta, incluir_desempenho):
     df["valor_apostado"] = np.round(total_aposta * (fator_ajuste / fator_ajuste.sum()), 2)
     return df
 
-def calculate_dutching(odds, bankroll, historical_factor):
 #Calcula a distribuição de apostas usando Dutching
+def calculate_dutching(odds, bankroll, historical_factor):
     probabilities = np.array([1 / odd for odd in odds])
     adjusted_probabilities = probabilities * historical_factor
     total_probability = adjusted_probabilities.sum()
@@ -157,21 +157,7 @@ def calcular_desempenho_equipes(team_data):
 
     return pd.DataFrame(df_desempenho_lista).sort_values(by="Desempenho Médio Ajustado", ascending=False)
 
-def distribuir_apostas(df, total_aposta, incluir_desempenho):
-    # Garantir que fator_ajuste seja uma série válida
-    if incluir_desempenho:
-        fator_ajuste = df["Desempenho Médio Ajustado"] / 100
-    else:
-        fator_ajuste = np.ones(len(df))  # Caso a análise esteja desativada, usa 1 para todos
-
-    # Verificar se fator_ajuste é uma série válida antes da operação
-    if isinstance(fator_ajuste, pd.Series):
-        df["valor_apostado"] = np.round(total_aposta * (fator_ajuste / fator_ajuste.sum()), 2)
-    else:
-        st.error("Erro ao calcular fator de ajuste: a variável não é uma série válida.")
-
-    return df
-
+# Função para calcular aposta ajustada com base nas odds e desempenho
 def calcular_aposta_ajustada(df, bankroll_favoritos):
     # ✅ Criar fator de ajuste baseado no desempenho
     df["Fator Ajustado"] = df["Desempenho Médio Ajustado"] / df["Desempenho Médio Ajustado"].max()
