@@ -469,14 +469,15 @@ with tab4:
         df_cavalos_filtrado["Valor Apostado"] = distribuir_apostas(df_cavalos_filtrado, bankroll, incluir_desempenho)["valor_apostado"]
     else:
         st.warning("⚠️ Nenhum cavalo foi selecionado ou carregado. Não há apostas para calcular.")
+        df_cavalos = pd.DataFrame(columns=["Nome", "Odds", "Dutching Bet", "Gain Dutch"])
+
     # ✅ Garantir que há dados antes de calcular apostas
     if "horse_data" in st.session_state and st.session_state["horse_data"]:
         df_cavalos = pd.DataFrame(st.session_state["horse_data"])
         bankroll = st.number_input("Digite o valor do Bankroll:", min_value=100.0, max_value=100000.0, step=10.0, value=1000.0, key="bankroll_input")
     else:
         st.warning("⚠️ Nenhum dado de cavalos disponível.")
-        df_cavalos = pd.DataFrame(columns=["Nome", "Odds", "Dutching Bet", "Gain Dutch"])
-
+    
     # ✅ Aplicação do filtro antes dos cálculos
     nomes_selecionados = st.multiselect("Selecione os cavalos:", df_cavalos["Nome"].unique())
     df_cavalos_filtrado = df_cavalos[df_cavalos["Nome"].isin(nomes_selecionados)] if nomes_selecionados else df_cavalos
