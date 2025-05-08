@@ -562,7 +562,7 @@ with tab4:
         st.divider()
 
     # ✅ Ajuste de apostas baseado no desempenho histórico
-        if not df_cavalos_filtrado.empty and "Desempenho Médio Ajustado" in df_cavalos_filtrado.columns:
+    if not df_cavalos_filtrado.empty and "Desempenho Médio Ajustado" in df_cavalos_filtrado.columns:
         # Normalizar os valores de desempenho para evitar distorções extremas
         df_cavalos_filtrado["Fator Desempenho"] = df_cavalos_filtrado["Desempenho Médio Ajustado"] / df_cavalos_filtrado["Desempenho Médio Ajustado"].max()
         
