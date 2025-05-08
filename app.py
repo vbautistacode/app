@@ -541,11 +541,11 @@ with tab4:
     if "Dutching Bet" in df_cavalos_ajuste.columns:
         df_cavalos_ajuste["Adjusted Bet"] = round(df_cavalos_ajuste["Dutching Bet"] * ajuste_percentual, 2)
         df_cavalos_ajuste["Gain Adjusted"] = round(df_cavalos_ajuste["Adjusted Bet"] * df_cavalos_ajuste["Odds"], 2)
-
         total_adjusted = df_cavalos_ajuste["Adjusted Bet"].sum()
         lucro_adjusted1 = df_cavalos_ajuste["Gain Adjusted"].sum()
+        lucro1 = (df_cavalos_ajuste["Adjusted Bet"].sum() - df_cavalos_ajuste["Gain Adjusted"].sum()
 
         st.dataframe(df_cavalos_ajuste[["Nome", "Odds", "Dutching Bet", "Adjusted Bet", "Gain Adjusted"]])
         st.write(f"💰 **Total de Aposta Ajustado:** R$ {total_adjusted:.2f}")
         st.write(f"💸 **Gain Esperado:** R$ {lucro_adjusted1:.2f}")
-        st.divider()
+        st.write(f"✅ **Lucro:** R$ {lucro1:.2f}")
