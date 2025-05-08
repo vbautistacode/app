@@ -517,5 +517,3 @@ with tab4:
 
     st.write(f"💰 **Total Ajustado:** R$ {df_cavalos_filtrado['Adjusted Bet'].sum():.2f}")
     st.write(f"💸 **Gain Esperado Ajustado:** R$ {df_cavalos_filtrado['Gain Adjusted'].sum():.2f}")
-
-    st.divider()xx
