@@ -540,18 +540,28 @@ with tab4:
 
     df_cavalos_ajuste = df_cavalos_filtrado[df_cavalos_filtrado["Nome"].isin(nomes_ajuste)] if nomes_ajuste else df_cavalos_filtrado
 
-    if "Dutching Bet" in df_cavalos_ajuste.columns:
-        df_cavalos_ajuste["Adjusted Bet"] = round(df_cavalos_ajuste["Dutching Bet"] * ajuste_base, 2)
-        df_cavalos_ajuste["Gain Adjusted"] = round(df_cavalos_ajuste["Adjusted Bet"] * df_cavalos_ajuste["Odds"], 2)
-    
-        st.dataframe(df_cavalos_ajuste[["Nome", "Odds", "Dutching Bet", "Adjusted Bet", "Gain Adjusted"]])
-    
-        # ✅ Retorno Máximo (Baseado nos 3 últimos cavalos com maiores odds)
+    # ✅ Converter "Odds" para numérico e eliminar possíveis NaN
+    df_cavalos_ajuste["Odds"] = pd.to_numeric(df_cavalos_ajuste["Odds"], errors="coerce")
+    df_cavalos_ajuste.dropna(subset=["Odds"], inplace=True)
+
+    # ✅ Garantir que "Gain Adjusted" existe antes de calcular os retornos
+    if not df_cavalos_ajuste.empty and "Gain Adjusted" in df_cavalos_ajuste.columns:
         retorno_maximo = df_cavalos_ajuste.nlargest(3, "Odds")["Gain Adjusted"].sum()
-    
-        # ✅ Retorno Mínimo (Baseado nos 3 primeiros cavalos com menores odds)
         retorno_minimo = df_cavalos_ajuste.nsmallest(3, "Odds")["Gain Adjusted"].sum()
     
         # ✅ Exibir os retornos ajustados para validar a estratégia
         st.write(f"📈 **Retorno Máximo:** R$ {retorno_maximo:.2f}")
         st.write(f"📉 **Retorno Mínimo:** R$ {retorno_minimo:.2f}")
+    else:
+        st.warning("⚠️ Não há dados suficientes para calcular retorno máximo e mínimo.")
+    
+        # ✅ Cálculo do EV com probabilidade estimada
+        df_cavalos_filtrado["Probabilidade Estimada"] = prob_vitoria_favorito
+        df_cavalos_filtrado["EV"] = (df_cavalos_filtrado["Probabilidade Estimada"] * df_cavalos_filtrado["Odds"]) - 1
+        
+        # ✅ Exibir status de aposta com base no EV
+        df_cavalos_filtrado["Status Aposta"] = df_cavalos_filtrado["EV"].apply(lambda x: "Odd Favorável" if x > 1 else "Não Apostar")
+        
+        # ✅ Exibir o resultado na interface
+        for index, row in df_cavalos_filtrado.iterrows():
+            st.write(f"🐎 **{row['Nome']}** | EV: {row['EV']:.2f} → {row['Status Aposta']}")
