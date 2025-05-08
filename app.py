@@ -546,8 +546,15 @@ with tab4:
     if "Dutching Bet" in df_cavalos_ajuste.columns:
         df_cavalos_ajuste["Adjusted Bet"] = round(df_cavalos_ajuste["Dutching Bet"] * ajuste_base, 2)
         df_cavalos_ajuste["Gain Adjusted"] = round(df_cavalos_ajuste["Adjusted Bet"] * df_cavalos_ajuste["Odds"], 2)
-
+    
         st.dataframe(df_cavalos_ajuste[["Nome", "Odds", "Dutching Bet", "Adjusted Bet", "Gain Adjusted"]])
     
-    st.write(f"📈 **Retorno Máximo:** R$ {df_cavalos_ajuste['Gain Adjusted'].max():.2f}")
-    st.write(f"📉 **Retorno Mínimo:** R$ {df_cavalos_ajuste['Gain Adjusted'].min():.2f}")
+        # ✅ Retorno Máximo (Baseado nos 3 últimos cavalos com maiores odds)
+        retorno_maximo = df_cavalos_ajuste.nlargest(3, "Odds")["Gain Adjusted"].sum()
+    
+        # ✅ Retorno Mínimo (Baseado nos 3 primeiros cavalos com menores odds)
+        retorno_minimo = df_cavalos_ajuste.nsmallest(3, "Odds")["Gain Adjusted"].sum()
+    
+        # ✅ Exibir os retornos ajustados para validar a estratégia
+        st.write(f"📈 **Retorno Máximo:** R$ {retorno_maximo:.2f}")
+        st.write(f"📉 **Retorno Mínimo:** R$ {retorno_minimo:.2f}")
