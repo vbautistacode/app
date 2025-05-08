@@ -516,7 +516,7 @@ with tab4:
         st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Probabilidade", "Dutching Bet", "Gain Dutch", "ROI (%)"]])
 
         st.write(f"💰 **Total de Aposta:** R$ {df_cavalos_filtrado['Dutching Bet'].sum():.2f}")
-        st.write(f"💸 **Gain Esperado:** R$ {df_cavalos_filtrado['Gain Dutch'].sum():.2f}")
+        st.write(f"💸 **Gain Esperado:** R$ {df_cavalos_filtrado['Gain Dutch'].iloc[0]:.2f}")
         st.write(f"✅ **Lucro:** R$ {(df_cavalos_filtrado['Gain Dutch'] - df_cavalos_filtrado['Dutching Bet']).sum():.2f}")
 
     st.divider()
