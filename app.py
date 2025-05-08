@@ -566,14 +566,3 @@ if not df_cavalos_ajuste.empty:
     st.write(f"📉 **Retorno Mínimo:** R$ {retorno_minimo:.2f}")
 else:
     st.warning("⚠️ Não há dados suficientes para calcular retorno máximo e mínimo.")
-
-# Cálculo do EV com probabilidade estimada
-df_cavalos_filtrado["Probabilidade Estimada"] = prob_vitoria_favorito
-df_cavalos_filtrado["EV"] = (df_cavalos_filtrado["Probabilidade Estimada"] * df_cavalos_filtrado["Odds"]) - 1
-
-# Exibir status de aposta com base no EV
-df_cavalos_filtrado["Status Aposta"] = df_cavalos_filtrado["EV"].apply(lambda x: "Odd Favorável" if x > 0 else "Não Apostar")
-
-# Exibir o resultado na interface
-for index, row in df_cavalos_filtrado.iterrows():
-    st.write(f"🐎 **{row['Nome']}** | EV: {row['EV']:.2f} → {row['Status Aposta']}")
