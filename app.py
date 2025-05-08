@@ -534,7 +534,7 @@ with tab4:
         top_desempenho = df_desempenho.nlargest(3, "Desempenho Médio Ajustado")
     
         # ✅ Exibir o Top 3 lado a lado
-        st.markdown("<h2 style='text-align: center; font-size: 18px;'>🏆 Top 3 Melhores Desempenhos 🏆</h2>", unsafe_allow_html=True)
+        st.markdown("<h2 style='text-align: left; font-size: 18px;'>🏆 Top 3 Melhores Desempenhos 🏆</h2>", unsafe_allow_html=True)
         col1, col2, col3 = st.columns(3)  # Criando três colunas para exibir os melhores
         with col1:
             st.write(f"🥇 **{top_desempenho.iloc[0]['Nome da Equipe']}** → {top_desempenho.iloc[0]['Desempenho Médio Ajustado']:.2f}")
@@ -547,7 +547,7 @@ with tab4:
         equipes_restantes = df_desempenho[~df_desempenho["Nome da Equipe"].isin(top_desempenho["Nome da Equipe"])]
     
         # ✅ Exibir o restante das equipes em duas colunas
-        st.markdown("<h3 style='text-align: center; font-size: 18px;'>🏇 Desempenho das Outras Equipes</h3>", unsafe_allow_html=True)
+        st.markdown("<h3 style='text-align: left; font-size: 18px;'>🏇 Desempenho das Outras Equipes</h3>", unsafe_allow_html=True)
         col_a, col_b = st.columns(2)
         for index, row in equipes_restantes.iterrows():
             if index % 2 == 0:  # Alterna entre as colunas
