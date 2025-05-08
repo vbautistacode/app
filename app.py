@@ -587,7 +587,7 @@ with tab4:
     if incluir_desempenho and not df_cavalos_filtrado.empty and "Desempenho Médio Ajustado" in df_cavalos_filtrado.columns:
         df_cavalos_filtrado = df_cavalos_filtrado.sort_values("Desempenho Médio Ajustado", ascending=False)
     else:
-        st.warning("⚠️ O DataFrame está vazio ou a coluna 'Desempenho Médio Ajustado' não existe. Verifique os dados antes da ordenação.")
+        st.text("")
 
     nomes_favoritos = st.multiselect(
         "Selecione os cavalos para apostar:",
