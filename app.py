@@ -469,6 +469,18 @@ with tab4:
     nomes_selecionados = st.multiselect("Selecione os cavalos:", df_cavalos["Nome"].unique())
     df_cavalos_filtrado = df_cavalos[df_cavalos["Nome"].isin(nomes_selecionados)] if nomes_selecionados else df_cavalos
 
+    # ✅ Verificar se df_desempenho tem dados antes do merge
+    if not df_desempenho.empty and "Desempenho Médio Ajustado" in df_desempenho.columns:
+        df_cavalos_filtrado = df_cavalos_filtrado.merge(df_desempenho[["Nome da Equipe", "Desempenho Médio Ajustado"]],
+                                                         left_on="Nome",
+                                                         right_on="Nome da Equipe",
+                                                         how="left")
+        df_cavalos_filtrado["Desempenho Médio Ajustado"].fillna(1, inplace=True)  # Define 1 como padrão se não houver correspondência
+
+    else:
+        st.warning("⚠️ Nenhuma equipe ou desempenho encontrado. Ajuste desativado.")
+        df_cavalos_filtrado["Desempenho Médio Ajustado"] = 1  # Valor padrão para evitar erro
+
     # ✅ Cálculo das probabilidades e apostas Dutching
     if not df_cavalos_filtrado.empty and "Odds" in df_cavalos_filtrado.columns:
         df_cavalos_filtrado["Probabilidade"] = (1 / df_cavalos_filtrado["Odds"]).round(2)
@@ -501,21 +513,11 @@ with tab4:
     # ✅ Opção de ativar ou desativar a análise de desempenho
     incluir_desempenho = st.checkbox("Incluir análise de desempenho?", value=True)
 
-    # ✅ Distribuição ajustada das apostas
-    if not df_cavalos_filtrado.empty:
+    # ✅ Garantir que a coluna existe antes de chamar distribuir_apostas()
+    if "Desempenho Médio Ajustado" in df_cavalos_filtrado.columns:
         df_cavalos_filtrado["Valor Apostado"] = distribuir_apostas(df_cavalos_filtrado, bankroll, incluir_desempenho)["valor_apostado"]
-        df_cavalos_filtrado["Gain Dutch"] = round(df_cavalos_filtrado["Odd Ajustada"] * df_cavalos_filtrado["Valor Apostado"], 2)
-        df_cavalos_filtrado["ROI-Dutch"] = round((df_cavalos_filtrado["Gain Dutch"] - df_cavalos_filtrado["Valor Apostado"]), 2)
-        df_cavalos_filtrado["ROI (%)"] = round((df_cavalos_filtrado["Gain Dutch"] / df_cavalos_filtrado["Valor Apostado"]) * 100, 2)
-
-        st.dataframe(df_cavalos_filtrado[["Nome", "Odd Ajustada", "Valor Apostado", "Gain Dutch", "ROI-Dutch", "ROI (%)"]])
-
-        total_apostado = df_cavalos_filtrado["Valor Apostado"].sum()
-        lucro_esperado = df_cavalos_filtrado["Gain Dutch"].sum()
-
-        st.write(f"💰 **Total de Aposta:** R$ {total_apostado:.2f}")
-        st.write(f"💸 **Gain Esperado:** R$ {lucro_esperado:.2f}")
-        st.divider()
+    else:
+        st.error("Erro: 'Desempenho Médio Ajustado' não foi encontrado no DataFrame de cavalos.")
 
     # ✅ Seção de ajuste de desempenho
     st.write("##### | Apostas Rebalanceadas com Desempenho")
@@ -534,4 +536,3 @@ with tab4:
         st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Dutching Bet", "Adjusted Bet", "Gain Adjusted"]])
         st.write(f"💰 **Total de Aposta Ajustado:** R$ {total_adjusted:.2f}")
         st.write(f"💸 **Gain Esperado:** R$ {lucro_adjusted1:.2f}")
-        st.divider()
