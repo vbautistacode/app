@@ -504,19 +504,24 @@ with tab4:
 
     st.divider()
     
-    # --- Aposta Top 3 ---
+# --- Aposta Top 3 ---
 st.write("##### | Aposta Top 3")
 
 # Definir probabilidade histórica de vitória do favorito
 prob_vitoria_favorito = st.number_input("Insira a probabilidade histórica de vitória do favorito (%)", min_value=0.0, max_value=100.0, step=0.1, value=39.68) / 100
 
-# Seleção dos favoritos (50% dos cavalos do páreo)
-num_favoritos = round(len(df_cavalos_filtrado) * 0.5)
-df_favoritos = df_cavalos_filtrado.nsmallest(num_favoritos, "Odds") if not df_cavalos_filtrado.empty else pd.DataFrame()
+# Entrada manual para seleção dos favoritos
+nomes_favoritos = st.multiselect("Selecione manualmente os cavalos favoritos:", df_cavalos_filtrado["Nome"].unique())
+
+# Filtrar os favoritos com base na seleção manual
+df_favoritos = df_cavalos_filtrado[df_cavalos_filtrado["Nome"].isin(nomes_favoritos)] if nomes_favoritos else pd.DataFrame()
+
+# Entrada manual para definir percentual do bankroll nos favoritos
+percentual_bankroll_favoritos = st.number_input("Defina o percentual do bankroll para favoritos (%)", min_value=0.0, max_value=100.0, step=1.0, value=50.0) / 100
 
 # Verificação de existência de dados antes de prosseguir com cálculos
 if not df_favoritos.empty:
-    bankroll_favoritos = bankroll * 0.5
+    bankroll_favoritos = bankroll * percentual_bankroll_favoritos
     soma_inverso_odds = df_favoritos["Odds"].apply(lambda x: (1 / x) * prob_vitoria_favorito).sum()
 
     # Verificando se soma_inverso_odds não é zero para evitar erro na divisão
@@ -536,19 +541,14 @@ if not df_favoritos.empty:
         st.warning("⚠️ Erro: soma das probabilidades inversas é zero, verifique os dados das odds.")
 else:
     st.warning("⚠️ Nenhum favorito foi identificado, verifique os dados disponíveis.")
-    
+
 # Definir nomes_ajuste corretamente antes da filtragem
 nomes_ajuste = st.multiselect("Selecione os cavalos para apostar:", df_cavalos_filtrado["Nome"].unique())
 
 # Garantir que nomes_ajuste tenha um valor válido
-if not nomes_ajuste:
-    nomes_ajuste = []  # Garante que seja uma lista vazia
-
 df_cavalos_ajuste = df_cavalos_filtrado[df_cavalos_filtrado["Nome"].isin(nomes_ajuste)] if nomes_ajuste else df_cavalos_filtrado.copy()
 
-# Ajuste e filtragem de apostas
-df_cavalos_ajuste = df_cavalos_filtrado[df_cavalos_filtrado["Nome"].isin(nomes_ajuste)] if nomes_ajuste else df_cavalos_filtrado.copy()
-
+# Conversão de odds e limpeza de dados
 if not df_cavalos_ajuste.empty:
     df_cavalos_ajuste["Odds"] = pd.to_numeric(df_cavalos_ajuste["Odds"], errors="coerce")
     df_cavalos_ajuste.dropna(subset=["Odds"], inplace=True)
