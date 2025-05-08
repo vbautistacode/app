@@ -468,8 +468,12 @@ with tab3:
 # --- Aba 4: Resultados ---
 with tab4:
 # ✅ Exibir local e horário no cabeçalho da Aba 4
-    st.write(f"📍 **Local da Prova:** {st.session_state.get('local_atual', 'Não definido')}")
-    st.write(f"⏰ **Horário da Prova:** {st.session_state.get('hora_prova', 'Não definido')}")
+# Divisão em duas colunas
+    col1, col2 = st.columns(2)
+    with col1:
+        st.write(f"📍 **Local da Prova:** {st.session_state.get('local_atual', 'Não definido')}")
+    with col2:
+        st.write(f"⏰ **Horário da Prova:** {st.session_state.get('hora_prova', 'Não definido')}")
 
     st.write("##### | Dutching e Performance de Equipes")
 
