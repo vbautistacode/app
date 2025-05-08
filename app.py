@@ -623,8 +623,15 @@ if not df_cavalos_filtrado.empty:
         )
         df_cavalos_filtrado["Desempenho Médio Ajustado"].fillna(1, inplace=True)  # Define valores padrão
     
+    # ✅ Verificar se a coluna realmente existe após o merge
+        if "Desempenho Médio Ajustado" in df_cavalos_filtrado.columns:
+            df_cavalos_filtrado["Desempenho Médio Ajustado"].fillna(1, inplace=True)
+        else:
+            st.warning("⚠️ A coluna 'Desempenho Médio Ajustado' não foi encontrada após o merge.")
+
     else:
-        df_cavalos_filtrado["Desempenho Médio Ajustado"] = 1  # Define 1 como padrão se não houver análise
+        df_cavalos_filtrado["Desempenho Médio Ajustado"] = 1  # Define valor padrão se não houver análise
+
 
     # ✅ Garantir que "Valor Apostado" seja criado antes do ajuste
     bankroll_favoritos = bankroll * percentual_bankroll_favoritos
