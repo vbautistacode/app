@@ -514,10 +514,6 @@ prob_vitoria_favorito = st.number_input("Insira a probabilidade histórica de vi
 num_favoritos = round(len(df_cavalos_filtrado) * 0.5)
 df_favoritos = df_cavalos_filtrado.nsmallest(num_favoritos, "Odds") if not df_cavalos_filtrado.empty else pd.DataFrame()
 
-# Debug: Exibir os dados dos favoritos antes da aposta
-st.write("🛠️ Debug - Dados dos favoritos antes da aposta:")
-st.write(df_favoritos)
-
 # Verificação de existência de dados antes de prosseguir com cálculos
 if not df_favoritos.empty:
     bankroll_favoritos = bankroll * 0.5
@@ -540,13 +536,18 @@ if not df_favoritos.empty:
         st.warning("⚠️ Erro: soma das probabilidades inversas é zero, verifique os dados das odds.")
 else:
     st.warning("⚠️ Nenhum favorito foi identificado, verifique os dados disponíveis.")
+    
+# Definir nomes_ajuste corretamente antes da filtragem
+nomes_ajuste = st.multiselect("Selecione os cavalos para apostar:", df_cavalos_filtrado["Nome"].unique())
+
+# Garantir que nomes_ajuste tenha um valor válido
+if not nomes_ajuste:
+    nomes_ajuste = []  # Garante que seja uma lista vazia
+
+df_cavalos_ajuste = df_cavalos_filtrado[df_cavalos_filtrado["Nome"].isin(nomes_ajuste)] if nomes_ajuste else df_cavalos_filtrado.copy()
 
 # Ajuste e filtragem de apostas
 df_cavalos_ajuste = df_cavalos_filtrado[df_cavalos_filtrado["Nome"].isin(nomes_ajuste)] if nomes_ajuste else df_cavalos_filtrado.copy()
-
-# Debug: Exibir os dados antes da conversão de odds
-st.write("🔍 Debug - Antes da conversão das odds:")
-st.write(df_cavalos_ajuste)
 
 if not df_cavalos_ajuste.empty:
     df_cavalos_ajuste["Odds"] = pd.to_numeric(df_cavalos_ajuste["Odds"], errors="coerce")
