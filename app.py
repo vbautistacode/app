@@ -550,7 +550,9 @@ with tab4:
     percentual_bankroll_favoritos = st.number_input("Defina o percentual do bankroll para favoritos (%)", min_value=0.0, max_value=100.0, step=1.0, value=50.0) / 100
 
 # ✅ Entrada manual para seleção dos favoritos com tamanho ajustado
-    nomes_favoritos = st.multiselect("Selecione os cavalos para apostar:", df_cavalos_filtrado["Nome"].unique())
+    nomes_favoritos = st.multiselect("Selecione os cavalos para apostar:", df_cavalos_filtrado["Nome"].unique(),
+        default=df_cavalos_filtrado["Nome"].unique()[:3]  # Ajuste para selecionar os primeiros 3 por padrão
+    )
     
     # ✅ Filtrar os favoritos com base na seleção manual
     df_favoritos = df_cavalos_filtrado[df_cavalos_filtrado["Nome"].isin(nomes_favoritos)] if nomes_favoritos else pd.DataFrame()
