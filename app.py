@@ -630,4 +630,4 @@ with tab4:
         st.write(f"📊 **Total de Aposta Ajustado:** R$ {total_aposta_ajustada:.2f}")
     
     else:
-        st.warning("⚠️ As colunas 'Valor Apostado' ou 'Desempenho Médio Ajustado' não foram encontradas. Ajuste de apostas não aplicado.")
+        st.warning("⚠️ Desempenho Médio Ajustado não foi encontrado. Ajuste de apostas não aplicado.")
