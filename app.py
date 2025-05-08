@@ -146,6 +146,21 @@ def calcular_desempenho_equipes(team_data):
 
     return pd.DataFrame(df_desempenho_lista).sort_values(by="Desempenho Médio Ajustado", ascending=False)
 
+def distribuir_apostas(df, total_aposta, incluir_desempenho):
+    # Garantir que fator_ajuste seja uma série válida
+    if incluir_desempenho:
+        fator_ajuste = df["Desempenho Médio Ajustado"] / 100
+    else:
+        fator_ajuste = np.ones(len(df))  # Caso a análise esteja desativada, usa 1 para todos
+
+    # Verificar se fator_ajuste é uma série válida antes da operação
+    if isinstance(fator_ajuste, pd.Series):
+        df["valor_apostado"] = np.round(total_aposta * (fator_ajuste / fator_ajuste.sum()), 2)
+    else:
+        st.error("Erro ao calcular fator de ajuste: a variável não é uma série válida.")
+
+    return df
+
 # --- Interface Streamlit ---
 st.title("Apostas | Estratégias Dutching")
 
@@ -506,7 +521,7 @@ with tab4:
 # Filtrar os dados com base na seleção
         df_cavalos_filtrado = df_cavalos[df_cavalos["Nome"].isin(nomes_selecionados)] if nomes_selecionados else df_cavalos    
 # Aplicar análise de desempenho se ativado
-        df_cavalos_filtrado["Fator Ajuste"] = df_cavalos_filtrado["historico_vitoria"] / 100 if incluir_desempenho else 1    
+        df_cavalos_filtrado["Fator Ajuste"] = df_cavalos_filtrado["df_desempenho"] / 100 if incluir_desempenho else 1    
 # Distribuição ajustada das apostas
         df_cavalos_filtrado["Valor Apostado"] = distribuir_apostas(df_cavalos_filtrado, bankroll, incluir_desempenho)["valor_apostado"]    
 # Cálculo de ganhos esperados
