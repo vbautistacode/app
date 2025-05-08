@@ -532,13 +532,25 @@ with tab4:
 # --- Aposta Top 3 ---
     st.write("##### | Aposta Top 3")
     
-    # ✅ Definir probabilidade histórica de vitória do favorito
+    # ✅ Ajustar tamanho dos campos de entrada usando CSS
+    st.markdown("""
+        <style>
+            div[data-baseweb="input"] {
+                width: 150px !important;
+            }
+            div[data-baseweb="select"] {
+                width: 250px !important;
+            }
+        </style>
+    """, unsafe_allow_html=True)
+
+# ✅ Definir probabilidade histórica de vitória do favorito
     prob_vitoria_favorito = st.number_input("Defina a probabilidade histórica de vitória do favorito (%)", min_value=0.0, max_value=100.0, step=0.1, value=39.68) / 100
-    
-    # ✅ Entrada manual para definir percentual do bankroll nos favoritos
+
+# ✅ Entrada manual para definir percentual do bankroll nos favoritos
     percentual_bankroll_favoritos = st.number_input("Defina o percentual do bankroll para favoritos (%)", min_value=0.0, max_value=100.0, step=1.0, value=50.0) / 100
-    
-    # ✅ Entrada manual para seleção dos favoritos
+
+# ✅ Entrada manual para seleção dos favoritos com tamanho ajustado
     nomes_favoritos = st.multiselect("Selecione os cavalos para apostar:", df_cavalos_filtrado["Nome"].unique())
     
     # ✅ Filtrar os favoritos com base na seleção manual
