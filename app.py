@@ -612,13 +612,13 @@ with tab4:
     
 # ✅ Verificar se existem dados de cavalos antes de prosseguir
 if not df_cavalos_filtrado.empty:
-
-    # ✅ Incluir análise de desempenho antes de prosseguir com cálculos
-    incluir_desempenho = st.checkbox("Incluir análise de desempenho?", value=True, key="incluir_desempenho_check")
     df_desempenho = pd.DataFrame(df_desempenho_lista)
     st.write("🔍 Visualizando df_desempenho antes do merge:")
     st.dataframe(df_desempenho)
 
+    # ✅ Incluir análise de desempenho antes de prosseguir com cálculos
+    incluir_desempenho = st.checkbox("Incluir análise de desempenho?", value=True, key="incluir_desempenho_check")
+    
     # ✅ Garantir que df_desempenho possui os dados necessários antes do merge
     if incluir_desempenho and not df_desempenho.empty:
         if "Nome da Equipe" in df_desempenho.columns and "Desempenho Médio Ajustado" in df_desempenho.columns:
