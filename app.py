@@ -643,9 +643,6 @@ if not df_cavalos_filtrado.empty:
     else:
         st.warning("⚠️ As colunas necessárias ainda não estão disponíveis. Ajuste de apostas não aplicado.")
 
-        st.write("🔍 Visualizando df_cavalos_filtrado após cálculos:")
-        st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Desempenho Médio Ajustado", "Valor Apostado", "Valor Apostado Ajustado"]])
-        
         # ✅ Exibir tabela com ajustes aplicados
         st.write("##### | Ajuste de Apostas Baseado no Desempenho Histórico")
         st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Desempenho Médio Ajustado", "Valor Apostado", "Valor Apostado Ajustado"]])
@@ -653,5 +650,3 @@ if not df_cavalos_filtrado.empty:
         # ✅ Exibir totais ajustados
         total_aposta_ajustada = df_cavalos_filtrado["Valor Apostado Ajustado"].sum()
         st.write(f"📊 **Total de Aposta Ajustado:** R$ {total_aposta_ajustada:.2f}")
-    else:
-        st.warning("⚠️ Desempenho Médio Ajustado não foi encontrado. Ajuste de apostas não aplicado.")
