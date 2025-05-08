@@ -584,9 +584,11 @@ with tab4:
     
     # ✅ Entrada manual para seleção dos favoritos, ordenando por desempenho se ativado
     incluir_desempenho = st.checkbox("Incluir análise de desempenho?", value=True, key="incluir_desempenho_top3")
-    if incluir_desempenho:
+    if incluir_desempenho and not df_cavalos_filtrado.empty and "Desempenho Médio Ajustado" in df_cavalos_filtrado.columns:
         df_cavalos_filtrado = df_cavalos_filtrado.sort_values("Desempenho Médio Ajustado", ascending=False)
-    
+    else:
+        st.warning("⚠️ O DataFrame está vazio ou a coluna 'Desempenho Médio Ajustado' não existe. Verifique os dados antes da ordenação.")
+
     nomes_favoritos = st.multiselect(
         "Selecione os cavalos para apostar:",
         df_cavalos_filtrado["Nome"].unique(),
