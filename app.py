@@ -613,7 +613,7 @@ with tab4:
     # ✅ Verificar se existem dados de cavalos antes de prosseguir
     if not df_cavalos_filtrado.empty:
 
-    st.write("##### | Apostas Balanceadas (Desempenho) |")
+        st.write("##### | Apostas Balanceadas (Desempenho) |")
         
         # ✅ Incluir análise de desempenho antes de prosseguir com cálculos
         incluir_desempenho = st.checkbox("Incluir análise de desempenho?", value=True, key="incluir_desempenho_check")
