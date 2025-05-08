@@ -514,7 +514,7 @@ prob_vitoria_favorito = st.number_input("Insira a probabilidade histórica de vi
 percentual_bankroll_favoritos = st.number_input("Defina o percentual do bankroll para favoritos (%)", min_value=0.0, max_value=100.0, step=1.0, value=50.0) / 100
 
 # Entrada manual para seleção dos favoritos
-nomes_favoritos = st.multiselect("Selecione manualmente os cavalos favoritos:", df_cavalos_filtrado["Nome"].unique())
+nomes_favoritos = st.multiselect("Selecione os cavalos para apostar:", df_cavalos_filtrado["Nome"].unique())
 
 # Filtrar os favoritos com base na seleção manual
 df_favoritos = df_cavalos_filtrado[df_cavalos_filtrado["Nome"].isin(nomes_favoritos)] if nomes_favoritos else pd.DataFrame()
@@ -544,12 +544,6 @@ if not df_favoritos.empty:
 else:
     st.warning("⚠️ Nenhum favorito foi identificado, verifique os dados disponíveis.")
 
-# Definir nomes_ajuste corretamente antes da filtragem
-nomes_ajuste = st.multiselect("Selecione os cavalos para apostar:", df_cavalos_filtrado["Nome"].unique())
-
-# Garantir que nomes_ajuste tenha um valor válido
-df_cavalos_ajuste = df_cavalos_filtrado[df_cavalos_filtrado["Nome"].isin(nomes_ajuste)] if nomes_ajuste else df_cavalos_filtrado.copy()
-
 # Conversão de odds e limpeza de dados
 if not df_cavalos_ajuste.empty:
     df_cavalos_ajuste["Odds"] = pd.to_numeric(df_cavalos_ajuste["Odds"], errors="coerce")
@@ -561,8 +555,8 @@ if "Gain Adjusted" not in df_cavalos_ajuste.columns:
 
 # Calcular retorno máximo e mínimo
 if not df_cavalos_ajuste.empty:
-    retorno_maximo = df_cavalos_ajuste.nlargest(3, "Odds")["Gain Adjusted"].sum()
-    retorno_minimo = df_cavalos_ajuste.nsmallest(3, "Odds")["Gain Adjusted"].sum()
+    retorno_maximo = df_cavalos_ajuste["Gain Adjusted"].max()
+    retorno_minimo = df_cavalos_ajuste["Gain Adjusted"].min()
 
     st.write(f"📈 **Retorno Máximo:** R$ {retorno_maximo:.2f}")
     st.write(f"📉 **Retorno Mínimo:** R$ {retorno_minimo:.2f}")
