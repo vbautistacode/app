@@ -511,14 +511,13 @@ with tab4:
     # ✅ Exibir seção "Aposta Top 3"
     st.write("##### | Aposta Top 3")
 
-    # ✅ Entrada manual para ajustar overround das odds
-    df_cavalos_filtrado["Odd Ajustada"] = [
-        ajuste_percentual = st.number_input("Digite o percentual de redução do Overround (%)", min_value=0.1, max_value=2.0, step=0.05, value=0.2)
-        if not df_cavalos_filtrado.empty and "Odds" in df_cavalos_filtrado.columns:
-            df_cavalos_filtrado["Odd Ajustada"] = df_cavalos_filtrado["Odds"] * (1 - ajuste_percentual / 100)
-        else:
-            st.warning("⚠️ Nenhum cavalo disponível para ajuste manual.")
-
+    # ✅ Entrada manual para definir o percentual de redução do Overround
+    ajuste_percentual = st.number_input("Digite o percentual de redução do Overround (%)", min_value=0.1, max_value=2.0, step=0.05, value=0.2)    
+    # ✅ Aplicação do ajuste nas odds com o percentual manual
+    if not df_cavalos_filtrado.empty and "Odds" in df_cavalos_filtrado.columns:
+        df_cavalos_filtrado["Odd Ajustada"] = df_cavalos_filtrado["Odds"] * (1 - ajuste_percentual / 100)
+    else:
+        st.warning("⚠️ Nenhum cavalo disponível para ajuste manual.")
 
     # ✅ Entrada manual da probabilidade de vitória do favorito
     prob_vitoria_favorito = st.number_input("Insira a probabilidade histórica de vitória do favorito (%)",
