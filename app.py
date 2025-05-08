@@ -500,13 +500,13 @@ with tab4:
     #else:
     #    incluir_desempenho = st.checkbox("Incluir análise de desempenho?", value=True, key="incluir_desempenho_aba4")
     
-        # Merge de desempenho apenas se necessário
-        if incluir_desempenho and not df_desempenho.empty:
-            df_cavalos_filtrado = df_cavalos_filtrado.merge(df_desempenho, left_on="Nome", right_on="Nome da Equipe", how="left")
-            df_cavalos_filtrado["Desempenho Médio Ajustado"].fillna(1, inplace=True)
-        else:
-            df_cavalos_filtrado["Desempenho Médio Ajustado"] = 1
-        
+    # Merge de desempenho apenas se necessário
+    if incluir_desempenho and not df_desempenho.empty:
+        df_cavalos_filtrado = df_cavalos_filtrado.merge(df_desempenho, left_on="Nome", right_on="Nome da Equipe", how="left")
+        df_cavalos_filtrado["Desempenho Médio Ajustado"].fillna(1, inplace=True)
+    else:
+        df_cavalos_filtrado["Desempenho Médio Ajustado"] = 1
+    
         # Calcular apostas Dutching e probabilidades
         df_cavalos_filtrado["Probabilidade"] = (1 / df_cavalos_filtrado["Odds"]).round(2)
         df_cavalos_filtrado["Dutching Bet"] = calculate_dutching(df_cavalos_filtrado["Odds"], bankroll, np.ones(len(df_cavalos_filtrado)))
