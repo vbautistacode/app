@@ -685,16 +685,12 @@ with tab4:
         else:
             st.warning("⚠️ Erro: Soma das Odds é zero. Verifique os dados antes de calcular apostas.")
     
-        # ✅ Aplicar ajuste baseado no desempenho histórico apenas se colunas existirem
-        if "Valor Apostado" in df_cavalos_filtrado.columns and "Desempenho Médio Ajustado" in df_cavalos_filtrado.columns:
-            df_cavalos_filtrado["Fator Desempenho"] = df_cavalos_filtrado["Desempenho Médio Ajustado"] / df_cavalos_filtrado["Desempenho Médio Ajustado"].max()
-            df_cavalos_filtrado["Valor Apostado Ajustado"] = round(df_cavalos_filtrado["Valor Apostado"] * df_cavalos_filtrado["Fator Desempenho"], 2)
-        else:
-            st.warning("⚠️ As colunas necessárias ainda não estão disponíveis. Ajuste de apostas não aplicado.")
-    
-        # ✅ Exibir DataFrame atualizado para validar os cálculos
+        # ✅ Aplicando ajuste antes da exibição dos dados
+        df_cavalos_filtrado = calcular_aposta_ajustada(df_cavalos_filtrado, bankroll_favoritos)
+        
+        # ✅ Exibir DataFrame atualizado
         st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Desempenho Médio Ajustado", "Valor Apostado Ajustado"]])
-    
+        
         # ✅ Exibir totais ajustados
         total_aposta_ajustada = df_cavalos_filtrado["Valor Apostado Ajustado"].sum()
         st.write(f"📊 **Total de Aposta Ajustado:** R$ {total_aposta_ajustada:.2f}")
