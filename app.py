@@ -505,56 +505,59 @@ with tab4:
     st.divider()
     
 # --- Aposta Top 3 ---
-st.write("##### | Aposta Top 3")
-
-# Definir probabilidade histórica de vitória do favorito
-prob_vitoria_favorito = st.number_input("Insira a probabilidade histórica de vitória do favorito (%)", min_value=0.0, max_value=100.0, step=0.1, value=39.68) / 100
-
-# Entrada manual para definir percentual do bankroll nos favoritos
-percentual_bankroll_favoritos = st.number_input("Defina o percentual do bankroll para favoritos (%)", min_value=0.0, max_value=100.0, step=1.0, value=50.0) / 100
-
-# Entrada manual para seleção dos favoritos
-nomes_favoritos = st.multiselect("Selecione os cavalos para apostar:", df_cavalos_filtrado["Nome"].unique())
-
-# Filtrar os favoritos com base na seleção manual
-df_favoritos = df_cavalos_filtrado[df_cavalos_filtrado["Nome"].isin(nomes_favoritos)] if nomes_favoritos else pd.DataFrame()
-
-# Verificação de existência de dados antes de prosseguir com cálculos
-if not df_favoritos.empty:
-    bankroll_favoritos = bankroll * percentual_bankroll_favoritos
-    soma_inverso_odds = df_favoritos["Odds"].apply(lambda x: (1 / x) * prob_vitoria_favorito).sum()
-
-    # Verificando se soma_inverso_odds não é zero para evitar erro na divisão
-    if soma_inverso_odds > 0:
-        df_favoritos["Valor Apostado"] = round(bankroll_favoritos * (1 / df_favoritos["Odds"]) / soma_inverso_odds, 2)
-
-        # Exibir dataframe atualizado com valores apostados
-        st.dataframe(df_favoritos[["Nome", "Odds", "Valor Apostado"]])
-
-        # Cálculo do valor total apostado e do lucro esperado
-        total_apostado = df_favoritos["Valor Apostado"].sum()
-        retorno_aposta = (df_favoritos["Valor Apostado"] * df_favoritos["Odds"]).sum()
-        lucro_aposta = retorno_aposta - total_apostado
-        
-        st.write(f"💰 **Total de Aposta:** R$ {total_apostado:.2f}")
-        st.write(f"💸 **Gain Esperado:** R$ {retorno_aposta:.2f}")
-        st.write(f"✅ **Lucro Esperado:** R$ {lucro_aposta:.2f}")
+    st.write("##### | Aposta Top 3")
+    
+    # Definir probabilidade histórica de vitória do favorito
+    prob_vitoria_favorito = st.number_input("Defina a probabilidade histórica de vitória do favorito (%)", min_value=0.0, max_value=100.0, step=0.1, value=39.68) / 100
+    
+    # Entrada manual para definir percentual do bankroll nos favoritos
+    percentual_bankroll_favoritos = st.number_input("Defina o percentual do bankroll para favoritos (%)", min_value=0.0, max_value=100.0, step=1.0, value=50.0) / 100
+    
+    # Entrada manual para seleção dos favoritos
+    nomes_favoritos = st.multiselect("Selecione os cavalos para apostar:", df_cavalos_filtrado["Nome"].unique())
+    
+    # Filtrar os favoritos com base na seleção manual
+    df_favoritos = df_cavalos_filtrado[df_cavalos_filtrado["Nome"].isin(nomes_favoritos)] if nomes_favoritos else pd.DataFrame()
+    
+    # Verificação de existência de dados antes de prosseguir com cálculos
+    if not df_favoritos.empty:
+        bankroll_favoritos = bankroll * percentual_bankroll_favoritos
+        soma_inverso_odds = df_favoritos["Odds"].apply(lambda x: (1 / x) * prob_vitoria_favorito).sum()
+    
+        # Verificando se soma_inverso_odds não é zero para evitar erro na divisão
+        if soma_inverso_odds > 0:
+            df_favoritos["Valor Apostado"] = round(bankroll_favoritos * (1 / df_favoritos["Odds"]) / soma_inverso_odds, 2)
+    
+            # Exibir dataframe atualizado com valores apostados
+            st.dataframe(df_favoritos[["Nome", "Odds", "Valor Apostado"]])
+    
+            # Cálculo do valor total apostado e do lucro esperado
+            total_apostado = df_favoritos["Valor Apostado"].sum()
+            retorno_aposta = (df_favoritos["Valor Apostado"] * df_favoritos["Odds"]).sum()
+            lucro_aposta = retorno_aposta - total_apostado
+            
+            st.write(f"💰 **Total de Aposta:** R$ {total_apostado:.2f}")
+            st.write(f"💸 **Gain Esperado:** R$ {retorno_aposta:.2f}")
+            st.write(f"✅ **Lucro Esperado:** R$ {lucro_aposta:.2f}")
+        else:
+            st.warning("⚠️ Erro: soma das probabilidades inversas é zero, verifique os dados das odds.")
     else:
-        st.warning("⚠️ Erro: soma das probabilidades inversas é zero, verifique os dados das odds.")
-else:
-    st.warning("⚠️ Nenhum favorito foi identificado, verifique os dados disponíveis.")
-
-# Conversão de odds e limpeza de dados
-if not df_favoritos.empty:
-    df_favoritos["Odds"] = pd.to_numeric(df_favoritos["Odds"], errors="coerce")
-    df_favoritos.dropna(subset=["Odds"], inplace=True)
-
-# Calcular retorno máximo e mínimo
-if not df_favoritos.empty:
-    retorno_maximo = df_favoritos["Valor Apostado"].nlargest(3).sum()
-    retorno_minimo = df_favoritos["Valor Apostado"].nsmallest(3).sum()
-
-    st.write(f"📈 **Retorno Máximo:** R$ {retorno_maximo:.2f}")
-    st.write(f"📉 **Retorno Mínimo:** R$ {retorno_minimo:.2f}")
-else:
-    st.warning("⚠️ Não há dados suficientes para calcular retorno máximo e mínimo.")
+        st.warning("⚠️ Nenhum favorito foi identificado, verifique os dados disponíveis.")
+    
+    # Conversão de odds e limpeza de dados
+    if not df_favoritos.empty:
+        df_favoritos["Odds"] = pd.to_numeric(df_favoritos["Odds"], errors="coerce")
+        df_favoritos.dropna(subset=["Odds"], inplace=True)
+    
+    # Calcular retorno máximo e mínimo
+    if not df_favoritos.empty:
+        retorno_maximo = df_favoritos["Valor Apostado"].nlargest(3).sum()
+        retorno_minimo = df_favoritos["Valor Apostado"].nsmallest(3).sum()
+    
+        st.write(f"📈 **Retorno Máximo:** R$ {retorno_maximo:.2f}")
+        st.write(f"📉 **Retorno Mínimo:** R$ {retorno_minimo:.2f}")
+    else:
+        st.warning("⚠️ Não há dados suficientes para calcular retorno máximo e mínimo.")
+    
+        st.divider()
+        
