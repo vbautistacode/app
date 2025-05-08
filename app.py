@@ -473,11 +473,14 @@ with tab4:
         bankroll = 1000.0  # 🔹 Definir um valor padrão seguro para evitar erro
 
     # ✅ Aplicação do filtro antes dos cálculos
-    nomes_selecionados = st.multiselect("Selecione os cavalos:", df_cavalos["Nome"].unique())
-    df_cavalos_filtrado = df_cavalos[df_cavalos["Nome"].isin(nomes_selecionados)] if not df_cavalos.empty else None  # 🔹 Se não houver dados, `None`
+    if not df_cavalos.empty:
+        nomes_selecionados = st.multiselect("Selecione os cavalos:", df_cavalos["Nome"].unique())
+        df_cavalos_filtrado = df_cavalos[df_cavalos["Nome"].isin(nomes_selecionados)] if nomes_selecionados else df_cavalos
+    else:
+        df_cavalos_filtrado = pd.DataFrame(columns=df_cavalos.columns)  # 🔹 Criar um DataFrame vazio ao invés de None
 
     # ✅ Exibir alerta ao invés de erro
-    if df_cavalos_filtrado is None or df_cavalos_filtrado.empty:
+    if df_cavalos_filtrado.empty:
         st.warning("⚠️ Nenhum cavalo foi selecionado ou carregado. Adicione dados para calcular as apostas.")
     else:
         # ✅ Opção de ativar ou desativar a análise de desempenho
@@ -495,7 +498,7 @@ with tab4:
 
         # ✅ Chamar distribuir_apostas somente se houver dados
         df_cavalos_filtrado["Valor Apostado"] = distribuir_apostas(df_cavalos_filtrado, bankroll, incluir_desempenho)["valor_apostado"]
-
+        
     # ✅ Cálculo das probabilidades e apostas Dutching
     if not df_cavalos_filtrado.empty and "Odds" in df_cavalos_filtrado.columns:
         df_cavalos_filtrado["Probabilidade"] = (1 / df_cavalos_filtrado["Odds"]).round(2)
