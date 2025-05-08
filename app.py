@@ -560,4 +560,22 @@ with tab4:
         st.warning("⚠️ Não há dados suficientes para calcular retorno máximo e mínimo.")
     
         st.divider()
+
+    # ✅ Ajuste de apostas baseado no desempenho histórico
+        if not df_cavalos_filtrado.empty and "Desempenho Médio Ajustado" in df_cavalos_filtrado.columns:
+        # Normalizar os valores de desempenho para evitar distorções extremas
+        df_cavalos_filtrado["Fator Desempenho"] = df_cavalos_filtrado["Desempenho Médio Ajustado"] / df_cavalos_filtrado["Desempenho Médio Ajustado"].max()
         
+        # Aplicar ajuste ao valor apostado
+        df_cavalos_filtrado["Valor Apostado Ajustado"] = round(df_cavalos_filtrado["Valor Apostado"] * df_cavalos_filtrado["Fator Desempenho"], 2)
+    
+        # ✅ Exibir tabela com os ajustes aplicados
+        st.write("##### | Ajuste de Apostas Baseado no Desempenho Histórico")
+        st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Desempenho Médio Ajustado", "Valor Apostado", "Valor Apostado Ajustado"]])
+    
+        # ✅ Exibir totais ajustados
+        total_aposta_ajustada = df_cavalos_filtrado["Valor Apostado Ajustado"].sum()
+        st.write(f"📊 **Total de Aposta Ajustado:** R$ {total_aposta_ajustada:.2f}")
+    
+    else:
+        st.warning("⚠️ Dados insuficientes para aplicar ajuste de apostas baseado no desempenho histórico.")
