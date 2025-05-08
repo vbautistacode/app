@@ -489,12 +489,12 @@ with tab4:
         df_cavalos_filtrado["Fator Ajuste"] = df_cavalos_filtrado["Desempenho Médio Ajustado"] / 100 if incluir_desempenho else 1        
             
         # Exibir melhor equipe caso haja dados
-            if not df_desempenho.empty:
-                melhor_equipe = df_desempenho.iloc[0]
-                st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
-                st.dataframe(df_desempenho)
-        
-            st.divider()
+        if not df_desempenho.empty:
+            melhor_equipe = df_desempenho.iloc[0]
+            st.write(f"🏆 **Melhor Equipe:** {melhor_equipe['Nome da Equipe']} com Desempenho Médio de {melhor_equipe['Desempenho Médio Ajustado']:.2f}")
+            st.dataframe(df_desempenho)
+    
+        st.divider()
 
         # Aplicação da remoção de overround das odds
         df_cavalos["Odd Ajustada"] = df_cavalos["Odds"].apply(lambda x: ajustar_odds([x], 0.05)[0])
