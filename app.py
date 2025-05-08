@@ -545,9 +545,9 @@ else:
     st.warning("⚠️ Nenhum favorito foi identificado, verifique os dados disponíveis.")
 
 # Conversão de odds e limpeza de dados
-if not df_cavalos_ajuste.empty:
-    df_cavalos_ajuste["Odds"] = pd.to_numeric(df_cavalos_ajuste["Odds"], errors="coerce")
-    df_cavalos_ajuste.dropna(subset=["Odds"], inplace=True)
+if not df_favoritos.empty:
+    df_favoritos["Odds"] = pd.to_numeric(df_cavalos_ajuste["Odds"], errors="coerce")
+    df_favoritos.dropna(subset=["Odds"], inplace=True)
 
 # Criar "Gain Adjusted" se não existir para evitar erro
 if "Gain Adjusted" not in df_cavalos_ajuste.columns:
