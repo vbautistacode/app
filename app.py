@@ -484,9 +484,6 @@ with tab4:
         else:
             df_cavalos_filtrado["Desempenho Médio Ajustado"] = 1
         
-        # Filtragem: Apostar apenas em cavalos com EV positivo
-        df_cavalos_filtrado = df_cavalos_filtrado[df_cavalos_filtrado["EV"] > 0]
-        
         # Calcular apostas Dutching e probabilidades
         df_cavalos_filtrado["Probabilidade"] = (1 / df_cavalos_filtrado["Odds"]).round(2)
         df_cavalos_filtrado["Dutching Bet"] = calculate_dutching(df_cavalos_filtrado["Odds"], bankroll, np.ones(len(df_cavalos_filtrado)))
