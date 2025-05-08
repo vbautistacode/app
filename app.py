@@ -536,10 +536,10 @@ with tab4:
     st.markdown("""
         <style>
             div[data-baseweb="input"] {
-                width: 150px !important;
+                width: 75px !important;
             }
             div[data-baseweb="select"] {
-                width: 250px !important;
+                width: 75px !important;
             }
         </style>
     """, unsafe_allow_html=True)
