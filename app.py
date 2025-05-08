@@ -623,7 +623,7 @@ with tab4:
         retorno_maximo = df_favoritos.nlargest(3, "Odds")["Gain Adjusted"].sum()
         retorno_minimo = df_favoritos.nsmallest(3, "Odds")["Gain Adjusted"].sum()
         col1, col2 = st.columns(2)
-        with col2;
+        with col2:
             st.write(f"📈 **Retorno Máximo:** R$ {retorno_maximo:.2f}")
             st.write(f"📉 **Retorno Mínimo:** R$ {retorno_minimo:.2f}")
     else:
