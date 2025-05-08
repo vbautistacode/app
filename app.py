@@ -617,6 +617,7 @@ if not df_cavalos_filtrado.empty:
     # ✅ Incluir análise de desempenho antes de prosseguir com cálculos
     incluir_desempenho = st.checkbox("Incluir análise de desempenho?", value=True, key="incluir_desempenho_check")
     st.write("🔎 Colunas disponíveis em df_cavalos_filtrado:", list(df_cavalos_filtrado.columns))
+    st.write("🔎 Colunas em df_desempenho:", list(df_desempenho.columns))
     if incluir_desempenho and not df_desempenho.empty:
         if "Nome da Equipe" in df_desempenho.columns and "Desempenho Médio Ajustado" in df_desempenho.columns:
             df_cavalos_filtrado = df_cavalos_filtrado.merge(
