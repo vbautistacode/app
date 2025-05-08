@@ -547,7 +547,7 @@ with tab4:
         equipes_restantes = df_desempenho[~df_desempenho["Nome da Equipe"].isin(top_desempenho["Nome da Equipe"])]
     
         # ✅ Exibir o restante das equipes em duas colunas
-        st.write("\n🏇 **Desempenho das Outras Equipes**")
+        st.markdown("<h3 style='text-align: left; font-size: 12px;'>🏇 Desempenho das Outras Equipes</h3>", unsafe_allow_html=True)
         col_a, col_b = st.columns(2)
         for index, row in equipes_restantes.iterrows():
             if index % 2 == 0:  # Alterna entre as colunas
