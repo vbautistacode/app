@@ -16,16 +16,16 @@ import os
 pd.set_option('future.no_silent_downcasting', True)
 
 # ✅ Ajustar tamanho dos campos de entrada usando CSS
-    st.markdown("""
-        <style>
-            div[data-baseweb="input"] {
-                width: 75px !important;
-            }
-            div[data-baseweb="select"] {
-                width: 200px !important;
-            }
-        </style>
-    """, unsafe_allow_html=True)
+st.markdown("""
+    <style>
+        div[data-baseweb="input"] {
+            width: 75px !important;
+        }
+        div[data-baseweb="select"] {
+            width: 200px !important;
+        }
+    </style>
+""", unsafe_allow_html=True)
 
 # --- Configuração do GitHub ---
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
