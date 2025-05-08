@@ -607,6 +607,14 @@ with tab4:
         st.warning("⚠️ Não há dados suficientes para calcular retorno máximo e mínimo.")
     
     st.divider()
+
+    # ✅ Verificar se 'Desempenho Médio Ajustado' foi criado corretamente
+    if incluir_desempenho and "Desempenho Médio Ajustado" not in df_cavalos_filtrado.columns:
+        st.warning("⚠️ A análise de desempenho não foi aplicada corretamente. Verifique a integração do desempenho.")
+    
+    # ✅ Verificar se 'Valor Apostado' foi definido antes do cálculo
+    if "Valor Apostado" not in df_cavalos_filtrado.columns:
+    st.warning("⚠️ O cálculo de apostas ainda não foi feito. Certifique-se de calcular antes de aplicar ajustes.")
     
     # ✅ Ajuste de apostas baseado no desempenho histórico (se ativado)
     if incluir_desempenho and not df_cavalos_filtrado.empty and "Desempenho Médio Ajustado" in df_cavalos_filtrado.columns and "Valor Apostado" in df_cavalos_filtrado.columns:
