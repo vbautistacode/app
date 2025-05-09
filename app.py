@@ -159,16 +159,19 @@ def calcular_desempenho_equipes(team_data):
 
 # Função para calcular aposta ajustada com base nas odds e desempenho
 def calcular_aposta_ajustada(df, bankroll_favoritos, prob_vitoria_favorito):
-    # ✅ Criar fator ajustado considerando desempenho e probabilidade histórica de vitória
-    df["Fator Ajustado"] = (df["Desempenho Médio Ajustado"] / df["Desempenho Médio Ajustado"].max()) * (prob_vitoria_favorito * 2)
+    if not df.empty and "Desempenho Médio Ajustado" in df.columns:
+        # ✅ Criar fator ajustado incluindo probabilidade histórica de vitória
+        df["Fator Ajustado"] = (df["Desempenho Médio Ajustado"] / df["Desempenho Médio Ajustado"].max()) * (1 + prob_vitoria_favorito)
 
-    # ✅ Ajustar as odds com base no fator ajustado
-    df["Odds Ajustadas"] = df["Odds"] * df["Fator Ajustado"]
+        # ✅ Ajustar as odds com base no fator ajustado
+        df["Odds Ajustadas"] = df["Odds"] * df["Fator Ajustado"]
 
-    # ✅ Redistribuir apostas proporcionalmente considerando Odds Ajustadas
-    df["Valor Apostado Ajustado"] = round(
-        (bankroll_favoritos / df["Odds Ajustadas"].sum()) * df["Odds Ajustadas"], 2
-    )
+        # ✅ Redistribuir apostas proporcionalmente considerando Odds Ajustadas
+        df["Valor Apostado Ajustado"] = round(
+            (bankroll_favoritos / df["Odds Ajustadas"].sum()) * df["Odds Ajustadas"], 2
+        )
+    else:
+        st.warning("⚠️ Dados insuficientes para calcular aposta ajustada.")
 
     return df
 
