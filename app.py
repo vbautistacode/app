@@ -694,7 +694,39 @@ with tab4:
         # ✅ Exibir DataFrame atualizado
         st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Valor Apostado Ajustado"]])
         
-        # ✅ Exibir totais ajustados
-        total_aposta_ajustada = df_cavalos_filtrado["Valor Apostado Ajustado"].sum()
-        st.write(f"📊 **Total de Aposta Ajustado:** R$ {total_aposta_ajustada:.2f}")
+        # ✅ Dividir apostas ajustadas entre os 50% primeiros e os 50% restantes
+        df_cavalos_filtrado = df_cavalos_filtrado.sort_values("Odds", ascending=True)
+        metade_index = len(df_cavalos_filtrado) // 2  # Define ponto de separação
         
+        # ✅ Selecionar os 50% primeiros e 50% restantes
+        df_top50 = df_cavalos_filtrado.iloc[:metade_index]
+        df_bottom50 = df_cavalos_filtrado.iloc[metade_index:]
+        
+        # ✅ Calcular soma das apostas ajustadas para cada grupo
+        soma_top50 = df_top50["Valor Apostado Ajustado"].sum()
+        soma_bottom50 = df_bottom50["Valor Apostado Ajustado"].sum()
+        
+        # ✅ Calcular retorno máximo e mínimo para cada grupo
+        retorno_maximo_top50 = (df_top50["Valor Apostado Ajustado"] * df_top50["Odds"]).sum()
+        retorno_minimo_top50 = df_top50["Valor Apostado Ajustado"].sum()
+        
+        retorno_maximo_bottom50 = (df_bottom50["Valor Apostado Ajustado"] * df_bottom50["Odds"]).sum()
+        retorno_minimo_bottom50 = df_bottom50["Valor Apostado Ajustado"].sum()
+        
+        # ✅ Exibir resultados organizados
+        st.write("### 📊 | Resumo das Apostas por Odds |")
+        col1, col2 = st.columns(2)
+        
+        # ✅ Bloco 1 - Apostas nos 50% primeiros valores de odds
+        with col1:
+            st.write("🔝 **Apostas nos 50% Menores Odds**")
+            st.write(f"💰 **Total de Aposta:** R$ {soma_top50:.2f}")
+            st.write(f"📈 **Retorno Máximo:** R$ {retorno_maximo_top50:.2f}")
+            st.write(f"📉 **Retorno Mínimo:** R$ {retorno_minimo_top50:.2f}")
+        
+        # ✅ Bloco 2 - Apostas nos 50% restantes valores de odds
+        with col2:
+            st.write("🔻 **Apostas nos 50% Maiores Odds**")
+            st.write(f"💰 **Total de Aposta:** R$ {soma_bottom50:.2f}")
+            st.write(f"📈 **Retorno Máximo:** R$ {retorno_maximo_bottom50:.2f}")
+            st.write(f"📉 **Retorno Mínimo:** R$ {retorno_minimo_bottom50:.2f}")
