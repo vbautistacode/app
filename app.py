@@ -160,27 +160,12 @@ def calcular_desempenho_equipes(team_data):
 # Função para calcular aposta ajustada com base nas odds e desempenho
 def calcular_aposta_ajustada(df, bankroll_favoritos):
     # ✅ Criar fator de ajuste baseado no desempenho
-    df["Fator Ajustado"] = df["Desempenho Médio Ajustado"] / df["Desempenho Médio Ajustado"].max()
+    df["Fator Ajustado"] = (df["Desempenho Médio Ajustado"] / df["Desempenho Médio Ajustado"].max()) * prob_vitoria_favorito
     
     # ✅ Recalcular odds ajustadas com base no desempenho
     df["Odds Ajustadas"] = df["Odds"] * df["Fator Ajustado"]
 
     # ✅ Redistribuir apostas proporcionalmente considerando Odds Ajustadas
-    df["Valor Apostado Ajustado"] = round(
-        (bankroll_favoritos / df["Odds Ajustadas"].sum()) * df["Odds Ajustadas"], 2
-    )
-
-    return df
-
-# Função para calcular aposta sobre probabilidade de vitória do favorito
-def calcular_aposta_ajustada(df, bankroll_favoritos, prob_vitoria_favorito):
-    # ✅ Criar fator de ajuste baseado no desempenho
-    df["Fator Ajustado"] = (df["Desempenho Médio Ajustado"] / df["Desempenho Médio Ajustado"].max()) * prob_vitoria_favorito
-    
-    # ✅ Ajustar as odds com base no desempenho
-    df["Odds Ajustadas"] = df["Odds"] * df["Fator Ajustado"]
-
-    # ✅ Redistribuir as apostas considerando Odds Ajustadas
     df["Valor Apostado Ajustado"] = round(
         (bankroll_favoritos / df["Odds Ajustadas"].sum()) * df["Odds Ajustadas"], 2
     )
