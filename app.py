@@ -160,8 +160,8 @@ def calcular_desempenho_equipes(team_data):
 # Função para calcular aposta ajustada com base nas odds e desempenho
 def calcular_aposta_ajustada(df, bankroll_favoritos, prob_vitoria_favorito):
     # ✅ Criar fator ajustado considerando desempenho e probabilidade histórica de vitória
-    df["Fator Ajustado"] = (df["Desempenho Médio Ajustado"] / df["Desempenho Médio Ajustado"].max()) * prob_vitoria_favorito
-    
+    df["Fator Ajustado"] = (df["Desempenho Médio Ajustado"] / df["Desempenho Médio Ajustado"].max()) * (prob_vitoria_favorito * 2)
+
     # ✅ Ajustar as odds com base no fator ajustado
     df["Odds Ajustadas"] = df["Odds"] * df["Fator Ajustado"]
 
@@ -687,13 +687,11 @@ with tab4:
     
         # ✅ Aplicando ajuste antes da exibição dos dados
         df_cavalos_filtrado = calcular_aposta_ajustada(df_cavalos_filtrado, bankroll_favoritos, prob_vitoria_favorito)
-        st.write(f"🔍 Probabilidade de Vitória Aplicada: {prob_vitoria_favorito:.2%}")
-        st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Valor Apostado"]])
+        
         # ✅ Exibir DataFrame atualizado
         st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Valor Apostado Ajustado"]])
         
         # ✅ Exibir totais ajustados
         total_aposta_ajustada = df_cavalos_filtrado["Valor Apostado Ajustado"].sum()
         st.write(f"📊 **Total de Aposta Ajustado:** R$ {total_aposta_ajustada:.2f}")
-        st.write(f"🔍 Probabilidade de Vitória Aplicada: {prob_vitoria_favorito:.2%}")
-        st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Valor Apostado"]])
+        
