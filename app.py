@@ -693,8 +693,4 @@ with tab4:
         
         # ✅ Exibir totais ajustados
         total_aposta_ajustada = df_cavalos_filtrado["Valor Apostado Ajustado"].sum()
-        st.write(f"📊 **Total de Aposta Ajustado:** R$ {total_aposta_ajustada:.2f}"), 2
-            )
-        else:
-            st.warning("⚠️ Erro: Soma das Odds é zero. Verifique os dados antes de calcular apostas.")
-    
+        st.write(f"📊 **Total de Aposta Ajustado:** R$ {total_aposta_ajustada:.2f}"), 2)
