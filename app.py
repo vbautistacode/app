@@ -687,10 +687,13 @@ with tab4:
     
         # ✅ Aplicando ajuste antes da exibição dos dados
         df_cavalos_filtrado = calcular_aposta_ajustada(df_cavalos_filtrado, bankroll_favoritos, prob_vitoria_favorito)
-        
+        st.write(f"🔍 Probabilidade de Vitória Aplicada: {prob_vitoria_favorito:.2%}")
+        st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Valor Apostado"]])
         # ✅ Exibir DataFrame atualizado
         st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Valor Apostado Ajustado"]])
         
         # ✅ Exibir totais ajustados
         total_aposta_ajustada = df_cavalos_filtrado["Valor Apostado Ajustado"].sum()
         st.write(f"📊 **Total de Aposta Ajustado:** R$ {total_aposta_ajustada:.2f}")
+        st.write(f"🔍 Probabilidade de Vitória Aplicada: {prob_vitoria_favorito:.2%}")
+        st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Valor Apostado"]])
