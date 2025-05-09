@@ -172,6 +172,21 @@ def calcular_aposta_ajustada(df, bankroll_favoritos):
 
     return df
 
+# Função para calcular aposta sobre probabilidade de vitória do favorito
+def calcular_aposta_ajustada(df, bankroll_favoritos, prob_vitoria_favorito):
+    # ✅ Criar fator de ajuste baseado no desempenho
+    df["Fator Ajustado"] = (df["Desempenho Médio Ajustado"] / df["Desempenho Médio Ajustado"].max()) * prob_vitoria_favorito
+    
+    # ✅ Ajustar as odds com base no desempenho
+    df["Odds Ajustadas"] = df["Odds"] * df["Fator Ajustado"]
+
+    # ✅ Redistribuir as apostas considerando Odds Ajustadas
+    df["Valor Apostado Ajustado"] = round(
+        (bankroll_favoritos / df["Odds Ajustadas"].sum()) * df["Odds Ajustadas"], 2
+    )
+
+    return df
+
 # --- Interface Streamlit ---
 st.title("Apostas | Estratégias Dutching")
 
@@ -686,7 +701,7 @@ with tab4:
             st.warning("⚠️ Erro: Soma das Odds é zero. Verifique os dados antes de calcular apostas.")
     
         # ✅ Aplicando ajuste antes da exibição dos dados
-        df_cavalos_filtrado = calcular_aposta_ajustada(df_cavalos_filtrado, bankroll_favoritos)
+        df_cavalos_filtrado = calcular_aposta_ajustada(df_cavalos_filtrado, bankroll_favoritos, prob_vitoria_favorito)
         
         # ✅ Exibir DataFrame atualizado
         st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Valor Apostado Ajustado"]])
