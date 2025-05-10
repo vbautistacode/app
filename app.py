@@ -714,7 +714,7 @@ with tab4:
         retorno_minimo_bottom50 = df_bottom50["Valor Apostado Ajustado"].sum()
         
         # ✅ Exibir resultados organizados
-        st.write("#### | Resumo das Apostas por Odds |")
+        st.write("##### | Resumo das Apostas por Odds |")
         col1, col2 = st.columns(2)
         
         # ✅ Bloco 1 - Apostas nos 50% primeiros valores de odds
