@@ -715,6 +715,7 @@ with tab4:
         
         # ✅ Exibir resultados organizados
         st.write("##### | Resumo das Apostas por Odds |")
+        St.text("")
         col1, col2 = st.columns(2)
         
         # ✅ Bloco 1 - Apostas nos 50% primeiros valores de odds
@@ -730,3 +731,5 @@ with tab4:
             st.write(f"💰 **Total de Aposta:** R$ {soma_bottom50:.2f}")
             st.write(f"📈 **Retorno Máximo:** R$ {retorno_maximo_bottom50:.2f}")
             st.write(f"📉 **Retorno Mínimo:** R$ {retorno_minimo_bottom50:.2f}")
+
+        st.divider()
