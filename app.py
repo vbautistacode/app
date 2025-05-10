@@ -715,7 +715,7 @@ with tab4:
         
         # ✅ Exibir resultados organizados
         st.write("##### | Resumo das Apostas por Odds |")
-        St.text("")
+        st.text("")
         col1, col2 = st.columns(2)
         
         # ✅ Bloco 1 - Apostas nos 50% primeiros valores de odds
