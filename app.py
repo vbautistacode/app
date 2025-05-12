@@ -605,11 +605,9 @@ with tab4:
     if not df_favoritos.empty:
         # ✅ Ajuste correto do bankroll, distribuindo proporcionalmente
         bankroll_favoritos = bankroll * percentual_bankroll_favoritos
+        df_favoritos["Valor Apostado"] = round((bankroll_favoritos / df_favoritos["Odds"].sum()) * df_favoritos["Odds"], 2)
         # ✅ Botão para inverter lógica de distribuição das apostas
         inverter_logica = st.button("🔄 Inverter lógica de aposta")
-        
-        # ✅ Ajuste correto do bankroll
-        bankroll_favoritos = bankroll * percentual_bankroll_favoritos
         
         # ✅ Aplicar distribuição baseada na escolha do usuário (removendo verificação de soma das odds)
         if inverter_logica:
