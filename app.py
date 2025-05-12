@@ -801,7 +801,7 @@ with tab5:
     
         # ✅ Aba de Apostas
         with st.container():
-            st.write("#### 🏆 Histórico de Performance Pessoal")
+            st.write("#### 🏆 Histórico de Performance")
     
             if {"Nome", "Lucro", "Valor Apostado", "Odds"}.issubset(df_cavalos.columns):
                 df_cavalos["Lucro Total"] = df_cavalos["Lucro"] - df_cavalos["Valor Apostado"]
