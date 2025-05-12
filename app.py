@@ -182,7 +182,7 @@ def calcular_aposta_ajustada(df, bankroll_favoritos, prob_vitoria_favorito):
 st.title("Apostas | Estratégias Dutching")
 
 # Abas para organização
-tab1, tab2, tab3, tab4, = st.tabs(["Locais", "Dados dos Cavalos", "Dados das Equipes", "Análises", ])
+tab1, tab2, tab3, tab4, tab5 = st.tabs(["Locais", "Dados dos Cavalos", "Dados das Equipes", "Análises", "Apostas"])
 
 # --- Aba 1: Escolha ou Registro do Local de Prova ---   
 with tab1:
@@ -755,3 +755,18 @@ if not df_favoritos.empty and "Odds" in df_favoritos.columns:
             st.write(f"📉 **Retorno Mínimo:** R$ {retorno_minimo_bottom50:.2f}")
 
         st.divider()
+
+# --- Aba 5: Apostas ---
+with tab5:
+    def salvar_xlsx_no_github(nome_arquivo_local, nome_arquivo_remoto):
+        
+    GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+    REPO_OWNER = "vbautistacode"
+    REPO_NAME = "app"
+    BRANCH = "main"
+    FILE_PATH = "apostas_registradas.xlsx"
+    # URL da API do GitHub para criar ou atualizar o arquivo
+    GITHUB_API_URL = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/contents/{nome_arquivo_remoto}"
+    GITHUB_API_URL = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/contents/{FILE_PATH}"
+    # Ler o arquivo e codificá-lo em base64
+
