@@ -611,24 +611,19 @@ with tab4:
         # ✅ Ajuste correto do bankroll
         bankroll_favoritos = bankroll * percentual_bankroll_favoritos
         
-        # ✅ Verificação de soma das odds antes de prosseguir
-        if df_cavalos_filtrado["Odds"].sum() > 0:
-            if inverter_logica:
-                # Se o botão for pressionado, atribuir maior valor para odds menores
-                df_cavalos_filtrado["Valor Apostado"] = round(
-                    (bankroll_favoritos / df_cavalos_filtrado["Odds"].sum()) * (df_cavalos_filtrado["Odds"].max() - df_cavalos_filtrado["Odds"]), 2
-                )
-            else:
-                # Manter a lógica original caso o botão não seja ativado
-                df_cavalos_filtrado["Valor Apostado"] = round(
-                    (bankroll_favoritos / df_cavalos_filtrado["Odds"].sum()) * df_cavalos_filtrado["Odds"], 2
-                )
+        # ✅ Aplicar distribuição baseada na escolha do usuário (removendo verificação de soma das odds)
+        if inverter_logica:
+            df_favoritos["Valor Apostado"] = round(
+                (bankroll_favoritos / df_favoritos["Odds"].sum()) * (df_favoritos["Odds"].max() - df_favoritos["Odds"]), 2
+            )
         else:
-            st.warning("⚠️ Erro: Soma das Odds é zero. Verifique os dados antes de calcular apostas.")
+            df_favoritos["Valor Apostado"] = round(
+                (bankroll_favoritos / df_favoritos["Odds"].sum()) * df_favoritos["Odds"], 2
+            )
         
         # ✅ Exibir DataFrame atualizado
-        st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Valor Apostado"]])
-    
+        st.dataframe(df_favoritos[["Nome", "Odds", "Valor Apostado"]])
+            
         # ✅ Cálculo do valor total apostado e do lucro esperado
         total_apostado = df_favoritos["Valor Apostado"].sum()
         retorno_aposta = (df_favoritos["Valor Apostado"] * df_favoritos["Odds"]).sum()
