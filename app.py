@@ -757,19 +757,19 @@ if not df_favoritos.empty and "Odds" in df_favoritos.columns:
         st.divider()
 
 # --- Aba 5: Apostas ---
-with tab5:
-    def salvar_xlsx_no_github(nome_arquivo_local, nome_arquivo_remoto):
-        
-    GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
-    REPO_OWNER = "vbautistacode"
-    REPO_NAME = "app"
-    BRANCH = "main"
-    FILE_PATH = "apostas_registradas.xlsx"
-    # URL da API do GitHub para criar ou atualizar o arquivo
-    GITHUB_API_URL = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/contents/{nome_arquivo_remoto}"
-    GITHUB_API_URL = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/contents/{FILE_PATH}"
-    # Ler o arquivo e codificá-lo em base64
+def salvar_xlsx_no_github(nome_arquivo_local, nome_arquivo_remoto):
+    
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+REPO_OWNER = "vbautistacode"
+REPO_NAME = "app"
+BRANCH = "main"
+FILE_PATH = "apostas_registradas.xlsx"
+# URL da API do GitHub para criar ou atualizar o arquivo
+GITHUB_API_URL = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/contents/{nome_arquivo_remoto}"
+GITHUB_API_URL = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/contents/{FILE_PATH}"
+# Ler o arquivo e codificá-lo em base64
 
+with tab5:
 # 5.1 Histórico de Performance Pessoal
         if {"Nome", "Lucro", "Valor Apostado", "Odds"}.issubset(df_cavalos.columns):
 # Criar a coluna "Lucro Total" com a subtração de "Lucro" e "Valor Apostado"
