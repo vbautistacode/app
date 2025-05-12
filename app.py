@@ -820,19 +820,7 @@ with tab5:
                 st.warning("⚠️ As colunas necessárias estão ausentes no arquivo!")
                 
             st.divider()
-            
-            # ✅ Índice de Recuperação
-            st.write("#### 🔄 Índice de Recuperação")
-    
-            if "Data" in df_cavalos.columns:
-                df_cavalos["Data"] = pd.to_datetime(df_cavalos["Data"], errors='coerce')
-                df_cavalos["Intervalo (Dias)"] = df_cavalos["Data"].diff().dt.days
-                st.write(f"📅 **Média do Intervalo Entre Corridas:** {df_cavalos['Intervalo (Dias)'].mean():.2f} dias")
-            else:
-                st.warning("⚠️ A coluna 'Data' é necessária para calcular o Índice de Recuperação.")
-
-            st.divider()
-            
+                        
             # ✅ Gráfico de Lucro por Cavalo
             st.write("#### 📊 Gráficos")
     
@@ -864,7 +852,17 @@ with tab5:
     
             else:
                 st.warning("⚠️ As colunas necessárias estão ausentes no arquivo!")
+
+                # ✅ Índice de Recuperação
+            st.write("#### 🔄 Índice de Recuperação")
     
+            if "Data" in df_cavalos.columns:
+                df_cavalos["Data"] = pd.to_datetime(df_cavalos["Data"], errors='coerce')
+                df_cavalos["Intervalo (Dias)"] = df_cavalos["Data"].diff().dt.days
+                st.write(f"📅 **Média do Intervalo Entre Corridas:** {df_cavalos['Intervalo (Dias)'].mean():.2f} dias")
+            else:
+                st.warning("⚠️ A coluna 'Data' é necessária para calcular o Índice de Recuperação.")
+
     except FileNotFoundError:
         st.error(f"❌ Arquivo '{nome_arquivo}' não encontrado!")
     except Exception as e:
