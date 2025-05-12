@@ -1,5 +1,5 @@
 # --- Importações ---
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 import streamlit as st
 from fpdf import FPDF
 import pandas as pd
@@ -209,7 +209,7 @@ with tab1:
             st.warning("Este local já está registrado.")
 
 # ✅ Campo para inserção da hora abaixo do botão
-    hora_prova = st.time_input("Insira o horário da prova:")
+    hora_prova = st.time_input("⏰ Insira o horário da prova:", value=time(12,0))
 
 # ✅ Salvar local e hora na `session_state`
 if hora_prova:
