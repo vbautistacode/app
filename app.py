@@ -607,8 +607,13 @@ with tab4:
         bankroll_favoritos = bankroll * percentual_bankroll_favoritos
         df_favoritos["Valor Apostado"] = round((bankroll_favoritos / df_favoritos["Odds"].sum()) * df_favoritos["Odds"], 2)
         
-        # ✅ Botão para inverter lógica de distribuição das apostas
-        inverter_logica = st.button("🔄 Inverter lógica de aposta")
+        # ✅ Inicializar estado de inversão na sessão, se ainda não existir
+        if "inverter_logica" not in st.session_state:
+            st.session_state["inverter_logica"] = False
+        
+        # ✅ Criar botão para alternar lógica
+        if st.button("🔄 Inverter lógica de aposta"):
+            st.session_state["inverter_logica"] = not st.session_state["inverter_logica"]  # Alterna entre True e False
         
         # ✅ Aplicar distribuição baseada na escolha do usuário
         if not df_favoritos.empty and "Odds" in df_favoritos.columns:
