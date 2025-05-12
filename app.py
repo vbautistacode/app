@@ -863,19 +863,25 @@ with tab5:
             else:
                 st.warning("⚠️ A coluna 'Data' é necessária para calcular o Índice de Recuperação.")
 
-            # Nome do arquivo local
             nome_arquivo = "apostas_registradas.xlsx"
+
+            # ✅ Carregar o arquivo e exibir a tabela antes do download
+            try:
+                df = pd.read_excel(nome_arquivo)
+                st.write("📊 **Visualização do Registro de Apostas:**")
+                st.dataframe(df)
             
-            # ✅ Exibir botão para download do arquivo
-            with open(nome_arquivo, "rb") as file:
-                st.download_button(
-                    label="📥 Baixar Registro de Apostas",
-                    data=file,
-                    file_name="apostas_registradas.xlsx",
-                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-            )
-                
-    except FileNotFoundError:
-        st.error(f"❌ Arquivo '{nome_arquivo}' não encontrado!")
+                # ✅ Botão para baixar o arquivo
+                with open(nome_arquivo, "rb") as file:
+                    st.download_button(
+                        label="📥 Baixar Registro de Apostas",
+                        data=file,
+                        file_name="apostas_registradas.xlsx",
+                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                    )
+            
+            except FileNotFoundError:
+                st.error(f"❌ O arquivo '{nome_arquivo}' não foi encontrado.")
+
     except Exception as e:
         st.error(f"⚠️ Erro ao carregar ou processar os dados: {str(e)}")
