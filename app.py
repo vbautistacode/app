@@ -1,5 +1,8 @@
 # --- Importações ---
 from datetime import datetime, timedelta, time
+import plotly.graph_objects as go
+import matplotlib.pyplot as plt
+import plotly.express as px
 import streamlit as st
 from fpdf import FPDF
 import pandas as pd
@@ -179,7 +182,7 @@ def calcular_aposta_ajustada(df, bankroll_favoritos, prob_vitoria_favorito):
 st.title("Apostas | Estratégias Dutching")
 
 # Abas para organização
-tab1, tab2, tab3, tab4, = st.tabs(["Locais", "Dados dos Cavalos", "Dados das Equipes", "Análises"])
+tab1, tab2, tab3, tab4, = st.tabs(["Locais", "Dados dos Cavalos", "Dados das Equipes", "Análises", ])
 
 # --- Aba 1: Escolha ou Registro do Local de Prova ---   
 with tab1:
