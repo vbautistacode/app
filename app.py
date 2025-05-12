@@ -641,10 +641,7 @@ with tab4:
         total_apostado = df_favoritos["Valor Apostado"].sum()
         retorno_aposta = (df_favoritos["Valor Apostado"] * df_favoritos["Odds"]).sum()
         lucro_aposta = retorno_aposta - total_apostado
-            
-    else:
-        st.warning("⚠️ Nenhum favorito foi identificado, verifique os dados disponíveis.")
-    
+   
     # ✅ Conversão de odds e limpeza de dados
     if not df_favoritos.empty:
         df_favoritos["Odds"] = pd.to_numeric(df_favoritos["Odds"], errors="coerce")
