@@ -617,7 +617,7 @@ with tab4:
         
         # ✅ Aplicar distribuição baseada na escolha do usuário
         if not df_favoritos.empty and "Odds" in df_favoritos.columns:
-        max_odds = df_favoritos["Odds"].max()  # Obtém o maior valor de odds
+            max_odds = df_favoritos["Odds"].max()  # Obtém o maior valor de odds
     
         if st.session_state["inverter_logica"]:  # ✅ Substitua inverter_logica por session_state
             odds_invertidas = max_odds - df_favoritos["Odds"]
