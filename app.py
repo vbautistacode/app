@@ -613,148 +613,148 @@ with tab4:
         # ✅ Botão para inverter lógica de distribuição das apostas
         inverter_logica = st.button("Inverter lógica de aposta")
 
-# ✅ Aplicar lógica de distribuição de apostas
-if not df_favoritos.empty and "Odds" in df_favoritos.columns:
-    max_odds = df_favoritos["Odds"].max()  # Obtém o maior valor de odds
-
-    if inverter_logica:
-        # Normalizar a inversão para manter a soma igual
-        odds_invertidas = max_odds - df_favoritos["Odds"]
-        fator_ajuste = bankroll_favoritos / odds_invertidas.sum()
-        df_favoritos["Valor Apostado"] = round(odds_invertidas * fator_ajuste, 2)
-        logica_aplicada = "🔄 **Modo invertido:** Maior valor apostado nas menores odds."
-    else:
-        # Modo padrão: maior valor apostado nas maiores odds
-        fator_ajuste = bankroll_favoritos / df_favoritos["Odds"].sum()
-        df_favoritos["Valor Apostado"] = round(df_favoritos["Odds"] * fator_ajuste, 2)
-        logica_aplicada = "✅ **Modo padrão:** Maior valor apostado nas maiores odds."
-
-    # ✅ Exibir mensagem sobre qual lógica está sendo aplicada
-    st.write(logica_aplicada)
-
-    # ✅ Exibir DataFrame atualizado
-    st.dataframe(df_favoritos[["Nome", "Odds", "Valor Apostado"]])
-
-    # ✅ Cálculo do valor total apostado e do lucro esperado
-    total_apostado = df_favoritos["Valor Apostado"].sum()
-    retorno_aposta = (df_favoritos["Valor Apostado"] * df_favoritos["Odds"]).sum()
-    lucro_aposta = retorno_aposta - total_apostado
-   
-    # ✅ Conversão de odds e limpeza de dados
-    if not df_favoritos.empty:
-        df_favoritos["Odds"] = pd.to_numeric(df_favoritos["Odds"], errors="coerce")
-        df_favoritos.dropna(subset=["Odds"], inplace=True)
-
-    # ✅ Calcular retorno máximo e mínimo corretamente
-    if not df_favoritos.empty and "Valor Apostado" in df_favoritos.columns:
-        df_favoritos["Gain Adjusted"] = df_favoritos["Valor Apostado"] * df_favoritos["Odds"]
+    # ✅ Aplicar lógica de distribuição de apostas
+    if not df_favoritos.empty and "Odds" in df_favoritos.columns:
+        max_odds = df_favoritos["Odds"].max()  # Obtém o maior valor de odds
     
-        retorno_maximo = df_favoritos.nlargest(3, "Odds")["Gain Adjusted"].sum()
-        retorno_minimo = df_favoritos.nsmallest(3, "Odds")["Gain Adjusted"].sum()
-
-        # ✅ Criar duas colunas para organizar os blocos
-        col1, col2 = st.columns(2)
-        
-        # ✅ Bloco 1 - Exibir informações gerais de aposta
-        with col1:
-            st.write("📊 **Informações da Aposta:**")
-            st.write(f"💰 **Total de Aposta:** R$ {total_apostado:.2f}")
-            st.write(f"💸 **Gain Esperado:** R$ {retorno_aposta:.2f}")
-            st.write(f"✅ **Lucro Esperado:** R$ {lucro_aposta:.2f}")
-        
-        # ✅ Bloco 2 - Exibir cálculos de retorno máximo e mínimo
-        with col2:
-            st.write("🔝 **Cálculo de Retorno:**")
-            st.write(f"📈 **Retorno Máximo:** R$ {retorno_maximo:.2f}")
-            st.write(f"📉 **Retorno Mínimo:** R$ {retorno_minimo:.2f}")
-    else:
-        st.warning("⚠️ Não há dados suficientes para calcular retorno máximo e mínimo.")
-    
-    st.divider()
-    
-    # ✅ Verificar se existem dados de cavalos antes de prosseguir
-    if not df_cavalos_filtrado.empty:
-
-        st.write("#### 📊| Apostas Balanceadas (Desempenho) |")
-        
-        # ✅ Incluir análise de desempenho antes de prosseguir com cálculos
-        incluir_desempenho = st.checkbox("Incluir análise de desempenho?", value=False, key="incluir_desempenho_check")
-    
-        # ✅ Garantir que df_desempenho possui os dados necessários antes da aplicação
-        if incluir_desempenho and not df_desempenho.empty:
-            if "Nome da Equipe" in df_desempenho.columns and "Desempenho Médio Ajustado" in df_desempenho.columns:
-                
-                # ✅ Padronizar nomes para evitar erro de correspondência
-                df_cavalos_filtrado["Nome"] = df_cavalos_filtrado["Nome"].str.strip().str.lower()
-                df_desempenho["Nome da Equipe"] = df_desempenho["Nome da Equipe"].str.strip().str.lower()
-    
-                # ✅ Criar dicionário de mapeamento
-                desempenho_dict = df_desempenho.set_index("Nome da Equipe")["Desempenho Médio Ajustado"].to_dict()
-    
-                # ✅ Aplicar valores de desempenho diretamente via map()
-                df_cavalos_filtrado["Desempenho Médio Ajustado"] = df_cavalos_filtrado["Nome"].map(desempenho_dict).fillna(1)
-    
-            else:
-                st.warning("⚠️ O DataFrame de desempenho não tem as colunas esperadas. Verifique os dados antes da aplicação.")
-    
+        if inverter_logica:
+            # Normalizar a inversão para manter a soma igual
+            odds_invertidas = max_odds - df_favoritos["Odds"]
+            fator_ajuste = bankroll_favoritos / odds_invertidas.sum()
+            df_favoritos["Valor Apostado"] = round(odds_invertidas * fator_ajuste, 2)
+            logica_aplicada = "🔄 **Modo invertido:** Maior valor apostado nas menores odds."
         else:
-            df_cavalos_filtrado["Desempenho Médio Ajustado"] = 1  # Define valor padrão se não houver análise
+            # Modo padrão: maior valor apostado nas maiores odds
+            fator_ajuste = bankroll_favoritos / df_favoritos["Odds"].sum()
+            df_favoritos["Valor Apostado"] = round(df_favoritos["Odds"] * fator_ajuste, 2)
+            logica_aplicada = "✅ **Modo padrão:** Maior valor apostado nas maiores odds."
     
-        # ✅ Garantir que "Valor Apostado" seja criado corretamente antes de usar desempenho
-        bankroll_favoritos = bankroll * percentual_bankroll_favoritos
+        # ✅ Exibir mensagem sobre qual lógica está sendo aplicada
+        st.write(logica_aplicada)
     
-        if df_cavalos_filtrado["Odds"].sum() > 0:
-            df_cavalos_filtrado["Valor Apostado"] = round(
-                (bankroll_favoritos / df_cavalos_filtrado["Odds"].sum()) * df_cavalos_filtrado["Odds"], 2
-            )
-        else:
-            st.warning("⚠️ Erro: Soma das Odds é zero. Verifique os dados antes de calcular apostas.")
-    
-        # ✅ Aplicando ajuste antes da exibição dos dados
-        df_cavalos_filtrado = calcular_aposta_ajustada(df_cavalos_filtrado, bankroll_favoritos, prob_vitoria_favorito)
-        
         # ✅ Exibir DataFrame atualizado
-        st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Valor Apostado Ajustado"]])
+        st.dataframe(df_favoritos[["Nome", "Odds", "Valor Apostado"]])
+    
+        # ✅ Cálculo do valor total apostado e do lucro esperado
+        total_apostado = df_favoritos["Valor Apostado"].sum()
+        retorno_aposta = (df_favoritos["Valor Apostado"] * df_favoritos["Odds"]).sum()
+        lucro_aposta = retorno_aposta - total_apostado
+       
+        # ✅ Conversão de odds e limpeza de dados
+        if not df_favoritos.empty:
+            df_favoritos["Odds"] = pd.to_numeric(df_favoritos["Odds"], errors="coerce")
+            df_favoritos.dropna(subset=["Odds"], inplace=True)
+    
+        # ✅ Calcular retorno máximo e mínimo corretamente
+        if not df_favoritos.empty and "Valor Apostado" in df_favoritos.columns:
+            df_favoritos["Gain Adjusted"] = df_favoritos["Valor Apostado"] * df_favoritos["Odds"]
         
-        # ✅ Dividir apostas ajustadas entre os 50% primeiros e os 50% restantes
-        df_cavalos_filtrado = df_cavalos_filtrado.sort_values("Odds", ascending=True)
-        metade_index = len(df_cavalos_filtrado) // 2  # Define ponto de separação
+            retorno_maximo = df_favoritos.nlargest(3, "Odds")["Gain Adjusted"].sum()
+            retorno_minimo = df_favoritos.nsmallest(3, "Odds")["Gain Adjusted"].sum()
+    
+            # ✅ Criar duas colunas para organizar os blocos
+            col1, col2 = st.columns(2)
+            
+            # ✅ Bloco 1 - Exibir informações gerais de aposta
+            with col1:
+                st.write("📊 **Informações da Aposta:**")
+                st.write(f"💰 **Total de Aposta:** R$ {total_apostado:.2f}")
+                st.write(f"💸 **Gain Esperado:** R$ {retorno_aposta:.2f}")
+                st.write(f"✅ **Lucro Esperado:** R$ {lucro_aposta:.2f}")
+            
+            # ✅ Bloco 2 - Exibir cálculos de retorno máximo e mínimo
+            with col2:
+                st.write("🔝 **Cálculo de Retorno:**")
+                st.write(f"📈 **Retorno Máximo:** R$ {retorno_maximo:.2f}")
+                st.write(f"📉 **Retorno Mínimo:** R$ {retorno_minimo:.2f}")
+        else:
+            st.warning("⚠️ Não há dados suficientes para calcular retorno máximo e mínimo.")
         
-        # ✅ Selecionar os 50% primeiros e 50% restantes
-        df_top50 = df_cavalos_filtrado.iloc[:metade_index]
-        df_bottom50 = df_cavalos_filtrado.iloc[metade_index:]
-        
-        # ✅ Calcular soma das apostas ajustadas para cada grupo
-        soma_top50 = df_top50["Valor Apostado Ajustado"].sum()
-        soma_bottom50 = df_bottom50["Valor Apostado Ajustado"].sum()
-        
-        # ✅ Calcular retorno máximo e mínimo para cada grupo
-        retorno_maximo_top50 = (df_top50["Valor Apostado Ajustado"] * df_top50["Odds"]).sum()
-        retorno_minimo_top50 = df_top50["Valor Apostado Ajustado"].sum()
-        
-        retorno_maximo_bottom50 = (df_bottom50["Valor Apostado Ajustado"] * df_bottom50["Odds"]).sum()
-        retorno_minimo_bottom50 = df_bottom50["Valor Apostado Ajustado"].sum()
-        
-        # ✅ Exibir resultados organizados
-        st.write("##### | Resumo das Apostas por Odds |")
-        st.text("")
-        col1, col2 = st.columns(2)
-        
-        # ✅ Bloco 1 - Apostas nos 50% primeiros valores de odds
-        with col1:
-            st.write("🔝 **Apostas nos 50% Menores Odds**")
-            st.write(f"💰 **Total de Aposta:** R$ {soma_top50:.2f}")
-            st.write(f"📈 **Retorno Máximo:** R$ {retorno_maximo_top50:.2f}")
-            st.write(f"📉 **Retorno Mínimo:** R$ {retorno_minimo_top50:.2f}")
-        
-        # ✅ Bloco 2 - Apostas nos 50% restantes valores de odds
-        with col2:
-            st.write("🔻 **Apostas nos 50% Maiores Odds**")
-            st.write(f"💰 **Total de Aposta:** R$ {soma_bottom50:.2f}")
-            st.write(f"📈 **Retorno Máximo:** R$ {retorno_maximo_bottom50:.2f}")
-            st.write(f"📉 **Retorno Mínimo:** R$ {retorno_minimo_bottom50:.2f}")
-
         st.divider()
+        
+        # ✅ Verificar se existem dados de cavalos antes de prosseguir
+        if not df_cavalos_filtrado.empty:
+    
+            st.write("#### 📊| Apostas Balanceadas (Desempenho) |")
+            
+            # ✅ Incluir análise de desempenho antes de prosseguir com cálculos
+            incluir_desempenho = st.checkbox("Incluir análise de desempenho?", value=False, key="incluir_desempenho_check")
+        
+            # ✅ Garantir que df_desempenho possui os dados necessários antes da aplicação
+            if incluir_desempenho and not df_desempenho.empty:
+                if "Nome da Equipe" in df_desempenho.columns and "Desempenho Médio Ajustado" in df_desempenho.columns:
+                    
+                    # ✅ Padronizar nomes para evitar erro de correspondência
+                    df_cavalos_filtrado["Nome"] = df_cavalos_filtrado["Nome"].str.strip().str.lower()
+                    df_desempenho["Nome da Equipe"] = df_desempenho["Nome da Equipe"].str.strip().str.lower()
+        
+                    # ✅ Criar dicionário de mapeamento
+                    desempenho_dict = df_desempenho.set_index("Nome da Equipe")["Desempenho Médio Ajustado"].to_dict()
+        
+                    # ✅ Aplicar valores de desempenho diretamente via map()
+                    df_cavalos_filtrado["Desempenho Médio Ajustado"] = df_cavalos_filtrado["Nome"].map(desempenho_dict).fillna(1)
+        
+                else:
+                    st.warning("⚠️ O DataFrame de desempenho não tem as colunas esperadas. Verifique os dados antes da aplicação.")
+        
+            else:
+                df_cavalos_filtrado["Desempenho Médio Ajustado"] = 1  # Define valor padrão se não houver análise
+        
+            # ✅ Garantir que "Valor Apostado" seja criado corretamente antes de usar desempenho
+            bankroll_favoritos = bankroll * percentual_bankroll_favoritos
+        
+            if df_cavalos_filtrado["Odds"].sum() > 0:
+                df_cavalos_filtrado["Valor Apostado"] = round(
+                    (bankroll_favoritos / df_cavalos_filtrado["Odds"].sum()) * df_cavalos_filtrado["Odds"], 2
+                )
+            else:
+                st.warning("⚠️ Erro: Soma das Odds é zero. Verifique os dados antes de calcular apostas.")
+        
+            # ✅ Aplicando ajuste antes da exibição dos dados
+            df_cavalos_filtrado = calcular_aposta_ajustada(df_cavalos_filtrado, bankroll_favoritos, prob_vitoria_favorito)
+            
+            # ✅ Exibir DataFrame atualizado
+            st.dataframe(df_cavalos_filtrado[["Nome", "Odds", "Valor Apostado Ajustado"]])
+            
+            # ✅ Dividir apostas ajustadas entre os 50% primeiros e os 50% restantes
+            df_cavalos_filtrado = df_cavalos_filtrado.sort_values("Odds", ascending=True)
+            metade_index = len(df_cavalos_filtrado) // 2  # Define ponto de separação
+            
+            # ✅ Selecionar os 50% primeiros e 50% restantes
+            df_top50 = df_cavalos_filtrado.iloc[:metade_index]
+            df_bottom50 = df_cavalos_filtrado.iloc[metade_index:]
+            
+            # ✅ Calcular soma das apostas ajustadas para cada grupo
+            soma_top50 = df_top50["Valor Apostado Ajustado"].sum()
+            soma_bottom50 = df_bottom50["Valor Apostado Ajustado"].sum()
+            
+            # ✅ Calcular retorno máximo e mínimo para cada grupo
+            retorno_maximo_top50 = (df_top50["Valor Apostado Ajustado"] * df_top50["Odds"]).sum()
+            retorno_minimo_top50 = df_top50["Valor Apostado Ajustado"].sum()
+            
+            retorno_maximo_bottom50 = (df_bottom50["Valor Apostado Ajustado"] * df_bottom50["Odds"]).sum()
+            retorno_minimo_bottom50 = df_bottom50["Valor Apostado Ajustado"].sum()
+            
+            # ✅ Exibir resultados organizados
+            st.write("##### | Resumo das Apostas por Odds |")
+            st.text("")
+            col1, col2 = st.columns(2)
+            
+            # ✅ Bloco 1 - Apostas nos 50% primeiros valores de odds
+            with col1:
+                st.write("🔝 **Apostas nos 50% Menores Odds**")
+                st.write(f"💰 **Total de Aposta:** R$ {soma_top50:.2f}")
+                st.write(f"📈 **Retorno Máximo:** R$ {retorno_maximo_top50:.2f}")
+                st.write(f"📉 **Retorno Mínimo:** R$ {retorno_minimo_top50:.2f}")
+            
+            # ✅ Bloco 2 - Apostas nos 50% restantes valores de odds
+            with col2:
+                st.write("🔻 **Apostas nos 50% Maiores Odds**")
+                st.write(f"💰 **Total de Aposta:** R$ {soma_bottom50:.2f}")
+                st.write(f"📈 **Retorno Máximo:** R$ {retorno_maximo_bottom50:.2f}")
+                st.write(f"📉 **Retorno Mínimo:** R$ {retorno_minimo_bottom50:.2f}")
+    
+            st.divider()
 
 # --- Aba 5: Apostas ---
 with tab5:
