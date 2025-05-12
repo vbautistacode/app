@@ -608,7 +608,7 @@ with tab4:
         df_favoritos["Valor Apostado"] = round((bankroll_favoritos / df_favoritos["Odds"].sum()) * df_favoritos["Odds"], 2)
         
         # ✅ Botão para inverter lógica de distribuição das apostas
-        inverter_logica = st.button("🔄 Inverter lógica de aposta")
+        inverter_logica = st.button("Inverter lógica de aposta")
 
 # ✅ Aplicar lógica de distribuição de apostas
 if not df_favoritos.empty and "Odds" in df_favoritos.columns:
