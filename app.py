@@ -617,24 +617,25 @@ with tab4:
         
         # ✅ Aplicar distribuição baseada na escolha do usuário
         if not df_favoritos.empty and "Odds" in df_favoritos.columns:
-            max_odds = df_favoritos["Odds"].max()  # Obtém o maior valor de odds
-            if inverter_logica:
-                odds_invertidas = max_odds - df_favoritos["Odds"]
-                fator_ajuste = bankroll_favoritos / odds_invertidas.sum()
-                df_favoritos["Valor Apostado"] = round(odds_invertidas * fator_ajuste, 2)
-                logica_aplicada = "🔄 **Modo invertido:** Maior valor apostado nas menores odds."
-            else:
-                # Modo padrão: maior valor apostado nas maiores odds
-                fator_ajuste = bankroll_favoritos / df_favoritos["Odds"].sum()
-                df_favoritos["Valor Apostado"] = round(df_favoritos["Odds"] * fator_ajuste, 2)
-                logica_aplicada = "✅ **Modo padrão:** Maior valor apostado nas maiores odds."
-        # ✅ Exibir mensagem sobre qual lógica está sendo aplicada 
-            st.write(logica_aplicada)
+        max_odds = df_favoritos["Odds"].max()  # Obtém o maior valor de odds
     
-            # ✅ Exibir DataFrame atualizado
-            st.dataframe(df_favoritos[["Nome", "Odds", "Valor Apostado"]])
+        if st.session_state["inverter_logica"]:  # ✅ Substitua inverter_logica por session_state
+            odds_invertidas = max_odds - df_favoritos["Odds"]
+            fator_ajuste = bankroll_favoritos / odds_invertidas.sum()
+            df_favoritos["Valor Apostado"] = round(odds_invertidas * fator_ajuste, 2)
+            logica_aplicada = "🔄 **Modo invertido:** Maior valor apostado nas menores odds."
         else:
-            st.warning("⚠️ Erro ao calcular valores apostados. Verifique os dados antes de continuar.")
+            fator_ajuste = bankroll_favoritos / df_favoritos["Odds"].sum()
+            df_favoritos["Valor Apostado"] = round(df_favoritos["Odds"] * fator_ajuste, 2)
+            logica_aplicada = "✅ **Modo padrão:** Maior valor apostado nas maiores odds."
+    
+        # ✅ Exibir mensagem sobre qual lógica está sendo aplicada
+        st.write(logica_aplicada)
+    
+        # ✅ Exibir DataFrame atualizado
+        st.dataframe(df_favoritos[["Nome", "Odds", "Valor Apostado"]])
+    else:
+        st.warning("⚠️ Erro ao calcular valores apostados. Verifique os dados antes de continuar.")
             
         # ✅ Cálculo do valor total apostado e do lucro esperado
         total_apostado = df_favoritos["Valor Apostado"].sum()
