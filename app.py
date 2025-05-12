@@ -869,7 +869,7 @@ with tab5:
             # ✅ Exibir botão para download do arquivo
             with open(nome_arquivo, "rb") as file:
                 st.download_button(
-                    label="📥 Baixar Registro de Apostas",
+                    label="📥 Acessar Registro de Apostas",
                     data=file,
                     file_name="apostas_registradas.xlsx",
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
