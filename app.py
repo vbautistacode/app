@@ -631,9 +631,7 @@ if not df_favoritos.empty and "Odds" in df_favoritos.columns:
 
     # ✅ Exibir DataFrame atualizado
     st.dataframe(df_favoritos[["Nome", "Odds", "Valor Apostado"]])
-else:
-    st.warning("⚠️ Erro ao calcular valores apostados. Verifique os dados antes de continuar.")
-            
+
     # ✅ Cálculo do valor total apostado e do lucro esperado
     total_apostado = df_favoritos["Valor Apostado"].sum()
     retorno_aposta = (df_favoritos["Valor Apostado"] * df_favoritos["Odds"]).sum()
