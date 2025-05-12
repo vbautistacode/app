@@ -606,19 +606,23 @@ with tab4:
         # ✅ Ajuste correto do bankroll, distribuindo proporcionalmente
         bankroll_favoritos = bankroll * percentual_bankroll_favoritos
         df_favoritos["Valor Apostado"] = round((bankroll_favoritos / df_favoritos["Odds"].sum()) * df_favoritos["Odds"], 2)
+        
         # ✅ Botão para inverter lógica de distribuição das apostas
         inverter_logica = st.button("🔄 Inverter lógica de aposta")
         
-        # ✅ Aplicar distribuição baseada na escolha do usuário (removendo verificação de soma das odds)
+        # ✅ Aplicar distribuição baseada na escolha do usuário
         if inverter_logica:
             df_favoritos["Valor Apostado"] = round(
                 (bankroll_favoritos / df_favoritos["Odds"].sum()) * (df_favoritos["Odds"].max() - df_favoritos["Odds"]), 2
             )
+            logica_aplicada = "🔄 **Modo invertido:** Maior valor apostado nas menores odd."
         else:
             df_favoritos["Valor Apostado"] = round(
                 (bankroll_favoritos / df_favoritos["Odds"].sum()) * df_favoritos["Odds"], 2
             )
-        
+            logica_aplicada = "✅ **Modo padrão:** Maior valor apostado nas maiores odds."
+        st.write(logica_aplicada)
+
         # ✅ Exibir DataFrame atualizado
         st.dataframe(df_favoritos[["Nome", "Odds", "Valor Apostado"]])
             
