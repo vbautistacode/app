@@ -757,112 +757,109 @@ if not df_favoritos.empty and "Odds" in df_favoritos.columns:
         st.divider()
 
 # --- Aba 5: Apostas ---
-def salvar_xlsx_no_github(nome_arquivo_local, nome_arquivo_remoto):
-    
-GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
-REPO_OWNER = "vbautistacode"
-REPO_NAME = "app"
-BRANCH = "main"
-FILE_PATH = "apostas_registradas.xlsx"
-# URL da API do GitHub para criar ou atualizar o arquivo
-GITHUB_API_URL = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/contents/{nome_arquivo_remoto}"
-GITHUB_API_URL = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/contents/{FILE_PATH}"
-# Ler o arquivo e codificá-lo em base64
 
-with tab5:
-# 5.1 Histórico de Performance Pessoal
+# ✅ Definição da função para salvar arquivo no GitHub
+def salvar_xlsx_no_github(nome_arquivo_local, nome_arquivo_remoto):
+    GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+    REPO_OWNER = "vbautistacode"
+    REPO_NAME = "app"
+    BRANCH = "main"
+    GITHUB_API_URL = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/contents/{nome_arquivo_remoto}"
+
+    try:
+        with open(nome_arquivo_local, "rb") as f:
+            file_content = base64.b64encode(f.read()).decode("utf-8")
+        
+        headers = {"Authorization": f"token {GITHUB_TOKEN}"}
+        response = requests.get(GITHUB_API_URL, headers=headers)
+
+        sha = response.json().get("sha") if response.status_code == 200 else None
+
+        payload = {
+            "message": "Atualizando arquivo apostas_registradas.xlsx",
+            "content": file_content,
+            "branch": BRANCH,
+        }
+        if sha:
+            payload["sha"] = sha
+
+        response = requests.put(GITHUB_API_URL, headers=headers, json=payload)
+
+        if response.status_code in [200, 201]:
+            st.success("✅ Arquivo salvo no GitHub com sucesso!")
+        else:
+            st.error(f"⚠️ Erro ao salvar o arquivo: {response.json()}")
+
+    except FileNotFoundError:
+        st.error(f"❌ Arquivo '{nome_arquivo_local}' não encontrado!")
+
+# ✅ Carregar dados do arquivo Excel
+nome_arquivo = "apostas_registradas.xlsx"
+
+try:
+    df_cavalos = pd.read_excel(nome_arquivo)
+
+    # ✅ Aba de Apostas
+    with st.container():
+        st.write("### 🏆 Histórico de Performance Pessoal")
+
         if {"Nome", "Lucro", "Valor Apostado", "Odds"}.issubset(df_cavalos.columns):
-# Criar a coluna "Lucro Total" com a subtração de "Lucro" e "Valor Apostado"
             df_cavalos["Lucro Total"] = df_cavalos["Lucro"] - df_cavalos["Valor Apostado"]
-# Agrupar por "Nome" e calcular os agregados
+            
+            # ✅ Corrigir agregação sem duplicação
             performance_pessoal = df_cavalos.groupby("Nome").agg({
                 "Lucro Total": "sum",
                 "Valor Apostado": "sum",
-                "Lucro Total": "sum",
                 "Odds": "mean"
-            }).rename(columns={
-                "Lucro": "Ganhos",
-                "Odds": "Odds Média"
-            })
-# Exibir a tabela no Streamlit
-            st.write("##### Histórico de Performance Pessoal")
+            }).rename(columns={"Odds": "Odds Média"})
+
             st.dataframe(performance_pessoal)
-            lucro_total = performance_pessoal["Lucro Total"].sum()
-            st.write(f"##### 💰Lucro Total de: R$ {lucro_total:,.2f}")
+            st.write(f"💰 **Lucro Total:** R$ {performance_pessoal['Lucro Total'].sum():,.2f}")
+
         else:
-            st.warning("As colunas 'Nome', 'Lucro', 'Valor Apostado' e 'Odds' são necessárias para calcular o Histórico de Performance Pessoal.")
-#5.2 Índice de Recuperação
+            st.warning("⚠️ As colunas necessárias estão ausentes no arquivo!")
+
+        # ✅ Índice de Recuperação
+        st.write("### 🔄 Índice de Recuperação")
+
         if "Data" in df_cavalos.columns:
-            df_cavalos["Data"] = pd.to_datetime(df_cavalos["Data"], errors='coerce')  # Garantir formato datetime
+            df_cavalos["Data"] = pd.to_datetime(df_cavalos["Data"], errors='coerce')
             df_cavalos["Intervalo (Dias)"] = df_cavalos["Data"].diff().dt.days
-            st.write("##### Índice de Recuperação")
             st.write(f"📅 **Média do Intervalo Entre Corridas:** {df_cavalos['Intervalo (Dias)'].mean():.2f} dias")
         else:
-            st.warning("A coluna 'Data' é necessária para calcular o Índice de Recuperação.")
-    except FileNotFoundError:
-        st.error(f"O arquivo '{nome_arquivo}' não foi encontrado. Certifique-se de que ele está na mesma pasta que o aplicativo.")
-    except Exception as e:
-        st.error(f"Erro ao carregar o arquivo: {str(e)}")
-        
-#5.3. Gráfico de barras - Lucro por cavalo
-nome_arquivo = "c:/Users/pncdp/.vscode/project_racing/apostas_registradas.xlsx"
-try:
-# Carregar os dados do arquivo
-        df_cavalos = pd.read_excel(nome_arquivo)
-# Verificar se as colunas necessárias estão disponíveis
+            st.warning("⚠️ A coluna 'Data' é necessária para calcular o Índice de Recuperação.")
+
+        # ✅ Gráfico de Lucro por Cavalo
+        st.write("### 📊 Gráficos")
+
         if {"Nome", "Lucro", "Valor Apostado", "Local"}.issubset(df_cavalos.columns):
-# Calcular "Lucro Total"
             df_cavalos["Lucro Total"] = df_cavalos["Lucro"] - df_cavalos["Valor Apostado"]
-# Agrupar por "Nome" e calcular os valores de "Lucro Total"
+
             lucro_por_cavalo = df_cavalos.groupby("Nome")["Lucro Total"].sum().reset_index()
-# Gerar o gráfico de Lucro Total por Cavalo
-            st.write("### Gráficos")
             fig_bar_cavalo = px.bar(
-                lucro_por_cavalo,
-                x="Nome",
-                y="Lucro Total",
-                title="Lucro Total por Cavalo",
-                color="Lucro Total",
-                text="Lucro Total",
+                lucro_por_cavalo, x="Nome", y="Lucro Total", title="Lucro Total por Cavalo",
+                color="Lucro Total", text="Lucro Total",
                 labels={"Nome": "Cavalo", "Lucro Total": "Lucro Total (R$)"}
             )
-# Ajustar layout do gráfico de cavalos
             fig_bar_cavalo.update_traces(texttemplate='%{text:.2f}', textposition='outside')
-            fig_bar_cavalo.update_layout(
-                uniformtext_minsize=8,
-                uniformtext_mode='hide',
-                xaxis_title="Cavalo",
-                yaxis_title="Lucro Total (R$)",
-                title_x=0.5  # Centralizar título
-            )
-# Exibir o gráfico de cavalos
+            fig_bar_cavalo.update_layout(title_x=0.5, xaxis_title="Cavalo", yaxis_title="Lucro Total (R$)")
             st.plotly_chart(fig_bar_cavalo, use_container_width=True)
-# Agrupar por "Local" e calcular os valores de "Lucro Total"
+
+            # ✅ Gráfico de Lucro por Local
             lucro_por_local = df_cavalos.groupby("Local")["Lucro Total"].sum().reset_index()
-# Gerar o gráfico de Lucro Total por Local
             fig_bar_local = px.bar(
-                lucro_por_local,
-                x="Local",
-                y="Lucro Total",
-                title="Lucro Total por Local",
-                color="Lucro Total",
-                text="Lucro Total",
+                lucro_por_local, x="Local", y="Lucro Total", title="Lucro Total por Local",
+                color="Lucro Total", text="Lucro Total",
                 labels={"Local": "Local", "Lucro Total": "Lucro Total (R$)"}
             )
-# Ajustar layout do gráfico de locais
             fig_bar_local.update_traces(texttemplate='%{text:.2f}', textposition='outside')
-            fig_bar_local.update_layout(
-                uniformtext_minsize=8,
-                uniformtext_mode='hide',
-                xaxis_title="Local",
-                yaxis_title="Lucro Total (R$)",
-                title_x=0.5  # Centralizar título
-            )
-# Exibir o gráfico de locais
+            fig_bar_local.update_layout(title_x=0.5, xaxis_title="Local", yaxis_title="Lucro Total (R$)")
             st.plotly_chart(fig_bar_local, use_container_width=True)
+
         else:
-            st.warning("As colunas 'Nome', 'Lucro', 'Valor Apostado' e 'Local' são necessárias para gerar os gráficos.")
+            st.warning("⚠️ As colunas necessárias estão ausentes no arquivo!")
+
 except FileNotFoundError:
-    st.error(f"O arquivo '{nome_arquivo}' não foi encontrado. Certifique-se de que ele está na mesma pasta do aplicativo.")
+    st.error(f"❌ Arquivo '{nome_arquivo}' não encontrado!")
 except Exception as e:
-    st.error(f"Erro ao carregar ou processar os dados: {str(e)}")
+    st.error(f"⚠️ Erro ao carregar ou processar os dados: {str(e)}")
