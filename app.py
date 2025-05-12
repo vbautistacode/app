@@ -611,20 +611,24 @@ with tab4:
         inverter_logica = st.button("🔄 Inverter lógica de aposta")
         
         # ✅ Aplicar distribuição baseada na escolha do usuário
-        if inverter_logica:
-            df_favoritos["Valor Apostado"] = round(
-                (bankroll_favoritos / df_favoritos["Odds"].sum()) * (df_favoritos["Odds"].max() - df_favoritos["Odds"]), 2
-            )
-            logica_aplicada = "🔄 **Modo invertido:** Maior valor apostado nas menores odd."
+        if not df_favoritos.empty and "Odds" in df_favoritos.columns:
+            max_odds = df_favoritos["Odds"].max()  # Obtém o maior valor de odds
+            if inverter_logica:
+                df_favoritos["Valor Apostado"] = round(
+                    (bankroll_favoritos / df_favoritos["Odds"].sum()) * (df_favoritos["Odds"].max() - df_favoritos["Odds"]), 2
+                )
+                logica_aplicada = "🔄 **Modo invertido:** Maior valor apostado nas menores odd."
+            else:
+                df_favoritos["Valor Apostado"] = round(
+                    (bankroll_favoritos / df_favoritos["Odds"].sum()) * df_favoritos["Odds"], 2
+                )
+                logica_aplicada = "✅ **Modo padrão:** Maior valor apostado nas maiores odds."
+            st.write(logica_aplicada)
+    
+            # ✅ Exibir DataFrame atualizado
+            st.dataframe(df_favoritos[["Nome", "Odds", "Valor Apostado"]])
         else:
-            df_favoritos["Valor Apostado"] = round(
-                (bankroll_favoritos / df_favoritos["Odds"].sum()) * df_favoritos["Odds"], 2
-            )
-            logica_aplicada = "✅ **Modo padrão:** Maior valor apostado nas maiores odds."
-        st.write(logica_aplicada)
-
-        # ✅ Exibir DataFrame atualizado
-        st.dataframe(df_favoritos[["Nome", "Odds", "Valor Apostado"]])
+            st.warning("⚠️ Erro ao calcular valores apostados. Verifique os dados antes de continuar.")
             
         # ✅ Cálculo do valor total apostado e do lucro esperado
         total_apostado = df_favoritos["Valor Apostado"].sum()
