@@ -643,8 +643,8 @@ else:
     if not df_favoritos.empty:
         df_favoritos["Odds"] = pd.to_numeric(df_favoritos["Odds"], errors="coerce")
         df_favoritos.dropna(subset=["Odds"], inplace=True)
-      else:
-        st.warning("⚠️ Nenhum favorito foi identificado, verifique os dados disponíveis.")
+else:
+    st.warning("⚠️ Nenhum favorito foi identificado, verifique os dados disponíveis.")
   
     # ✅ Calcular retorno máximo e mínimo corretamente
     if not df_favoritos.empty and "Valor Apostado" in df_favoritos.columns:
