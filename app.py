@@ -829,7 +829,7 @@ with tab5:
     
                 lucro_por_cavalo = df_cavalos.groupby("Nome")["Lucro Total"].sum().reset_index()
                 fig_bar_cavalo = px.bar(
-                    lucro_por_cavalo, x="Nome", y="Lucro Total", title="Lucro Total por Cavalo",
+                    lucro_por_cavalo, x="Nome", y="Lucro Total", title="Lucro por Cavalo",
                     color="Lucro Total", text="Lucro Total",
                     labels={"Nome": "Cavalo", "Lucro Total": "Lucro Total (R$)"}
                 )
@@ -842,7 +842,7 @@ with tab5:
                 # ✅ Gráfico de Lucro por Local
                 lucro_por_local = df_cavalos.groupby("Local")["Lucro Total"].sum().reset_index()
                 fig_bar_local = px.bar(
-                    lucro_por_local, x="Local", y="Lucro Total", title="Lucro Total por Local",
+                    lucro_por_local, x="Local", y="Lucro Total", title="Lucro por Pista",
                     color="Lucro Total", text="Lucro Total",
                     labels={"Local": "Local", "Lucro Total": "Lucro Total (R$)"}
                 )
