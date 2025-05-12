@@ -801,7 +801,7 @@ with tab5:
     
         # ✅ Aba de Apostas
         with st.container():
-            st.write("### 🏆 Histórico de Performance Pessoal")
+            st.write("#### 🏆 Histórico de Performance Pessoal")
     
             if {"Nome", "Lucro", "Valor Apostado", "Odds"}.issubset(df_cavalos.columns):
                 df_cavalos["Lucro Total"] = df_cavalos["Lucro"] - df_cavalos["Valor Apostado"]
@@ -818,9 +818,11 @@ with tab5:
     
             else:
                 st.warning("⚠️ As colunas necessárias estão ausentes no arquivo!")
-    
+                
+            st.divider()
+            
             # ✅ Índice de Recuperação
-            st.write("### 🔄 Índice de Recuperação")
+            st.write("#### 🔄 Índice de Recuperação")
     
             if "Data" in df_cavalos.columns:
                 df_cavalos["Data"] = pd.to_datetime(df_cavalos["Data"], errors='coerce')
@@ -828,9 +830,11 @@ with tab5:
                 st.write(f"📅 **Média do Intervalo Entre Corridas:** {df_cavalos['Intervalo (Dias)'].mean():.2f} dias")
             else:
                 st.warning("⚠️ A coluna 'Data' é necessária para calcular o Índice de Recuperação.")
-    
+
+            st.divider()
+            
             # ✅ Gráfico de Lucro por Cavalo
-            st.write("### 📊 Gráficos")
+            st.write("#### 📊 Gráficos")
     
             if {"Nome", "Lucro", "Valor Apostado", "Local"}.issubset(df_cavalos.columns):
                 df_cavalos["Lucro Total"] = df_cavalos["Lucro"] - df_cavalos["Valor Apostado"]
@@ -844,7 +848,9 @@ with tab5:
                 fig_bar_cavalo.update_traces(texttemplate='%{text:.2f}', textposition='outside')
                 fig_bar_cavalo.update_layout(title_x=0.5, xaxis_title="Cavalo", yaxis_title="Lucro Total (R$)")
                 st.plotly_chart(fig_bar_cavalo, use_container_width=True)
-    
+                
+                st.divider()
+                
                 # ✅ Gráfico de Lucro por Local
                 lucro_por_local = df_cavalos.groupby("Local")["Lucro Total"].sum().reset_index()
                 fig_bar_local = px.bar(
