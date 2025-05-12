@@ -863,6 +863,18 @@ with tab5:
             else:
                 st.warning("⚠️ A coluna 'Data' é necessária para calcular o Índice de Recuperação.")
 
+            # Nome do arquivo local
+            nome_arquivo = "apostas_registradas.xlsx"
+            
+            # ✅ Exibir botão para download do arquivo
+            with open(nome_arquivo, "rb") as file:
+                st.download_button(
+                    label="📥 Baixar Registro de Apostas",
+                    data=file,
+                    file_name="apostas_registradas.xlsx",
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            )
+                
     except FileNotFoundError:
         st.error(f"❌ Arquivo '{nome_arquivo}' não encontrado!")
     except Exception as e:
