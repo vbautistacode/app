@@ -627,13 +627,14 @@ with tab4:
             # Modo padrão: maior valor apostado nas maiores odds
             fator_ajuste = bankroll_favoritos / df_favoritos["Odds"].sum()
             df_favoritos["Valor Apostado"] = round(df_favoritos["Odds"] * fator_ajuste, 2)
+            df_favoritos["Ganhos"] = round(df_favoritos["Odds"] * df_favoritos["Valor Apostado"], 2)
             logica_aplicada = "✅ **Modo padrão:** Maior valor apostado nas maiores odds."
     
         # ✅ Exibir mensagem sobre qual lógica está sendo aplicada
         st.write(logica_aplicada)
     
         # ✅ Exibir DataFrame atualizado
-        st.dataframe(df_favoritos[["Nome", "Odds", "Valor Apostado"]])
+        st.dataframe(df_favoritos[["Nome", "Odds", "Valor Apostado", "Ganhos"]])
     
         # ✅ Cálculo do valor total apostado e do lucro esperado
         total_apostado = df_favoritos["Valor Apostado"].sum()
