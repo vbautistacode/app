@@ -862,8 +862,6 @@ with tab5:
                 st.write(f"📅 **Média do Intervalo Entre Corridas:** {df_cavalos['Intervalo (Dias)'].mean():.2f} dias")
             else:
                 st.warning("⚠️ A coluna 'Data' é necessária para calcular o Índice de Recuperação.")
-
-            st.write("🔗 [Acessar arquivo de apostas no GitHub](https://github.com/vbautistacode/app/blob/main/apostas_registradas.xlsx)")
             
             # Nome do arquivo local
             nome_arquivo = "apostas_registradas.xlsx"
@@ -871,11 +869,12 @@ with tab5:
             # ✅ Exibir botão para download do arquivo
             with open(nome_arquivo, "rb") as file:
                 st.download_button(
-                    label="📥 Acessar Registro de Apostas",
+                    label="📥 Baixar Registro de Apostas",
                     data=file,
                     file_name="apostas_registradas.xlsx",
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 )
+                st.write("🔗 [Acessar arquivo de apostas no GitHub](https://github.com/vbautistacode/app/blob/main/apostas_registradas.xlsx)")
             
     except FileNotFoundError:
         st.error(f"❌ O arquivo '{nome_arquivo}' não foi encontrado.")
