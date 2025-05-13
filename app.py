@@ -918,7 +918,9 @@ with tab5:
                     salvar_aposta(local, nome_cavalo, odds, valor_apostado, resultado)
                 else:
                     st.warning("⚠️ Preencha todos os campos antes de salvar!")
-
+                    
+            st.divider()
+            
             # ✅ Exibir tabela com apostas já registradas
             try:
                 df_exibir = pd.read_excel(nome_arquivo)
