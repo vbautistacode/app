@@ -874,9 +874,6 @@ with tab5:
             else:
                 st.warning("⚠️ A coluna 'Data' é necessária para calcular o Índice de Recuperação.")
             
-            # ✅ Nome do arquivo local
-            nome_arquivo = "apostas_registradas.xlsx"
-            
         # ✅ Nome do arquivo da planilha
         nome_arquivo = "apostas_registradas.xlsx"
         
@@ -915,7 +912,15 @@ with tab5:
                     salvar_aposta(nome_cavalo, odds, valor_apostado)
                 else:
                     st.warning("⚠️ Preencha todos os campos antes de salvar!")
-        
+
+            # ✅ Exibir tabela com apostas já registradas
+        try:
+            df_exibir = pd.read_excel(nome_arquivo)
+            st.write("📊 **Apostas Registradas:**")
+            st.dataframe(df_exibir)
+        except FileNotFoundError:
+            st.info("ℹ️ Nenhuma aposta registrada ainda.")
+
             # ✅ Exibir botão para download do arquivo
             with open(nome_arquivo, "rb") as file:
                 st.download_button(
