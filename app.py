@@ -622,6 +622,7 @@ with tab4:
             odds_invertidas = max_odds - df_favoritos["Odds"]
             fator_ajuste = bankroll_favoritos / odds_invertidas.sum()
             df_favoritos["Valor Apostado"] = round(odds_invertidas * fator_ajuste, 2)
+            df_favoritos["Ganhos"] = round(df_favoritos["Odds"] * df_favoritos["Valor Apostado"], 2)
             logica_aplicada = "🔄 **Modo invertido:** Maior valor apostado nas menores odds."
         else:
             # Modo padrão: maior valor apostado nas maiores odds
