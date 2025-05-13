@@ -125,9 +125,10 @@ def calculate_dutching(odds, bankroll, historical_factor):
 def calcular_desempenho_equipes(team_data):
     if not team_data:
         st.warning("⚠️ Nenhum dado de equipe disponível.")
-        return pd.DataFrame(columns=["Nome da Equipe", "Desempenho Médio Ajustado"])
-
+        return pd.DataFrame(columns=["Nome da Equipe", "Desempenho Médio Ajustado", "Desvio Padrão"])
+    
     df_desempenho_lista = []
+    
     for team in team_data:
         # 🔹 Cálculo dos desempenhos individuais
         podiums_horse = team.get("Wins", 0) + team.get("2nds", 0) + team.get("3rds", 0)
@@ -142,15 +143,21 @@ def calcular_desempenho_equipes(team_data):
         runs_trainer = max(team.get("Treinador Runs", 1), 1)
         desempenho_trainer = podiums_trainer / runs_trainer
 
-        desempenhos = [desempenho_horse, desempenho_jockey, desempenho_trainer]
-        
-        # 🔹 Melhorando o cálculo com desvio padrão
-        media_desempenho = np.mean(desempenhos)
-        variancia_desempenho = np.var(desempenhos)
-        desvio_padrao = np.std(desempenhos)
+        desempenhos = np.array([desempenho_horse, desempenho_jockey, desempenho_trainer])
 
-        # 🔹 Ajuste com ponderação do desvio padrão
-        resultado_ajustado = media_desempenho - (0.5 * desvio_padrao)  # O peso 0.5 pode ser ajustado
+        # 🔹 Normalização dos desempenhos
+        desempenhos_norm = desempenhos / np.max(desempenhos) if np.max(desempenhos) > 0 else desempenhos
+
+        # 🔹 Ponderação dos fatores
+        peso_horse = 0.5
+        peso_jockey = 0.3
+        peso_trainer = 0.2
+        media_desempenho = (desempenhos_norm[0] * peso_horse) + (desempenhos_norm[1] * peso_jockey) + (desempenhos_norm[2] * peso_trainer)
+
+        # 🔹 Melhorando o ajuste com desvio padrão adaptativo
+        desvio_padrao = np.std(desempenhos_norm)
+        peso_ajuste = desvio_padrao / (media_desempenho + 1)  # Ajuste dinâmico para variação
+        resultado_ajustado = media_desempenho - (peso_ajuste * desvio_padrao)
 
         df_desempenho_lista.append({
             "Nome da Equipe": team["Nome da Equipe"],
