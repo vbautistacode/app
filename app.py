@@ -902,26 +902,25 @@ with tab5:
             
             # ✅ Criar campos de entrada na aba "tab5"
             
-                st.write("### 🏇 Registrar Nova Aposta")
-            
-                nome_cavalo = st.text_input("🐴 Nome do Cavalo")
-                odds = st.number_input("📊 Odds", min_value=1.0, step=0.01, value=2.0)
-                valor_apostado = st.number_input("💰 Valor Apostado", min_value=1.0, step=0.1, value=10.0)
-            
-                if st.button("📌 Salvar Aposta"):
-                    if nome_cavalo and odds and valor_apostado:
-                        salvar_aposta(nome_cavalo, odds, valor_apostado)
-                    else:
-                        st.warning("⚠️ Preencha todos os campos antes de salvar!")
-            
-                # ✅ Exibir tabela com apostas já registradas
-                try:
-                    df_exibir = pd.read_excel(nome_arquivo)
-                    st.write("📊 **Apostas Registradas:**")
-                    st.dataframe(df_exibir)
-                except FileNotFoundError:
-                    st.info("ℹ️ Nenhuma aposta registrada ainda.")
-                            
+            st.write("### 🏇 Registrar Nova Aposta")
+            nome_cavalo = st.text_input("🐴 Nome do Cavalo")
+            odds = st.number_input("📊 Odds", min_value=1.0, step=0.01, value=2.0)
+            valor_apostado = st.number_input("💰 Valor Apostado", min_value=1.0, step=0.1, value=10.0)
+        
+            if st.button("📌 Salvar Aposta"):
+                if nome_cavalo and odds and valor_apostado:
+                    salvar_aposta(nome_cavalo, odds, valor_apostado)
+                else:
+                    st.warning("⚠️ Preencha todos os campos antes de salvar!")
+        
+            # ✅ Exibir tabela com apostas já registradas
+            try:
+                df_exibir = pd.read_excel(nome_arquivo)
+                st.write("📊 **Apostas Registradas:**")
+                st.dataframe(df_exibir)
+            except FileNotFoundError:
+                st.info("ℹ️ Nenhuma aposta registrada ainda.")
+                        
     except FileNotFoundError:
         st.error(f"❌ O arquivo '{nome_arquivo}' não foi encontrado.")
 
