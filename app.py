@@ -824,7 +824,7 @@ with tab5:
                     "Odds": "mean"
                 }).rename(columns={"Odds": "Odds Média"})
     
-                st.dataframe(performance_pessoal)
+                #st.dataframe(performance_pessoal)
                 st.write(f"💰 **Lucro Total:** R$ {performance_pessoal['Lucro Total'].sum():,.2f}")
     
             else:
