@@ -932,8 +932,8 @@ with tab5:
                         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                     )
                 
-        except FileNotFoundError:
-            st.error(f"❌ O arquivo '{nome_arquivo}' não foi encontrado.")
-    
-        except Exception as e:
-            st.error(f"⚠️ Erro ao carregar ou processar os dados: {str(e)}")
+    except FileNotFoundError:
+        st.error(f"❌ O arquivo '{nome_arquivo}' não foi encontrado.")
+
+    except Exception as e:
+        st.error(f"⚠️ Erro ao carregar ou processar os dados: {str(e)}")
