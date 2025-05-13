@@ -863,6 +863,8 @@ with tab5:
             else:
                 st.warning("⚠️ A coluna 'Data' é necessária para calcular o Índice de Recuperação.")
 
+            st.write("🔗 [Acessar arquivo de apostas no GitHub](https://github.com/vbautistacode/app/blob/main/apostas_registradas.xlsx)")
+            
             # Nome do arquivo local
             nome_arquivo = "apostas_registradas.xlsx"
             
