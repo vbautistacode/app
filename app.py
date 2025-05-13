@@ -804,9 +804,6 @@ with tab5:
         except FileNotFoundError:
             st.error(f"❌ Arquivo '{nome_arquivo_local}' não encontrado!")
     
-    # ✅ Carregar dados do arquivo Excel
-    nome_arquivo = "apostas_registradas.xlsx"
-    
     try:
         df_cavalos = pd.read_excel(nome_arquivo)
     
@@ -902,7 +899,8 @@ with tab5:
                 except Exception as e:
                     st.error(f"⚠️ Erro ao salvar aposta: {str(e)}")
             
-            # ✅ Criar campos de entrada na aba
+            # ✅ Criar campos de entrada na aba "tab5"
+            with tab5:
                 st.write("### 🏇 Registrar Nova Aposta")
             
                 nome_cavalo = st.text_input("🐴 Nome do Cavalo")
@@ -914,24 +912,15 @@ with tab5:
                         salvar_aposta(nome_cavalo, odds, valor_apostado)
                     else:
                         st.warning("⚠️ Preencha todos os campos antes de salvar!")
-    
+            
                 # ✅ Exibir tabela com apostas já registradas
-            try:
-                df_exibir = pd.read_excel(nome_arquivo)
-                st.write("📊 **Apostas Registradas:**")
-                st.dataframe(df_exibir)
-            except FileNotFoundError:
-                st.info("ℹ️ Nenhuma aposta registrada ainda.")
-    
-                # ✅ Exibir botão para download do arquivo
-                with open(nome_arquivo, "rb") as file:
-                    st.download_button(
-                        label="📥 Baixar Registro de Apostas",
-                        data=file,
-                        file_name="apostas_registradas.xlsx",
-                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                    )
-                
+                try:
+                    df_exibir = pd.read_excel(nome_arquivo)
+                    st.write("📊 **Apostas Registradas:**")
+                    st.dataframe(df_exibir)
+                except FileNotFoundError:
+                    st.info("ℹ️ Nenhuma aposta registrada ainda.")
+                            
     except FileNotFoundError:
         st.error(f"❌ O arquivo '{nome_arquivo}' não foi encontrado.")
 
