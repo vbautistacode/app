@@ -903,8 +903,7 @@ with tab5:
             except Exception as e:
                 st.error(f"⚠️ Erro ao salvar aposta: {str(e)}")
         
-        # ✅ Criar campos de entrada na aba "tab5"
-        with tab5:
+        # ✅ Criar campos de entrada na aba
             st.write("### 🏇 Registrar Nova Aposta")
         
             nome_cavalo = st.text_input("🐴 Nome do Cavalo")
@@ -916,14 +915,6 @@ with tab5:
                     salvar_aposta(nome_cavalo, odds, valor_apostado)
                 else:
                     st.warning("⚠️ Preencha todos os campos antes de salvar!")
-        
-            # ✅ Exibir tabela com apostas já registradas
-            try:
-                df_exibir = pd.read_excel(nome_arquivo)
-                st.write("📊 **Apostas Registradas:**")
-                st.dataframe(df_exibir)
-            except FileNotFoundError:
-                st.info("ℹ️ Nenhuma aposta registrada ainda.")
         
             # ✅ Exibir botão para download do arquivo
             with open(nome_arquivo, "rb") as file:
