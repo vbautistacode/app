@@ -923,7 +923,7 @@ with tab5:
                 st.write("📊 **Apostas Registradas:**")
                 st.dataframe(df_exibir)
             except FileNotFoundError:
-        st.info("ℹ️ Nenhuma aposta registrada ainda.")
+                st.info("ℹ️ Nenhuma aposta registrada ainda.")
         
             # ✅ Exibir botão para download do arquivo
             with open(nome_arquivo, "rb") as file:
