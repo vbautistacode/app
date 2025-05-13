@@ -874,9 +874,57 @@ with tab5:
             else:
                 st.warning("⚠️ A coluna 'Data' é necessária para calcular o Índice de Recuperação.")
             
-            # Nome do arquivo local
+            # ✅ Nome do arquivo local
             nome_arquivo = "apostas_registradas.xlsx"
             
+        # ✅ Nome do arquivo da planilha
+        nome_arquivo = "apostas_registradas.xlsx"
+        
+        # ✅ Função para salvar apostas no Excel
+        def salvar_aposta(nome, odds, valor_apostado):
+            try:
+                # 🔹 Verificar se o arquivo já existe
+                try:
+                    df_apostas = pd.read_excel(nome_arquivo)
+                except FileNotFoundError:
+                    df_apostas = pd.DataFrame(columns=["Nome", "Odds", "Valor Apostado", "Ganhos"])
+        
+                # 🔹 Calcular "Ganhos"
+                ganhos = round(odds * valor_apostado, 2)
+        
+                # 🔹 Adicionar nova aposta ao DataFrame
+                nova_aposta = pd.DataFrame([[nome, odds, valor_apostado, ganhos]], columns=df_apostas.columns)
+                df_apostas = pd.concat([df_apostas, nova_aposta], ignore_index=True)
+        
+                # 🔹 Salvar no Excel
+                df_apostas.to_excel(nome_arquivo, index=False)
+                st.success(f"✅ Aposta salva com sucesso! 🏇 {nome} - R$ {valor_apostado:.2f}")
+        
+            except Exception as e:
+                st.error(f"⚠️ Erro ao salvar aposta: {str(e)}")
+        
+        # ✅ Criar campos de entrada na aba "tab5"
+        with tab5:
+            st.write("### 🏇 Registrar Nova Aposta")
+        
+            nome_cavalo = st.text_input("🐴 Nome do Cavalo")
+            odds = st.number_input("📊 Odds", min_value=1.0, step=0.01, value=2.0)
+            valor_apostado = st.number_input("💰 Valor Apostado", min_value=1.0, step=0.1, value=10.0)
+        
+            if st.button("📌 Salvar Aposta"):
+                if nome_cavalo and odds and valor_apostado:
+                    salvar_aposta(nome_cavalo, odds, valor_apostado)
+                else:
+                    st.warning("⚠️ Preencha todos os campos antes de salvar!")
+        
+            # ✅ Exibir tabela com apostas já registradas
+            try:
+                df_exibir = pd.read_excel(nome_arquivo)
+                st.write("📊 **Apostas Registradas:**")
+                st.dataframe(df_exibir)
+            except FileNotFoundError:
+        st.info("ℹ️ Nenhuma aposta registrada ainda.")
+        
             # ✅ Exibir botão para download do arquivo
             with open(nome_arquivo, "rb") as file:
                 st.download_button(
@@ -885,7 +933,6 @@ with tab5:
                     file_name="apostas_registradas.xlsx",
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 )
-                st.write("🔗 [Acessar arquivo de apostas no GitHub](https://github.com/vbautistacode/app/blob/main/apostas_registradas.xlsx)")
             
     except FileNotFoundError:
         st.error(f"❌ O arquivo '{nome_arquivo}' não foi encontrado.")
