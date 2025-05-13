@@ -771,30 +771,30 @@ with tab4:
 
 with tab5:
 # ✅ Nome do arquivo da planilha
-nome_arquivo = "apostas_registradas.xlsx"
-
-# ✅ Função para salvar apostas no Excel
-def salvar_aposta(nome, odds, valor_apostado):
-    try:
-        # 🔹 Verificar se o arquivo já existe
+    nome_arquivo = "apostas_registradas.xlsx"
+    
+    # ✅ Função para salvar apostas no Excel
+    def salvar_aposta(nome, odds, valor_apostado):
         try:
-            df_apostas = pd.read_excel(nome_arquivo)
-        except FileNotFoundError:
-            df_apostas = pd.DataFrame(columns=["Nome", "Odds", "Valor Apostado", "Ganhos"])
-
-        # 🔹 Calcular "Ganhos"
-        ganhos = round(odds * valor_apostado, 2)
-
-        # 🔹 Adicionar nova aposta ao DataFrame
-        nova_aposta = pd.DataFrame([[nome, odds, valor_apostado, ganhos]], columns=df_apostas.columns)
-        df_apostas = pd.concat([df_apostas, nova_aposta], ignore_index=True)
-
-        # 🔹 Salvar no Excel
-        df_apostas.to_excel(nome_arquivo, index=False)
-        st.success(f"✅ Aposta salva com sucesso! 🏇 {nome} - R$ {valor_apostado:.2f}")
-
-    except Exception as e:
-        st.error(f"⚠️ Erro ao salvar aposta: {str(e)}")
+            # 🔹 Verificar se o arquivo já existe
+            try:
+                df_apostas = pd.read_excel(nome_arquivo)
+            except FileNotFoundError:
+                df_apostas = pd.DataFrame(columns=["Nome", "Odds", "Valor Apostado", "Ganhos"])
+    
+            # 🔹 Calcular "Ganhos"
+            ganhos = round(odds * valor_apostado, 2)
+    
+            # 🔹 Adicionar nova aposta ao DataFrame
+            nova_aposta = pd.DataFrame([[nome, odds, valor_apostado, ganhos]], columns=df_apostas.columns)
+            df_apostas = pd.concat([df_apostas, nova_aposta], ignore_index=True)
+    
+            # 🔹 Salvar no Excel
+            df_apostas.to_excel(nome_arquivo, index=False)
+            st.success(f"✅ Aposta salva com sucesso! 🏇 {nome} - R$ {valor_apostado:.2f}")
+    
+        except Exception as e:
+            st.error(f"⚠️ Erro ao salvar aposta: {str(e)}")
 
 # ✅ Definição da função para salvar arquivo no GitHub
     def salvar_xlsx_no_github(nome_arquivo_local, nome_arquivo_remoto):
