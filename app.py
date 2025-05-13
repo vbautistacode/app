@@ -774,27 +774,32 @@ with tab5:
     nome_arquivo = "apostas_registradas.xlsx"
     
     # ✅ Função para salvar apostas no Excel
-    def salvar_aposta(nome, odds, valor_apostado):
+    def salvar_aposta(local, nome, odds, valor_apostado, resultado="Pendente"):
+    try:
+        # 🔹 Verificar se o arquivo já existe
         try:
-            # 🔹 Verificar se o arquivo já existe
-            try:
-                df_apostas = pd.read_excel(nome_arquivo)
-            except FileNotFoundError:
-                df_apostas = pd.DataFrame(columns=["Nome", "Odds", "Valor Apostado", "Ganhos"])
-    
-            # 🔹 Calcular "Ganhos"
-            ganhos = round(odds * valor_apostado, 2)
-    
-            # 🔹 Adicionar nova aposta ao DataFrame
-            nova_aposta = pd.DataFrame([[nome, odds, valor_apostado, ganhos]], columns=df_apostas.columns)
-            df_apostas = pd.concat([df_apostas, nova_aposta], ignore_index=True)
-    
-            # 🔹 Salvar no Excel
-            df_apostas.to_excel(nome_arquivo, index=False)
-            st.success(f"✅ Aposta salva com sucesso! 🏇 {nome} - R$ {valor_apostado:.2f}")
-    
-        except Exception as e:
-            st.error(f"⚠️ Erro ao salvar aposta: {str(e)}")
+            df_apostas = pd.read_excel(nome_arquivo)
+        except FileNotFoundError:
+            df_apostas = pd.DataFrame(columns=["Local", "Nome", "Odds", "Valor Apostado", "Resultado", "Lucro", "Data", "Hora"])
+
+        # 🔹 Calcular "Lucro" (se o resultado ainda for indefinido, deixamos como 0)
+        lucro = round((odds * valor_apostado) - valor_apostado, 2) if resultado == "Vitória" else -valor_apostado
+
+        # 🔹 Adicionar Data e Hora automaticamente
+        data_atual = datetime.now().strftime("%Y-%m-%d")
+        hora_atual = datetime.now().strftime("%H:%M:%S")
+
+        # 🔹 Criar nova linha com todos os campos necessários
+        nova_aposta = pd.DataFrame([[local, nome, odds, valor_apostado, resultado, lucro, data_atual, hora_atual]], columns=df_apostas.columns)
+
+        # 🔹 Concatenar ao DataFrame e salvar no Excel
+        df_apostas = pd.concat([df_apostas, nova_aposta], ignore_index=True)
+        df_apostas.to_excel(nome_arquivo, index=False)
+
+        st.success(f"✅ Aposta salva com sucesso! 🏇 {nome} - Local: {local} - R$ {valor_apostado:.2f}")
+
+    except Exception as e:
+        st.error(f"⚠️ Erro ao salvar aposta: {str(e)}")
 
 # ✅ Definição da função para salvar arquivo no GitHub
     def salvar_xlsx_no_github(nome_arquivo_local, nome_arquivo_remoto):
@@ -900,19 +905,20 @@ with tab5:
                 
             st.divider()
             
-            # ✅ Criar campos de entrada na aba "tab5"
+            # ✅ Criar campos de entrada"
             
-            st.write("### 🏇 Registrar Nova Aposta")
+            local = st.text_input("📍 Local da Corrida")
             nome_cavalo = st.text_input("🐴 Nome do Cavalo")
             odds = st.number_input("📊 Odds", min_value=1.0, step=0.01, value=2.0)
             valor_apostado = st.number_input("💰 Valor Apostado", min_value=1.0, step=0.1, value=10.0)
+            resultado = st.selectbox("🏆 Resultado", ["Vitória", "Derrota", "Pendente"])  # Usuário pode definir resultado
         
             if st.button("📌 Salvar Aposta"):
-                if nome_cavalo and odds and valor_apostado:
-                    salvar_aposta(nome_cavalo, odds, valor_apostado)
+                if local and nome_cavalo and odds and valor_apostado:
+                    salvar_aposta(local, nome_cavalo, odds, valor_apostado, resultado)
                 else:
                     st.warning("⚠️ Preencha todos os campos antes de salvar!")
-        
+
             # ✅ Exibir tabela com apostas já registradas
             try:
                 df_exibir = pd.read_excel(nome_arquivo)
