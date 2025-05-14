@@ -794,8 +794,8 @@ with tab5:
     
             st.success(f"✅ Aposta salva com sucesso! 🏇 {nome} - Local: {local} - Hora: {hora.strftime('%H:%M')} - R$ {valor_apostado:.2f} - Lucro: R$ {lucro:.2f}")
 
-    except Exception as e:
-        st.error(f"⚠️ Erro ao salvar aposta: {str(e)}")
+        except Exception as e:
+            st.error(f"⚠️ Erro ao salvar aposta: {str(e)}")
 
 # ✅ Definição da função para salvar arquivo no GitHub
     def salvar_xlsx_no_github(nome_arquivo_local, nome_arquivo_remoto):
