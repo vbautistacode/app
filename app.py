@@ -676,8 +676,8 @@ with tab4:
             # ✅ Bloco 2 - Exibir cálculos de retorno máximo e mínimo
             with col2:
                 st.write("🔝 **Cálculo de Retorno:**")
-                st.write(f"📈 **Retorno Máximo:** R$ {retorno_maximo:.2f}")
-                st.write(f"📉 **Retorno Mínimo:** R$ {retorno_minimo:.2f}")
+                st.write(f"📈 **Retorno Máximo (+odds):** R$ {retorno_maximo:.2f}")
+                st.write(f"📉 **Retorno Mínimo (-odds):** R$ {retorno_minimo:.2f}")
         else:
             st.warning("⚠️ Não há dados suficientes para calcular retorno máximo e mínimo.")
         
@@ -755,15 +755,15 @@ with tab4:
             with col1:
                 st.write("🔝 **Apostas nos 50% Menores Odds**")
                 st.write(f"💰 **Total de Aposta:** R$ {soma_top50:.2f}")
-                st.write(f"📈 **Retorno Máximo:** R$ {retorno_maximo_top50:.2f}")
-                st.write(f"📉 **Retorno Mínimo:** R$ {retorno_minimo_top50:.2f}")
+                st.write(f"📈 **Retorno Máximo (+odds):** R$ {retorno_maximo_top50:.2f}")
+                st.write(f"📉 **Retorno Mínimo (-odds):** R$ {retorno_minimo_top50:.2f}")
             
             # ✅ Bloco 2 - Apostas nos 50% restantes valores de odds
             with col2:
                 st.write("🔻 **Apostas nos 50% Maiores Odds**")
                 st.write(f"💰 **Total de Aposta:** R$ {soma_bottom50:.2f}")
-                st.write(f"📈 **Retorno Máximo:** R$ {retorno_maximo_bottom50:.2f}")
-                st.write(f"📉 **Retorno Mínimo:** R$ {retorno_minimo_bottom50:.2f}")
+                st.write(f"📈 **Retorno Máximo (+odds):** R$ {retorno_maximo_bottom50:.2f}")
+                st.write(f"📉 **Retorno Mínimo (-odds):** R$ {retorno_minimo_bottom50:.2f}")
     
             st.divider()
 
