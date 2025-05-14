@@ -901,25 +901,36 @@ with tab5:
                 
             st.divider()
             
-            # ✅ Criar campos de entrada"
+            # ✅ Criar campos de entrada
             st.write("### 🏇 Registrar Nova Aposta")
             col1, col2 = st.columns(2)
+            
             with col1:
                 local = st.text_input("📍 Local da Corrida")
-                hora = st.time_input("⏰ Insira o horário da prova:", value=time(12,0))
+                hora = st.time_input("⏰ Insira o horário da prova:", value=time(12, 0), key="hora_aposta")  # Adicionado key único
                 nome_cavalo = st.text_input("🐴 Nome do Cavalo")
                 odds = st.number_input("📊 Odds", min_value=1.0, step=0.01, value=2.0)
-
+            
             with col2:
                 valor_apostado = st.number_input("💰 Valor Apostado", min_value=1.0, step=0.1, value=10.0)
                 lucro = st.number_input("💰 Lucro", min_value=-10000.0, step=0.1, value=0.0)  # Usuário insere manualmente
                 resultado = st.selectbox("🏆 Resultado", ["Vitória", "Derrota", "Pendente"])  # Usuário pode definir resultado
-        
+            
             if st.button("📌 Salvar Aposta"):
                 if local and nome_cavalo and hora and odds and valor_apostado:
                     salvar_aposta(local, nome_cavalo, hora, odds, valor_apostado, lucro, resultado)
                 else:
                     st.warning("⚠️ Preencha todos os campos antes de salvar!")
+            
+            st.divider()
+            
+            # ✅ Exibir tabela com apostas já registradas
+            try:
+                df_exibir = pd.read_excel(nome_arquivo)
+                st.write("📊 **Apostas Registradas:**")
+                st.dataframe(df_exibir)
+            except FileNotFoundError:
+                st.info("ℹ️ Nenhuma aposta registrada ainda.")
                     
             st.divider()
             
