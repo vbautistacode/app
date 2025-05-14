@@ -933,14 +933,6 @@ with tab5:
                 st.info("ℹ️ Nenhuma aposta registrada ainda.")
                     
             st.divider()
-            
-            # ✅ Exibir tabela com apostas já registradas
-            try:
-                df_exibir = pd.read_excel(nome_arquivo)
-                st.write("📊 **Apostas Registradas:**")
-                st.dataframe(df_exibir)
-            except FileNotFoundError:
-                st.info("ℹ️ Nenhuma aposta registrada ainda.")
                         
     except FileNotFoundError:
         st.error(f"❌ O arquivo '{nome_arquivo}' não foi encontrado.")
