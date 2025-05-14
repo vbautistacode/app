@@ -903,7 +903,7 @@ with tab5:
             
             # ✅ Criar campos de entrada"
             st.write("### 🏇 Registrar Nova Aposta")
-            col1, col2 = st.columns(2)col1, col2 = st.columns(2)
+            col1, col2 = st.columns(2)
             with col1:
                 local = st.text_input("📍 Local da Corrida")
                 hora = st.time_input("⏰ Insira o horário da prova:", value=time(12,0))
