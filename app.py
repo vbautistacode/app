@@ -933,6 +933,16 @@ with tab5:
                 df_exibir = pd.read_excel(nome_arquivo)
                 st.write("📊 **Apostas Registradas:**")
                 st.dataframe(df_exibir)
+
+                # ✅ Criar botão de download do arquivo
+                with open(nome_arquivo, "rb") as f:
+                    st.download_button(
+                        label="⬇️ Baixar Apostas Registradas",
+                        data=f,
+                        file_name="apostas_registradas.xlsx",
+                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                    )
+                    
             except FileNotFoundError:
                 st.info("ℹ️ Nenhuma aposta registrada ainda.")
                     
