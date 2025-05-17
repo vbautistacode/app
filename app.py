@@ -676,7 +676,7 @@ with tab4:
         st.write(logica_aplicada)
     
         # ✅ Exibir DataFrame atualizado
-        st.dataframe(df_favoritos[["Nome", "Odds", "Valor Apostado", "Ganhos", "Probabilidade Implícita", "Probabilidade Ajustada", "Valor Esperado (EV)"]])
+        st.dataframe(df_favoritos[["Nome", "Odds", "Valor Apostado", "Ganhos", "Probabilidade Ajustada", "Valor Esperado (EV)"]])
     
         # ✅ Cálculo do valor total apostado e do lucro esperado
         total_apostado = df_favoritos["Valor Apostado"].sum()
