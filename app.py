@@ -547,15 +547,19 @@ with tab4:
         top_desempenho = df_desempenho.nlargest(3, "Desempenho Médio Ajustado")
     
         # ✅ Exibir o Top 3 lado a lado
-        st.markdown("<h2 style='text-align: left; font-size: 18px;'>🏆 Top 3 Melhores Desempenhos 🏆</h2>", unsafe_allow_html=True)
-        col1, col2, col3 = st.columns(3)  # Criando três colunas para exibir os melhores
-        with col1:
-            st.write(f"🥇 **{top_desempenho.iloc[0]['Nome da Equipe']}** → {top_desempenho.iloc[0]['Desempenho Médio Ajustado']:.2f}")
-        with col2:
-            st.write(f"🥈 **{top_desempenho.iloc[1]['Nome da Equipe']}** → {top_desempenho.iloc[1]['Desempenho Médio Ajustado']:.2f}")
-        with col3:
-            st.write(f"🥉 **{top_desempenho.iloc[2]['Nome da Equipe']}** → {top_desempenho.iloc[2]['Desempenho Médio Ajustado']:.2f}")
-            st.text("")
+        if len(top_desempenho) >= 3:
+            st.markdown("<h2 style='text-align: left; font-size: 18px;'>🏆 Top 3 Melhores Desempenhos 🏆</h2>", unsafe_allow_html=True)
+            col1, col2, col3 = st.columns(3)  # Criando três colunas para exibir os melhores
+            with col1:
+                st.write(f"🥇 **{top_desempenho.iloc[0]['Nome da Equipe']}** → {top_desempenho.iloc[0]['Desempenho Médio Ajustado']:.2f}")
+            with col2:
+                st.write(f"🥈 **{top_desempenho.iloc[1]['Nome da Equipe']}** → {top_desempenho.iloc[1]['Desempenho Médio Ajustado']:.2f}")
+            with col3:
+                st.write(f"🥉 **{top_desempenho.iloc[2]['Nome da Equipe']}** → {top_desempenho.iloc[2]['Desempenho Médio Ajustado']:.2f}")
+                st.text("")
+        else:
+            st.warning("⚠️ Dados insuficientes para exibir o Top 3. Insira mais informações.")
+
         # ✅ Filtrar as equipes restantes
         equipes_restantes = df_desempenho[~df_desempenho["Nome da Equipe"].isin(top_desempenho["Nome da Equipe"])]
     
@@ -792,7 +796,7 @@ with tab5:
             df_apostas = pd.concat([df_apostas, nova_aposta], ignore_index=True)
             df_apostas.to_excel(nome_arquivo, index=False)
     
-            st.success(f"✅ Aposta salva com sucesso! 🏇 {nome} - Local: {local} - Hora: {hora.strftime('%H:%M')} - R$ {valor_apostado:.2f} - Lucro: R$ {lucro:.2f}")
+            st.success(f"✅ Aposta salva com sucesso! 🏇 {nome} - Local: {local} - Hora: {hora.strftime('%H:%M')} - Valor: {valor_apostado:.2f} - Lucro: {lucro:.2f}")
 
         except Exception as e:
             st.error(f"⚠️ Erro ao salvar aposta: {str(e)}")
