@@ -185,6 +185,16 @@ def calcular_aposta_ajustada(df, bankroll_favoritos, prob_vitoria_favorito):
 
     return df
 
+# ✅ Função para calcular probabilidade implícita das odds
+def calcular_probabilidade_implicita(odds):
+    return (1 / odds) * 100
+
+# ✅ Função para calcular odds ajustadas removendo a margem das casas de apostas
+def remover_margem_casas(df):
+    soma_probabilidades = df["Probabilidade Implícita"].sum()
+    df["Probabilidade Ajustada"] = (df["Probabilidade Implícita"] / soma_probabilidades) * 100
+    return df
+
 # --- Interface Streamlit ---
 st.title("Apostas | Estratégias Dutching")
 
@@ -620,6 +630,13 @@ with tab4:
         # ✅ Ajuste correto do bankroll, distribuindo proporcionalmente
         bankroll_favoritos = bankroll * percentual_bankroll_favoritos
         df_favoritos["Valor Apostado"] = round((bankroll_favoritos / df_favoritos["Odds"].sum()) * df_favoritos["Odds"], 2)
+
+        # ✅ Cálculo da probabilidade implícita das odds
+        df_favoritos["Probabilidade Implícita"] = df_favoritos["Odds"].apply(lambda odds: (1 / odds) * 100)
+    
+        # ✅ Ajustar odds removendo a margem das casas de apostas
+        soma_probabilidades = df_favoritos["Probabilidade Implícita"].sum()
+        df_favoritos["Probabilidade Ajustada"] = (df_favoritos["Probabilidade Implícita"] / soma_probabilidades) * 100
         
         # ✅ Botão para inverter lógica de distribuição das apostas
         inverter_logica = st.button("Inverter lógica de aposta")
@@ -648,7 +665,7 @@ with tab4:
         st.write(logica_aplicada)
     
         # ✅ Exibir DataFrame atualizado
-        st.dataframe(df_favoritos[["Nome", "Odds", "Valor Apostado", "Ganhos"]])
+        st.dataframe(df_favoritos[["Nome", "Odds", "Valor Apostado", "Ganhos","Probabilidade Implícita", "Probabilidade Ajustada"]])
     
         # ✅ Cálculo do valor total apostado e do lucro esperado
         total_apostado = df_favoritos["Valor Apostado"].sum()
