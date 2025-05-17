@@ -194,6 +194,12 @@ def remover_margem_casas(df):
     soma_probabilidades = df["Probabilidade Implícita"].sum()
     df["Probabilidade Ajustada"] = (df["Probabilidade Implícita"] / soma_probabilidades) * 100
     return df
+    
+# ✅ Função para calcular o Valor Esperado (EV)
+def calcular_valor_esperado(probabilidade_real, odds, valor_apostado):
+    retorno_potencial = odds * valor_apostado
+    ev = (probabilidade_real * retorno_potencial) - valor_apostado
+    return round(ev, 2)
 
 # --- Interface Streamlit ---
 st.title("Apostas | Estratégias Dutching")
@@ -637,7 +643,12 @@ with tab4:
         # ✅ Ajustar odds removendo a margem das casas de apostas
         soma_probabilidades = df_favoritos["Probabilidade Implícita"].sum()
         df_favoritos["Probabilidade Ajustada"] = (df_favoritos["Probabilidade Implícita"] / soma_probabilidades) * 100
-        
+
+        # ✅ Calcular o EV de cada aposta
+        df_favoritos["Valor Esperado (EV)"] = df_favoritos.apply(
+            lambda row: calcular_valor_esperado(row["Probabilidade Ajustada"] / 100, row["Odds"], row["Valor Apostado"]), axis=1
+        )
+                
         # ✅ Botão para inverter lógica de distribuição das apostas
         inverter_logica = st.button("Inverter lógica de aposta")
 
@@ -665,7 +676,7 @@ with tab4:
         st.write(logica_aplicada)
     
         # ✅ Exibir DataFrame atualizado
-        st.dataframe(df_favoritos[["Nome", "Odds", "Valor Apostado", "Ganhos", "Probabilidade Implícita", "Probabilidade Ajustada"]])
+        st.dataframe(df_favoritos[["Nome", "Odds", "Valor Apostado", "Ganhos", "Probabilidade Implícita", "Probabilidade Ajustada", "Valor Esperado (EV)"]])
     
         # ✅ Cálculo do valor total apostado e do lucro esperado
         total_apostado = df_favoritos["Valor Apostado"].sum()
