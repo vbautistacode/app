@@ -910,8 +910,8 @@ with tab5:
             col1, col2 = st.columns(2)
             
             with col1:
-                local = st.text_input("📍 Local da Corrida")
-                hora = st.time_input("⏰ Insira o horário da prova:", value=time(12, 0), key="hora_aposta")  # Adicionado key único
+                local = st.text_input("📍 Local da Corrida", value=st.session_state.get("local_atual",""))
+                hora = st.time_input("⏰ Insira o horário da prova:", value=st.session_state.get("hora_prova", time(12, 0)))
                 nome_cavalo = st.text_input("🐴 Nome do Cavalo")
             
             with col2:
